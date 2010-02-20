@@ -3,14 +3,14 @@ package com.carrotsearch.junitbenchmarks;
 import java.util.List;
 
 /**
- * Statistics from multiple {@link Result}s.
+ * Calculate simple statistics from multiple {@link SingleResult}s.
  */
-class Statistics
+final class Statistics
 {
     public Average gc;
     public Average evaluation;
 
-    public static Statistics from(List<Result> results)
+    public static Statistics from(List<SingleResult> results)
     {
         final Statistics stats = new Statistics();
         long [] times = new long [results.size()];

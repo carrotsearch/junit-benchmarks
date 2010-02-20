@@ -5,24 +5,34 @@ import java.util.Locale;
 /**
  * Average with standard deviation.
  */
-class Average
+public final class Average
 {
-    final double avg;
-    final double stddev;
+    /**
+     * Average (in milliseconds).
+     */
+    public final double avg;
 
-    public Average(double avg, double stddev)
+    /**
+     * Standard deviation (in milliseconds).
+     */
+    public final double stddev;
+
+    /**
+     * 
+     */
+    Average(double avg, double stddev)
     {
         this.avg = avg;
         this.stddev = stddev;
     }
 
-    public String toString(double multiplier)
+    public String toString()
     {
-        return String.format(Locale.ENGLISH, "%.2f [+- %.2f]", avg * multiplier,
-            stddev * multiplier);
+        return String.format(Locale.ENGLISH, "%.2f [+- %.2f]", 
+            avg, stddev);
     }
 
-    public static Average from(long [] values)
+    static Average from(long [] values)
     {
         long sum = 0;
         long sumSquares = 0;
@@ -34,7 +44,8 @@ class Average
         }
 
         double avg = sum / (double) values.length;
-        return new Average(sum / (double) values.length, Math.sqrt(sumSquares
-            / (double) values.length - avg * avg));
+        return new Average(
+            (sum / (double) values.length) / 1000.0, 
+            Math.sqrt(sumSquares / (double) values.length - avg * avg) / 1000.0);
     }
 }

@@ -1,7 +1,6 @@
 package com.carrotsearch.junitbenchmarks;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -43,7 +42,21 @@ final class BenchmarkStatement extends Statement
     private final FrameworkMethod method;
     private final Statement base;
     private final BenchmarkOptions options;
+    private final IResultsConsumer consumer;
 
+    /* */
+    public BenchmarkStatement(Statement base, FrameworkMethod method, Object target, 
+        IResultsConsumer consumer)
+    {
+        this.base = base;
+        this.method = method;
+        this.target = target;
+        this.consumer = consumer;
+
+        this.options = resolveOptions(method);
+    }
+
+    /* Provide the default options from the annotation. */
     @BenchmarkOptions
     @SuppressWarnings("unused")
     private void defaultOptions()
@@ -51,23 +64,14 @@ final class BenchmarkStatement extends Statement
     }
 
     /* */
-    public BenchmarkStatement(Statement base, FrameworkMethod method, Object object)
-    {
-        this.base = base;
-        this.method = method;
-        this.target = object;
-
-        this.options = resolveOptions(method, object);
-    }
-
-    private BenchmarkOptions resolveOptions(FrameworkMethod method, Object object)
+    private BenchmarkOptions resolveOptions(FrameworkMethod method)
     {
         // Method-level override.
         BenchmarkOptions options = method.getAnnotation(BenchmarkOptions.class);
         if (options != null) return options;
 
         // Class-level override. Look for annotations in this and superclasses.
-        Class<?> clz = object.getClass();
+        Class<?> clz = target.getClass();
         while (clz != null)
         {
             options = clz.getAnnotation(BenchmarkOptions.class);
@@ -88,6 +92,7 @@ final class BenchmarkStatement extends Statement
         }
     }
 
+    /* */
     @Override
     public void evaluate() throws Throwable
     {
@@ -99,7 +104,7 @@ final class BenchmarkStatement extends Statement
 
         final int totalRounds = warmupRounds + benchmarkRounds;
 
-        final ArrayList<Result> results = new ArrayList<Result>(totalRounds);
+        final ArrayList<SingleResult> results = new ArrayList<SingleResult>(totalRounds);
 
         GCSnapshot gcSnapshot = null;
         long warmupTime = System.currentTimeMillis();
@@ -121,27 +126,25 @@ final class BenchmarkStatement extends Statement
             base.evaluate();
             final long endTime = System.currentTimeMillis();
 
-            results.add(new Result(startTime, afterGC, endTime));
+            results.add(new SingleResult(startTime, afterGC, endTime));
         }
         benchmarkTime = System.currentTimeMillis() - benchmarkTime;
 
-        final Statistics stats = Statistics.from(results.subList(warmupRounds,
-            totalRounds));
-        
-        /*
-         * TODO: this should be extensible (emitting results via an interface, with
-         * one of the possible implementations dumping to the console.
-         */
-        System.out
-            .println(String
-                .format(
-                    Locale.ENGLISH,
-                    "%-50s: %d/%d rounds, time.total: %.2f, time.warmup: %.2f, time.bench: %.2f, round: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f",
-                    target.getClass().getSimpleName() + "." + method.getName(),
-                    benchmarkRounds, totalRounds, (warmupTime + benchmarkTime) * 0.001,
-                    warmupTime * 0.001, benchmarkTime * 0.001, stats.evaluation
-                        .toString(0.001), stats.gc.toString(0.001), gcSnapshot
-                        .accumulatedInvocations(), gcSnapshot.accumulatedTime() / 1000.0));
+        final Statistics stats = Statistics.from(
+            results.subList(warmupRounds, totalRounds));
+
+        final Result result = new Result(
+            target, method,
+            benchmarkRounds,
+            warmupRounds,
+            warmupTime,
+            benchmarkTime,
+            stats.evaluation,
+            stats.gc,
+            gcSnapshot
+        );
+
+        consumer.accept(result);
     }
 
     /**
@@ -151,7 +154,6 @@ final class BenchmarkStatement extends Statement
     private void cleanupMemory()
     {
         if (ignoreCallGC) return;
-
         if (!options.callgc()) return;
 
         /*
@@ -164,7 +166,7 @@ final class BenchmarkStatement extends Statement
     }
 
     /**
-     * Get an integer from system properties.
+     * Get an integer override from system properties.
      */
     private int getIntOption(int localValue, String property, int defaultValue)
     {

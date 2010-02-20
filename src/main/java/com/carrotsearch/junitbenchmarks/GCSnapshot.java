@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Snapshot of GC activity (cumulative for all GC types).
  */
-class GCSnapshot
+public final class GCSnapshot
 {
     private static List<GarbageCollectorMXBean> garbageBeans = ManagementFactory
         .getGarbageCollectorMXBeans();
@@ -15,7 +15,7 @@ class GCSnapshot
     private long [] gcInvocations = new long [garbageBeans.size()];
     private long [] gcTimes = new long [garbageBeans.size()];
 
-    public GCSnapshot()
+    GCSnapshot()
     {
         for (int i = 0; i < gcInvocations.length; i++)
         {
