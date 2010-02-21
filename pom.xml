@@ -45,12 +45,49 @@
     </plugins>
   </build>
 
+  <repositories>
+    <!-- Main Maven2 repo -->
+    <repository>
+      <id>maven2</id>
+      <name>maven2</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+
+    <!-- Codehaus repo -->
+    <repository>
+      <id>org.codehaus</id>
+      <name>Codehaus repository</name>
+      <url>http://repository.codehaus.org</url>
+    </repository>
+
+    <!-- ibiblio repository -->
+    <repository>
+      <id>ibiblio</id>
+      <name>ibiblio repository</name>
+      <url>http://www.ibiblio.org/maven</url>
+    </repository>  
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

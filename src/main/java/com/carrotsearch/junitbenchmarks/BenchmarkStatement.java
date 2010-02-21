@@ -2,6 +2,7 @@ package com.carrotsearch.junitbenchmarks;
 
 import java.util.ArrayList;
 
+import static com.carrotsearch.junitbenchmarks.Globals.*;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
@@ -10,12 +11,6 @@ import org.junit.runners.model.Statement;
  */
 final class BenchmarkStatement extends Statement
 {
-    public final static String WARMUP_ROUNDS_PROPERTY = "rounds.warmup";
-    public final static String BENCHMARK_ROUNDS_PROPERTY = "rounds.benchmark";
-
-    public static final String IGNORE_ANNOTATION_OPTIONS_PROPERTY = "ignore.annotation.options";
-    public static final String IGNORE_CALLGC_PROPERTY = "ignore.callgc";
-
     /**
      * How many warmup runs should we execute for each test method?
      */
