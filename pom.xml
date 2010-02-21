@@ -1,93 +1,106 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.carrotsearch</groupId>
-  <artifactId>junit-benchmarks</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.carrotsearch</groupId>
+    <artifactId>junit-benchmarks</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <properties>
-    <junit.version>4.7</junit.version>
-  </properties>
+    <properties>
+        <junit.version>4.7</junit.version>
+    </properties>
 
-  <build>
-    <directory>tmp/dist</directory>
-    <outputDirectory>tmp/classes</outputDirectory>
-    <testOutputDirectory>tmp/test-classes</testOutputDirectory>
+    <build>
+        <directory>tmp/dist</directory>
+        <outputDirectory>tmp/classes</outputDirectory>
+        <testOutputDirectory>tmp/test-classes</testOutputDirectory>
 
-    <defaultGoal>install</defaultGoal>
+        <defaultGoal>install</defaultGoal>
 
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <downloadJavadocs>true</downloadJavadocs>
-          <downloadSources>true</downloadSources>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+            <plugin>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <downloadJavadocs>true</downloadJavadocs>
+                    <downloadSources>true</downloadSources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-  <repositories>
-    <!-- Main Maven2 repo -->
-    <repository>
-      <id>maven2</id>
-      <name>maven2</name>
-      <url>http://repo1.maven.org/maven2</url>
-    </repository>
+    <repositories>
+        <!-- Main Maven2 repo -->
+        <repository>
+            <id>maven2</id>
+            <name>maven2</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
 
-    <!-- Codehaus repo -->
-    <repository>
-      <id>org.codehaus</id>
-      <name>Codehaus repository</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
+        <!-- Codehaus repo -->
+        <repository>
+            <id>org.codehaus</id>
+            <name>Codehaus repository</name>
+            <url>http://repository.codehaus.org</url>
+        </repository>
 
-    <!-- ibiblio repository -->
-    <repository>
-      <id>ibiblio</id>
-      <name>ibiblio repository</name>
-      <url>http://www.ibiblio.org/maven</url>
-    </repository>  
-  </repositories>
+        <!-- ibiblio repository -->
+        <repository>
+            <id>ibiblio</id>
+            <name>ibiblio repository</name>
+            <url>http://www.ibiblio.org/maven</url>
+        </repository>
+        
+        <repository>
+            <id>jboss</id>
+            <name>jboss repository</name>
+            <url>http://repository.jboss.com/maven2</url>
+        </repository>        
+    </repositories>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>jaxen</groupId>
-      <artifactId>jaxen</artifactId>
-      <version>1.1.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.127</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 </project>

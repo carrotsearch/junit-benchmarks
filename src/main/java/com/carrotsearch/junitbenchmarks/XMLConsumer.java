@@ -8,15 +8,13 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
  * {@link IResultsConsumer} that writes XML files for each benchmark.
  */
-public final class XMLConsumer implements IResultsConsumer, Closeable
+public final class XMLConsumer extends AutocloseConsumer implements Closeable
 {
     /**
      * Timestamp format.
@@ -28,16 +26,6 @@ public final class XMLConsumer implements IResultsConsumer, Closeable
      */
     private Writer writer;
 
-    /**
-     * A list of writers to close at shutdown (if not closed earlier).
-     */
-    private static List<Writer> autoclose = new ArrayList<Writer>();
-
-    /**
-     * A shutdown agent closing {@link #autoclose}.
-     */
-    private static Thread shutdownAgent;
-
     /*
      * 
      */
@@ -46,14 +34,13 @@ public final class XMLConsumer implements IResultsConsumer, Closeable
         try
         {
             writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
-            begin(writer);
+            addAutoclose(this);
+            writer.write("<benchmark-results tstamp=\"" + tstamp() + "\">\n\n");
         }
         catch (IOException e)
         {
             throw new RuntimeException("Could not open output writer.", e);
         }
-
-        initShutdownAgent();
     }
 
     /**
@@ -114,29 +101,17 @@ public final class XMLConsumer implements IResultsConsumer, Closeable
         try
         {
             if (this.writer != null)
-                end(writer);
+            {
+                writer.write("</benchmark-results>");
+                writer.close();
+                writer = null;
+                removeAutoclose(this);
+            }
         }
         catch (IOException e)
         {
             // Ignore.
         }
-    }
-
-    private static synchronized void begin(Writer writer) throws IOException
-    {
-        autoclose.add(writer);
-        writer.write("<benchmark-results tstamp=\"" + tstamp() + "\">\n\n");
-    }
-
-    private static synchronized void end(Writer writer) throws IOException
-    {
-        while (autoclose.remove(writer))
-        {
-            // repeat.
-        }
-    
-        writer.write("</benchmark-results>");
-        writer.close();
     }
 
     /**
@@ -158,33 +133,5 @@ public final class XMLConsumer implements IResultsConsumer, Closeable
         b.append("=\"");
         b.append(value);
         b.append('"');
-    }
-
-    /*
-     * 
-     */
-    private static synchronized void initShutdownAgent()
-    {
-        if (shutdownAgent == null)
-        {
-            shutdownAgent = new Thread()
-            {
-                public void run()
-                {
-                    for (Writer w : new ArrayList<Writer>(autoclose))
-                    {
-                        try
-                        {
-                            end(w);
-                        }
-                        catch (IOException e)
-                        {
-                            // Ignore, not much to do.
-                        }
-                    }
-                }
-            };
-            Runtime.getRuntime().addShutdownHook(shutdownAgent);
-        }
     }
 }
