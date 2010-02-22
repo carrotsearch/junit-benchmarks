@@ -7,6 +7,19 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <distributionManagement>
+    	<repository>
+    		<id>carrotsearch-distribution</id>
+    		<name>Carrot Search distribution repository</name>
+    		<url>scp://dweiss@ophelia.cs.put.poznan.pl/home/dweiss/public_html/maven</url>
+    	</repository>
+    	<snapshotRepository>
+    		<uniqueVersion>false</uniqueVersion>
+    		<id>carrotsearch-snapshots</id>
+    		<name>Carrot Search snapshots repository</name>
+    		<url>scp://dweiss@ophelia.cs.put.poznan.pl/home/dweiss/public_html/maven</url>
+    	</snapshotRepository>
+    </distributionManagement>
     <properties>
         <junit.version>4.7</junit.version>
     </properties>
@@ -43,6 +56,8 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+        </resources>
     </build>
 
     <repositories>
