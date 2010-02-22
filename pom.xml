@@ -2,91 +2,32 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+      <groupId>com.carrotsearch.labs</groupId>
+      <artifactId>labs-parent</artifactId>
+      <version>1</version>
+    </parent>
+
     <groupId>com.carrotsearch</groupId>
     <artifactId>junit-benchmarks</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <distributionManagement>
-    	<repository>
-    		<id>carrotsearch-distribution</id>
-    		<name>Carrot Search distribution repository</name>
-    		<url>scp://dweiss@ophelia.cs.put.poznan.pl/home/dweiss/public_html/maven</url>
-    	</repository>
-    	<snapshotRepository>
-    		<uniqueVersion>false</uniqueVersion>
-    		<id>carrotsearch-snapshots</id>
-    		<name>Carrot Search snapshots repository</name>
-    		<url>scp://dweiss@ophelia.cs.put.poznan.pl/home/dweiss/public_html/maven</url>
-    	</snapshotRepository>
-    </distributionManagement>
     <properties>
         <junit.version>4.7</junit.version>
     </properties>
 
     <build>
-        <directory>tmp/dist</directory>
-        <outputDirectory>tmp/classes</outputDirectory>
-        <testOutputDirectory>tmp/test-classes</testOutputDirectory>
-
         <defaultGoal>install</defaultGoal>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <configuration>
-                    <downloadJavadocs>true</downloadJavadocs>
-                    <downloadSources>true</downloadSources>
-                </configuration>
-            </plugin>
-        </plugins>
-        <resources>
-        </resources>
     </build>
 
     <repositories>
-        <!-- Main Maven2 repo -->
-        <repository>
-            <id>maven2</id>
-            <name>maven2</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-
-        <!-- Codehaus repo -->
-        <repository>
-            <id>org.codehaus</id>
-            <name>Codehaus repository</name>
-            <url>http://repository.codehaus.org</url>
-        </repository>
-
-        <!-- ibiblio repository -->
-        <repository>
-            <id>ibiblio</id>
-            <name>ibiblio repository</name>
-            <url>http://www.ibiblio.org/maven</url>
-        </repository>
-        
-        <repository>
-            <id>jboss</id>
-            <name>jboss repository</name>
-            <url>http://repository.jboss.com/maven2</url>
-        </repository>        
+     <repository>
+       <id>carrotsearch.releases</id>
+        <name>Carrot Search Releases Repository</name>
+         <url>http://download.carrot2.org/maven2/</url>
+       </repository>
     </repositories>
 
     <dependencies>
