@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Consumers that should be closed at shutdown (if not earlier).
  */
-abstract class AutocloseConsumer implements IResultsConsumer
+public abstract class AutocloseConsumer implements IResultsConsumer
 {
     /**
      * A list of closeables to close at shutdown (if not closed earlier).

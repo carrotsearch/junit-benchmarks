@@ -20,7 +20,6 @@ public final class Result
      * @param method Target tested method.
      * @param benchmarkRounds Number of executed benchmark rounds.
      * @param warmupRounds Number of warmup rounds.
-     * @param totalTime Total benchmark time, includes benchmarking and GC overhead.
      * @param warmupTime Total warmup time, includes benchmarking and GC overhead.
      * @param benchmarkTime Total benchmark time, includes benchmarking and GC overhead.
      * @param roundAverage Average and standard deviation from benchmark rounds.

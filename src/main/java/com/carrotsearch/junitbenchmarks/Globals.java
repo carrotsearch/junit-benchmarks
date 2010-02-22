@@ -1,8 +1,8 @@
 package com.carrotsearch.junitbenchmarks;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+
+import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**
  * Global settings for benchmarks.
@@ -38,6 +38,12 @@ public final class Globals
     public final static String BENCHMARKS_RESULTS_XML_PROPERTY = "benchmarks.xml.file";
 
     /**
+     * If set, the default {@link IResultsConsumer} is set to {@link H2Consumer} and
+     * benchmark results are saved to a database.
+     */
+    public final static String BENCHMARKS_RESULTS_DB_PROPERTY = "benchmarks.db.file";
+
+    /**
      * The default consumer of benchmark results.
      */
     private static IResultsConsumer consumer;
@@ -61,7 +67,13 @@ public final class Globals
     {
         assert consumer == null;
 
-        String path = System.getProperty(BENCHMARKS_RESULTS_XML_PROPERTY);
+        String path = System.getProperty(BENCHMARKS_RESULTS_DB_PROPERTY);
+        if (path != null && !path.trim().equals(""))
+        {
+            return new H2Consumer(new File(path));
+        }
+
+        path = System.getProperty(BENCHMARKS_RESULTS_XML_PROPERTY);
         if (path != null && !path.trim().equals(""))
         {
             return new XMLConsumer(new File(path));
