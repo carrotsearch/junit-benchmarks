@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-      <groupId>com.carrotsearch.labs</groupId>
+      <groupId>com.carrotsearch</groupId>
       <artifactId>labs-parent</artifactId>
       <version>1</version>
     </parent>
