@@ -62,7 +62,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     
             this.connection = ds.getConnection();
             connection.setAutoCommit(false);
-    
+            super.addAutoclose(this);
+
             checkSchema();
     
             runId = getRunID();
