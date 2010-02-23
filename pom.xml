@@ -20,14 +20,26 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
+        
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptor>src/main/assembly/bin.xml</descriptor>
+            </configuration>
+          </plugin>
+        </plugins>
     </build>
 
     <repositories>
-     <repository>
-       <id>carrotsearch.releases</id>
-        <name>Carrot Search Releases Repository</name>
-         <url>http://download.carrot2.org/maven2/</url>
-       </repository>
+        <repository>
+            <id>carrotsearch.labs.releases</id>
+            <name>Carrot Search Labs Releases Repository</name>
+            <url>http://repository.carrotsearch.com/labs/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
