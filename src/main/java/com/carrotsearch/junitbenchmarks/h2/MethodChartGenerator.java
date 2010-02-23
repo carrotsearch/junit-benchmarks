@@ -17,8 +17,9 @@ public final class MethodChartGenerator implements Callable<Void>
     
     /**
      * @param connection H2 database connection. 
+     * @param parentDir Parent directory where charts should be dumped.
      * @param runId The run from which to select data.
-     * @param clazzName The name of the test class.
+     * @param clazz The target test class.
      */
     public MethodChartGenerator(Connection connection, File parentDir, int runId, Class<?> clazz)
     {
