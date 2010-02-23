@@ -15,7 +15,7 @@ import org.junit.runners.model.Statement;
  */
 public final class BenchmarkRule implements MethodRule
 {
-    private final IResultsConsumer consumer;
+    private final IResultsConsumer [] consumers;
 
     /**
      * Creates a benchmark rule with the default sink for benchmark results (the default
@@ -23,18 +23,18 @@ public final class BenchmarkRule implements MethodRule
      */
     public BenchmarkRule()
     {
-        this(Globals.getDefaultConsumer());
+        this(Globals.getDefaultConsumers());
     }
 
     /**
      * Creates a benchmark rule with a given sink for benchmark results.
      */
-    public BenchmarkRule(IResultsConsumer consumer)
+    public BenchmarkRule(IResultsConsumer... consumers)
     {
-        if (consumer == null)
-            throw new IllegalArgumentException("Consumer must not be null.");
+        if (consumers == null || consumers.length == 0)
+            throw new IllegalArgumentException("There needs to be at least one consumer.");
 
-        this.consumer = consumer;
+        this.consumers = consumers;
     }
 
     /**
@@ -42,6 +42,6 @@ public final class BenchmarkRule implements MethodRule
      */
     public Statement apply(Statement base, FrameworkMethod method, Object target)
     {
-        return new BenchmarkStatement(base, method, target, consumer);
+        return new BenchmarkStatement(base, method, target, consumers);
     }
 }

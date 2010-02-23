@@ -2,6 +2,8 @@ package com.carrotsearch.junitbenchmarks.h2;
 
 import java.io.*;
 import java.sql.*;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 import org.h2.jdbcx.JdbcDataSource;
 
@@ -48,10 +50,21 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     /** Insert statement to the tests table. */
     private PreparedStatement newTest;
 
+    /** Output directory for charts. */
+    private File chartsDir;
+
+    /*
+     * 
+     */
+    public H2Consumer(File dbFileName)
+    {
+        this(dbFileName, new File("."));
+    }
+
     /*
      *
      */
-    public H2Consumer(File dbFileName)
+    public H2Consumer(File dbFileName, File chartsDir)
     {
         try
         {
@@ -59,6 +72,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     
             ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath());
             ds.setUser("sa");
+            
+            this.chartsDir = chartsDir;
     
             this.connection = ds.getConnection();
             connection.setAutoCommit(false);
@@ -68,7 +83,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     
             runId = getRunID();
     
-            newTest = connection.prepareStatement(getSQL("003-new-result.sql"));
+            newTest = connection.prepareStatement(getResource("003-new-result.sql"));
             newTest.setInt(RUN_ID, runId);
         }
         catch (SQLException e)
@@ -83,7 +98,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     private int getRunID() throws SQLException
     {
         PreparedStatement s = connection.prepareStatement(
-            getSQL("002-new-run.sql"), Statement.RETURN_GENERATED_KEYS);
+            getResource("002-new-run.sql"), Statement.RETURN_GENERATED_KEYS);
         s.setString(1, System.getProperty("os.arch", "?"));
         s.setString(2, System.getProperty("java.runtime.version", "?"));
         s.executeUpdate();
@@ -105,6 +120,9 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     public void accept(Result result)
     {
+        // Look for annotated types and save them for further analysis.
+        checkAnnotations(result);
+
         try
         {
             newTest.setString(CLASSNAME, result.target.getClass().getSimpleName());
@@ -136,6 +154,34 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     }
 
     /**
+     * Cache of types for which {@link MethodChartGenerator} should be invoked.
+     */
+    private HashSet<String> typeCharts = new HashSet<String>();
+
+    /**
+     * Chart generators to be executed at the end of collecting results. 
+     */
+    private List<Callable<Void>> chartGenerators = new ArrayList<Callable<Void>>();
+
+    /**
+     * Check target object and method's H2-specific annotations.
+     */
+    private void checkAnnotations(Result result)
+    {
+        Class<?> clazz = result.method.getMethod().getDeclaringClass();
+        if (clazz.isAnnotationPresent(GenerateMethodChart.class))
+        {
+            String clazzName = clazz.getName();
+            if (!typeCharts.contains(clazzName))
+            {
+                typeCharts.add(clazzName);
+                chartGenerators.add(new MethodChartGenerator(
+                    connection, chartsDir, runId, clazz));
+            }
+        }
+    }
+
+    /**
      * Close the output XML stream.
      */
     public void close()
@@ -145,14 +191,29 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             if (connection != null)
             {
                 if (!connection.isClosed())
-                    connection.close();
+                {
+                    doClose();
+                }
                 connection = null;
             }
         }
-        catch (SQLException e)
+        catch (Exception e)
         {
-            // Ignore?
+            throw new RuntimeException("Failed to close H2 consumer.", e);
         }
+    }
+
+    /**
+     * Do finalize the consumer; close db connection and emit reports.
+     */
+    private void doClose() throws Exception
+    {
+        for (Callable<?> c : chartGenerators)
+        {
+            c.call();
+        }
+
+        connection.close();
     }
 
     /**
@@ -162,8 +223,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     {
         final Statement s = connection.createStatement();
 
-        s.execute(getSQL("000-create-runs.sql"));
-        s.execute(getSQL("001-create-tests.sql"));
+        s.execute(getResource("000-create-runs.sql"));
+        s.execute(getResource("001-create-tests.sql"));
         connection.commit();
         s.close();
     }
@@ -171,11 +232,11 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     /**
      * Read a given resource from classpath and return UTF-8 decoded string.
      */
-    private String getSQL(String resourceName)
+    static String getResource(String resourceName)
     {
         try
         {
-            InputStream is = this.getClass().getResourceAsStream(resourceName);
+            InputStream is = H2Consumer.class.getResourceAsStream(resourceName);
             if (is == null) throw new IOException();
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

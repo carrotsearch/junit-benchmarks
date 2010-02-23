@@ -37,16 +37,16 @@ final class BenchmarkStatement extends Statement
     private final FrameworkMethod method;
     private final Statement base;
     private final BenchmarkOptions options;
-    private final IResultsConsumer consumer;
+    private final IResultsConsumer [] consumers;
 
     /* */
     public BenchmarkStatement(Statement base, FrameworkMethod method, Object target, 
-        IResultsConsumer consumer)
+        IResultsConsumer... consumers)
     {
         this.base = base;
         this.method = method;
         this.target = target;
-        this.consumer = consumer;
+        this.consumers = consumers;
 
         this.options = resolveOptions(method);
     }
@@ -139,7 +139,8 @@ final class BenchmarkStatement extends Statement
             gcSnapshot
         );
 
-        consumer.accept(result);
+        for (IResultsConsumer consumer : consumers)
+            consumer.accept(result);
     }
 
     /**

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Benchmark results for methods in class #CLASSNAME#</title>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['columnchart', 'table']});
+    </script>
+    
+    <style type="text/css">
+		#content {
+		  width: 800px ;
+		  margin-left: auto;
+		  margin-right: auto;
+		}
+
+		#raw-data {
+		  width: 800px;
+		  height: 400px;
+		}
+
+		#chart-round-time, #chart-gc-time {
+		  width: 400px;
+		  height: 300px;
+		  margin-left: auto;
+		  margin-right: auto;
+		  margin-bottom: 10px;
+		  display: block;
+		}
+    </style>
+
+    <script type="text/javascript">
+      function drawVisualization() {
+        var data = new google.visualization.DataTable();
+        // #DATA:START#
+        data.addColumn('string', 'Test');
+        data.addColumn('number', 'Round time');
+        data.addColumn('number', 'StdDev');
+        data.addColumn('number', 'GC time');
+        data.addColumn('number', 'GC invocations');
+        data.addRow(['testMethodWithLongName', 0.12, 0.02, 0.02, 0]);
+        data.addRow(['testMethodWithLongName', 0.24, 0.05, 0.05, 3]);
+        // #DATA:END#
+
+        new google.visualization.Table(document.getElementById('raw-data')).
+	        draw(data, {
+	            legend: "none",
+	            titleY: "time [s]",
+	            title: "#CLASSNAME#",
+	            showCategories: true,
+	        });
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1]);
+        new google.visualization.ColumnChart(document.getElementById('chart-round-time')).
+            draw(view, {
+                legend: "none",
+                titleY: "time [s]",
+                title: "#CLASSNAME#",
+                showCategories: true,
+                isStacked: false,
+            });
+
+        view = new google.visualization.DataView(data);
+        view.setColumns([0, 3]);
+        new google.visualization.ColumnChart(document.getElementById('chart-gc-time')).
+            draw(view, {
+                legend: "none",
+                titleY: "GC time [s]",
+                title: "#CLASSNAME#",
+                colors: ['#FF0000'],
+                showCategories: true,
+                isStacked: false,
+            });
+      }
+
+      google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+
+  <body style="font-family: Arial; margin: 30px;">
+    <div id="content">
+	    <h1>Benchmark results for methods in class #CLASSNAME#</h1>
+
+	    <div id="chart-round-time" ></div>
+	    <div id="chart-gc-time" ></div>
+	    <div id="raw-data"></div>
+    </div>
+  </body>
+</html>

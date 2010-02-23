@@ -7,7 +7,7 @@ package com.carrotsearch.junitbenchmarks;
 public interface IResultsConsumer
 {
     /**
-     * Accept results of a single benchmark.
+     * Accepts the results of a single benchmark.
      */
     void accept(Result result);
 }

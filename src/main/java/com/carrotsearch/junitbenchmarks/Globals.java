@@ -1,6 +1,7 @@
 package com.carrotsearch.junitbenchmarks;
 
 import java.io.*;
+import java.util.ArrayList;
 
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
@@ -32,59 +33,69 @@ public final class Globals
     public final static String IGNORE_CALLGC_PROPERTY = "ignore.callgc";
 
     /**
-     * If set, the default {@link IResultsConsumer} is set to {@link XMLConsumer} and
-     * benchmark results are saved to a path given in this property.
+     * If set, an {@link XMLConsumer} is added to the consumers list.
      */
     public final static String BENCHMARKS_RESULTS_XML_PROPERTY = "benchmarks.xml.file";
 
     /**
-     * If set, the default {@link IResultsConsumer} is set to {@link H2Consumer} and
-     * benchmark results are saved to a database.
+     * If set, an {@link H2Consumer} is added to the consumers list
+     * and benchmark results are saved to a database.
      */
     public final static String BENCHMARKS_RESULTS_DB_PROPERTY = "benchmarks.db.file";
 
     /**
+     * Benchmarks output directory if {@link H2Consumer} is active and charts are generated.
+     */
+    public final static String CHARTS_DIR_PROPERTY = "charts.dir";
+
+    /**
      * The default consumer of benchmark results.
      */
-    private static IResultsConsumer consumer;
+    private static IResultsConsumer [] consumers;
 
     /**
      * @return Return the default {@link IResultsConsumer}.
      */
-    public synchronized static IResultsConsumer getDefaultConsumer()
+    public synchronized static IResultsConsumer [] getDefaultConsumers()
     {
-        if (consumer == null)
+        if (consumers == null)
         {
-            consumer = initializeDefault();
+            consumers = initializeDefault();
         }
-        return consumer;
+
+        return consumers;
     }
 
     /**
-     * Initialize the default consumer.
+     * Initialize the default consumers.
      */
-    private static IResultsConsumer initializeDefault()
+    private static IResultsConsumer [] initializeDefault()
     {
-        assert consumer == null;
+        assert consumers == null;
 
+        final ArrayList<IResultsConsumer> result = new ArrayList<IResultsConsumer>();
+        
         String path = System.getProperty(BENCHMARKS_RESULTS_DB_PROPERTY);
+        String chartsDir = System.getProperty(CHARTS_DIR_PROPERTY, ".");
         if (path != null && !path.trim().equals(""))
         {
-            return new H2Consumer(new File(path));
+            result.add(new H2Consumer(new File(path), new File(chartsDir)));
         }
 
         path = System.getProperty(BENCHMARKS_RESULTS_XML_PROPERTY);
         if (path != null && !path.trim().equals(""))
         {
-            return new XMLConsumer(new File(path));
+            result.add(new XMLConsumer(new File(path)));
         }
 
-        return new WriterConsumer(new OutputStreamWriter(System.out)
+        result.add(new WriterConsumer(new OutputStreamWriter(System.out)
         {
             public void close() throws IOException
             {
                 // Don't close the superstream.
             }
-        });
+        }));
+
+        return result.toArray(new IResultsConsumer [result.size()]);
     }
 }
