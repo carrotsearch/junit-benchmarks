@@ -60,8 +60,14 @@ public class TestH2Charts
         assertTrue(dbFileFull.exists());
         assertTrue(dbFileFull.delete());
 
-        final File chart = new File(TestH2Charts.class.getName() + ".html");  
-        assertTrue(chart.exists());
-        //assertTrue(chart.delete());
+        assertFileExists(TestH2Charts.class.getName() + ".html");
+        assertFileExists(TestH2Charts.class.getName() + ".json");
+    }
+
+    private static void assertFileExists(String fileName)
+    {
+        final File f = new File(fileName);  
+        assertTrue(f.exists());
+        assertTrue(f.delete());
     }
 }

@@ -34,21 +34,25 @@ public final class MethodChartGenerator implements Callable<Void>
      */
     public Void call() throws Exception
     {
+        final String jsonFileName = clazzName + ".json";
+        final String htmlFileName = clazzName + ".html";
+        
         String template = H2Consumer.getResource("MethodChartGenerator.html");
-        template = replaceToken(template, "#CLASSNAME#", clazzName);
-        template = replaceRegexp(template, 
-            Pattern.compile("(#DATA:START#)(.+?)(#DATA:END#)", Pattern.DOTALL), getData());
-        save(parentDir, clazzName + ".html", template);
+        template = replaceToken(template, "CLASSNAME", clazzName);
+        template = replaceToken(template, "JSONDATA.json", jsonFileName);
+
+        save(parentDir, htmlFileName, template);
+        save(parentDir, jsonFileName, getData());
         return null;
     }
 
     /**
-     * Get chart data.
+     * Get chart data as JSON string.
      */
     private String getData() throws SQLException
     {
         StringBuilder buf = new StringBuilder();
-        buf.append("\n");
+        buf.append("{\n");
 
         final PreparedStatement s = 
             connection.prepareStatement(H2Consumer.getResource("MethodChartGenerator.sql"));
@@ -58,27 +62,40 @@ public final class MethodChartGenerator implements Callable<Void>
         ResultSet rs = s.executeQuery();
 
         // Emit columns.
+        buf.append("\"cols\": [\n");
         ResultSetMetaData metaData = rs.getMetaData();
         for (int i = 1; i <= metaData.getColumnCount(); i++)
         {
-            String colLabel = metaData.getColumnLabel(i);
-            buf.append("data.addColumn(");
-            buf.append("'" + getMappedType(metaData.getColumnType(i)) + "'");
-            buf.append(", ");
-            buf.append("'" + colLabel + "'");
-            buf.append(");\n");
-        }
+            final String colLabel = metaData.getColumnLabel(i);
+            final String type = getMappedType(metaData.getColumnType(i));
 
+            buf.append("{\"label\": \"");
+            buf.append(colLabel);
+            buf.append("\", \"type\": \"");
+            buf.append(type);
+            buf.append("\"}");
+            if (i != metaData.getColumnCount()) buf.append(",");
+            buf.append('\n');
+        }
+        buf.append("],\n");
+
+        buf.append("\"rows\": [\n");
         while (rs.next())
         {
-            buf.append("data.addRow([");
+            buf.append("{\"c\": [");
             for (int i = 1; i <= metaData.getColumnCount(); i++)
             {
                 if (i > 1) buf.append(", ");
-                buf.append(formatValue(metaData.getColumnType(i), rs.getObject(i)));
+                final Object value = formatValue(metaData.getColumnType(i), rs.getObject(i)); 
+                buf.append("{\"v\": ");
+                buf.append(value.toString());
+                buf.append("}");
             }
-            buf.append("]);\n");
+            buf.append("]}");
+            if (!rs.isLast()) buf.append(",");
+            buf.append('\n');
         }
+        buf.append("]}\n");
 
         rs.close();
         return buf.toString();
@@ -90,7 +107,7 @@ public final class MethodChartGenerator implements Callable<Void>
         {
             // TODO: add escaping here? Seems to be of little practical use in this scenario.
             case java.sql.Types.VARCHAR:
-                return "'" + val + "'";
+                return "\"" + val + "\"";
 
             case java.sql.Types.NUMERIC:
             case java.sql.Types.DOUBLE:
@@ -127,14 +144,6 @@ public final class MethodChartGenerator implements Callable<Void>
     private String replaceToken(String template, String key, String replacement)
     {
         Pattern p = Pattern.compile(key, Pattern.LITERAL);
-        return p.matcher(template).replaceAll(replacement); 
-    }
-
-    /**
-     * Process the template and substitute a regexp.
-     */
-    private String replaceRegexp(String template, Pattern p, String replacement)
-    {
         return p.matcher(template).replaceAll(replacement); 
     }
 
