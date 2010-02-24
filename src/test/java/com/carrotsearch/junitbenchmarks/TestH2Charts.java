@@ -68,6 +68,6 @@ public class TestH2Charts
     {
         final File f = new File(fileName);  
         assertTrue(f.exists());
-        assertTrue(f.delete());
+        // assertTrue(f.delete());
     }
 }

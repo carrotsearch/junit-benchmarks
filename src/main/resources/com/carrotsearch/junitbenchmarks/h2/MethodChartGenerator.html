@@ -17,12 +17,8 @@
 		  margin-right: auto;
 		}
 
-		#raw-data {
-		  width: 800px;
-		}
-
 		#chart {
-		  width: 400px;
+		  width: 500px;
 		  height: 300px;
 		  margin-left: auto;
 		  margin-right: auto;
@@ -36,6 +32,27 @@
 		  font-size: .8em;
 		  color: gray;
 		}
+		
+		ul.expander {
+	      display: inline;
+          margin-left: 0;
+          padding-left: 0;
+          font-size: .8em;
+		}
+
+		ul.expander li {
+		  margin-left: 0;
+          list-style: none;
+          display: inline;
+		}
+
+		ul.expander li:before {
+          content: "\25BA\0020";  // 25B8
+        }
+
+        ul.expander li.expanded:before {
+          content: "\25BC\0020";  // 25BE
+        }
     </style>
 
     <script type="text/javascript">
@@ -78,6 +95,11 @@
           $.getJSON('JSONDATA.json', function(data) {
               visualize(data, "CLASSNAME");
           });
+
+          $("#properties").click(function () {
+        	  $(this).toggleClass("expanded"); 
+              $("#proplist").slideToggle();
+          });
       });
     </script>
   </head>
@@ -88,10 +110,15 @@
 
 	    <div id="chart" ></div>
 	    <div id="raw-data"></div>
-    </div>
 
-    <div id="help">
-    Click on table headers to change the sorting order and redraw the chart.
+	    <div id="help">
+	    Click on table headers to change the sorting order and redraw the chart.
+	    </div>
+
+	    <div>
+	        <ul class="expander"><li id="properties"><a href="#">Properties</a></li></ul>
+	        <pre id="proplist" style="display: none; background-color: #e0e0e0;">PROPERTIES</pre>
+	    </div>
     </div>
   </body>
 </html>

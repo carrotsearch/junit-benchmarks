@@ -40,10 +40,39 @@ public final class MethodChartGenerator implements Callable<Void>
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = replaceToken(template, "CLASSNAME", clazzName);
         template = replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = replaceToken(template, "PROPERTIES", getProperties());
 
         save(parentDir, htmlFileName, template);
         save(parentDir, jsonFileName, getData());
         return null;
+    }
+
+    /**
+     * Get extra properties associated with the chart's test class/ run. 
+     */
+    private String getProperties() throws SQLException
+    {
+        StringBuilder buf = new StringBuilder();
+
+        final PreparedStatement s = 
+            connection.prepareStatement(H2Consumer.getResource("method-chart-properties.sql"));
+        s.setInt(1, runId);
+
+        ResultSet rs = s.executeQuery();
+        ResultSetMetaData metaData = rs.getMetaData();
+        while (rs.next())
+        {   
+            for (int i = 1; i <= metaData.getColumnCount(); i++)
+            {
+                buf.append(metaData.getColumnLabel(i));
+                buf.append(": ");
+                buf.append(rs.getObject(i));
+                buf.append("\n");
+            }
+        }
+
+        // TODO: buf HTML-escaping here?
+        return buf.toString();
     }
 
     /**
@@ -55,7 +84,7 @@ public final class MethodChartGenerator implements Callable<Void>
         buf.append("{\n");
 
         final PreparedStatement s = 
-            connection.prepareStatement(H2Consumer.getResource("MethodChartGenerator.sql"));
+            connection.prepareStatement(H2Consumer.getResource("method-chart-results.sql"));
         s.setInt(1, runId);
         s.setString(2, clazzName);
 
