@@ -17,7 +17,7 @@ import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
  */
 public class TestH2Consumer
 {
-    private static final File dbFile = new File("test-benchmarks");
+    private static final File dbFile = new File(TestH2Consumer.class.getName());
     private static final File dbFileFull = new File(dbFile.getName() + ".h2.db");
     private static final String CUSTOM_KEY_VALUE = "xyz";
 

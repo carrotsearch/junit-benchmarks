@@ -18,9 +18,9 @@ import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
  */
 @GenerateMethodChart
 @BenchmarkOptions(callgc = false)
-public class TestH2Charts
+public class TestH2MethodChart
 {
-    private static final File dbFile = new File("test-benchmarks");
+    private static final File dbFile = new File(TestH2MethodChart.class.getName());
     private static final File dbFileFull = new File(dbFile.getName() + ".h2.db");
 
     private static H2Consumer h2consumer;
@@ -62,8 +62,8 @@ public class TestH2Charts
         assertTrue(dbFileFull.exists());
         assertTrue(dbFileFull.delete());
 
-        assertFileExists(TestH2Charts.class.getName() + ".html");
-        assertFileExists(TestH2Charts.class.getName() + ".json");
+        assertFileExists(TestH2MethodChart.class.getName() + ".html");
+        assertFileExists(TestH2MethodChart.class.getName() + ".json");
     }
 
     private static void assertFileExists(String fileName)
