@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks;
+package com.carrotsearch.junitbenchmarks.h2;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import org.junit.*;
 import org.junit.rules.MethodRule;
 
+import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.h2.GenerateMethodChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
@@ -68,6 +70,6 @@ public class TestH2Charts
     {
         final File f = new File(fileName);  
         assertTrue(f.exists());
-        // assertTrue(f.delete());
+        assertTrue(f.delete());
     }
 }

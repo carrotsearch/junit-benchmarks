@@ -235,12 +235,75 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     private void checkSchema() throws SQLException
     {
-        final Statement s = connection.createStatement();
-        s.execute(getResource("000-create-runs.sql"));
-        s.execute(getResource("001-create-tests.sql"));
-        s.close();
+        DbVersions dbVersion = getDbVersion();
+        Statement s = connection.createStatement();
+        switch (dbVersion)
+        {
+            case UNINITIALIZED:
+                s.execute(getResource("000-create-runs.sql"));
+                s.execute(getResource("001-create-tests.sql"));
+                // fall-through.
+            case VERSION_1:
+                s.execute(getResource("004-create-dbversion.sql"));
+                s.execute(getResource("005-add-custom-key.sql"));
+                updateDbVersion(DbVersions.VERSION_2);
+                // fall-through
+            case VERSION_2:
+                break;
 
+            default:
+                throw new RuntimeException("Unexpected database version: "
+                    + dbVersion);
+        }
         connection.commit();
+    }
+
+    /**
+     * Update database version.
+     */
+    private void updateDbVersion(DbVersions newVersion) throws SQLException
+    {
+        Statement s = connection.createStatement();
+        s.executeUpdate("DELETE FROM DBVERSION");
+        s.executeUpdate("INSERT INTO DBVERSION (VERSION) VALUES (" + newVersion.version + ")");
+    }
+
+    /**
+     * Retrieve DB version. 
+     */
+    DbVersions getDbVersion() throws SQLException
+    {
+        Statement s = connection.createStatement();
+        ResultSet rs = s.executeQuery("SHOW TABLES");
+        Set<String> tables = new HashSet<String>();
+        while (rs.next())
+        {
+            tables.add(rs.getString(1));
+        }
+
+        if (!tables.contains("DBVERSION"))
+        {
+            if (tables.contains("RUNS"))
+            {
+                return DbVersions.VERSION_1;
+            }
+
+            return DbVersions.UNINITIALIZED;
+        }
+
+        DbVersions version;
+        rs = s.executeQuery("SELECT VERSION FROM DBVERSION");
+        if (!rs.next())
+        {
+            throw new RuntimeException("Missing version row in DBVERSION table.");
+        }
+
+        version = DbVersions.fromInt(rs.getInt(1));
+        if (rs.next()) {
+            throw new RuntimeException("More than one row in DBVERSION table.");
+        }
+
+        return version;
     }
 
     /**

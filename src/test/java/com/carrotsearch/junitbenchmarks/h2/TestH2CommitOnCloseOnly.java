@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks;
+package com.carrotsearch.junitbenchmarks.h2;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.*;
 import org.junit.rules.MethodRule;
 
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**

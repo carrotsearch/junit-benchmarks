@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks;
+package com.carrotsearch.junitbenchmarks.h2;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.*;
 import org.junit.rules.MethodRule;
 
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**
@@ -48,6 +49,13 @@ public class TestH2Consumer
     @AfterClass
     public static void verify() throws Exception
     {
+        // Check DB upgrade process.
+        DbVersions ver = h2consumer.getDbVersion();
+        int maxVersion = DbVersions.UNINITIALIZED.version;
+        for (DbVersions v : DbVersions.values())
+            maxVersion = Math.max(maxVersion, v.version);
+        assertEquals(maxVersion, ver.version);
+
         h2consumer.close();
         assertTrue(dbFileFull.exists());
 
