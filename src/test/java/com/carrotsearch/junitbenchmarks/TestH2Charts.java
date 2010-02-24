@@ -62,6 +62,6 @@ public class TestH2Charts
 
         final File chart = new File(TestH2Charts.class.getName() + ".html");  
         assertTrue(chart.exists());
-        // assertTrue(chart.delete());
+        //assertTrue(chart.delete());
     }
 }
