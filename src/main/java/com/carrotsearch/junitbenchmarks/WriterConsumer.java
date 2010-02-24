@@ -24,7 +24,7 @@ public final class WriterConsumer implements IResultsConsumer
                 "%s: [measured %d out of %d rounds]\n" +
                 " round: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f," +
                 " time.total: %.2f, time.warmup: %.2f, time.bench: %.2f\n",
-                result.target.getClass().getSimpleName() + "." + result.method.getName(),
+                result.getShortTestClassName() + "." + result.getTestMethodName(),
                 result.benchmarkRounds, 
                 result.benchmarkRounds + result.warmupRounds, 
                 result.roundAverage.toString(), 

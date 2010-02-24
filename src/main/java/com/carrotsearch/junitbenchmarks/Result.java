@@ -7,8 +7,9 @@ import org.junit.runners.model.FrameworkMethod;
  */
 public final class Result
 {
-    public final Object target;
-    public final FrameworkMethod method;
+    private final Object target;
+    private final FrameworkMethod method;
+
     public final int benchmarkRounds, warmupRounds;
     public final long warmupTime, benchmarkTime;
     public final Average roundAverage;
@@ -46,5 +47,37 @@ public final class Result
         this.roundAverage = roundAverage;
         this.gcAverage = gcAverage;
         this.gcInfo = gcInfo;
+    }
+    
+    /**
+     * Returns the short version of the test's class.
+     */
+    public String getShortTestClassName()
+    {
+        return target.getClass().getSimpleName();
+    }
+    
+    /**
+     * Returns the long version of the test's class.
+     */
+    public String getTestClassName()
+    {
+        return target.getClass().getName();
+    }
+
+    /**
+     * @return Return the test method's name.
+     */
+    public String getTestMethodName()
+    {
+        return method.getName();
+    }
+
+    /**
+     * Returns the class under test.
+     */
+    public Class<?> getTestClass()
+    {
+        return method.getMethod().getDeclaringClass();
     }
 }

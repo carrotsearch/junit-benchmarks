@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Benchmark results for methods in class com.carrotsearch.junitbenchmarks.TestH2Charts</title>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['columnchart', 'table']});
+    </script>
+    
+    <style type="text/css">
+		#content {
+		  width: 800px ;
+		  margin-left: auto;
+		  margin-right: auto;
+		}
+
+		#raw-data {
+		  width: 800px;
+		  height: 400px;
+		}
+
+		#chart-round-time, #chart-gc-time {
+		  width: 400px;
+		  height: 300px;
+		  margin-left: auto;
+		  margin-right: auto;
+		  margin-bottom: 10px;
+		  display: block;
+		}
+    </style>
+
+    <script type="text/javascript">
+      function drawVisualization() {
+        var data = new google.visualization.DataTable();
+        // 
+data.addColumn('string', 'method');
+data.addColumn('number', 'Average time [s]');
+data.addColumn('number', 'StdDev');
+data.addColumn('number', 'GC time [s]');
+data.addColumn('number', 'StdDev');
+data.addColumn('number', 'GC calls');
+data.addColumn('number', 'benchmark rounds');
+data.addColumn('number', 'warmup rounds');
+data.addColumn('number', 'Total benchmark time');
+data.addColumn('number', 'Total warmup time');
+data.addRow(['testMethodA', 0.0204, 9.0E-4, 1.0E-4, 3.0E-4, 0, 10, 5, 0.101, 0.205]);
+data.addRow(['testMethodB', 0.0403, 5.0E-4, 0.0, 0.0, 0, 10, 5, 0.201, 0.402]);
+data.addRow(['testMethodC', 0.0601, 3.0E-4, 0.0, 0.0, 0, 10, 5, 0.303, 0.601]);
+
+
+        new google.visualization.Table(document.getElementById('raw-data')).
+	        draw(data, {
+	            legend: "none",
+	            titleY: "time [s]",
+	            title: "com.carrotsearch.junitbenchmarks.TestH2Charts",
+	            showCategories: true,
+	        });
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1]);
+        new google.visualization.ColumnChart(document.getElementById('chart-round-time')).
+            draw(view, {
+                legend: "none",
+                titleY: "time [s]",
+                title: "com.carrotsearch.junitbenchmarks.TestH2Charts",
+                showCategories: true,
+                isStacked: false,
+            });
+
+        view = new google.visualization.DataView(data);
+        view.setColumns([0, 3]);
+        new google.visualization.ColumnChart(document.getElementById('chart-gc-time')).
+            draw(view, {
+                legend: "none",
+                titleY: "GC time [s]",
+                title: "com.carrotsearch.junitbenchmarks.TestH2Charts",
+                colors: ['#FF0000'],
+                showCategories: true,
+                isStacked: false,
+            });
+      }
+
+      google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+
+  <body style="font-family: Arial; margin: 30px;">
+    <div id="content">
+	    <h1>Benchmark results for methods in class com.carrotsearch.junitbenchmarks.TestH2Charts</h1>
+
+	    <div id="chart-round-time" ></div>
+	    <div id="chart-gc-time" ></div>
+	    <div id="raw-data"></div>
+    </div>
+  </body>
+</html>

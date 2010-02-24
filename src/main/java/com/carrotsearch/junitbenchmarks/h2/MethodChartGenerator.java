@@ -12,20 +12,20 @@ public final class MethodChartGenerator implements Callable<Void>
 {
     private Connection connection;
     private int runId;
-    private Class<?> clazz;
+    private String clazzName;
     private File parentDir;
-    
+
     /**
      * @param connection H2 database connection. 
      * @param parentDir Parent directory where charts should be dumped.
      * @param runId The run from which to select data.
-     * @param clazz The target test class.
+     * @param clazzName The target test class (fully qualified name).
      */
-    public MethodChartGenerator(Connection connection, File parentDir, int runId, Class<?> clazz)
+    public MethodChartGenerator(Connection connection, File parentDir, int runId, String clazzName)
     {
         this.connection = connection;
         this.runId = runId;
-        this.clazz = clazz;
+        this.clazzName = clazzName;
         this.parentDir = parentDir;
     }
 
@@ -35,10 +35,10 @@ public final class MethodChartGenerator implements Callable<Void>
     public Void call() throws Exception
     {
         String template = H2Consumer.getResource("MethodChartGenerator.html");
-        template = replaceToken(template, "#CLASSNAME#", clazz.getSimpleName());
+        template = replaceToken(template, "#CLASSNAME#", clazzName);
         template = replaceRegexp(template, 
             Pattern.compile("(#DATA:START#)(.+?)(#DATA:END#)", Pattern.DOTALL), getData());
-        save(parentDir, clazz.getName() + ".html", template);
+        save(parentDir, clazzName + ".html", template);
         return null;
     }
 
@@ -53,8 +53,8 @@ public final class MethodChartGenerator implements Callable<Void>
         final PreparedStatement s = 
             connection.prepareStatement(H2Consumer.getResource("MethodChartGenerator.sql"));
         s.setInt(1, runId);
-        s.setString(2, clazz.getSimpleName());
-        
+        s.setString(2, clazzName);
+
         ResultSet rs = s.executeQuery();
 
         // Emit columns.
@@ -143,7 +143,7 @@ public final class MethodChartGenerator implements Callable<Void>
      */
     private void save(File parentDir, String fileName, String content) throws IOException
     {
-        FileOutputStream fos = new FileOutputStream(fileName);
+        final FileOutputStream fos = new FileOutputStream(fileName);
         fos.write(content.getBytes("UTF-8"));
         fos.close();
     }

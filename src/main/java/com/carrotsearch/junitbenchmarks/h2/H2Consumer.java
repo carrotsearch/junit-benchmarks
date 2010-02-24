@@ -125,8 +125,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
 
         try
         {
-            newTest.setString(CLASSNAME, result.target.getClass().getSimpleName());
-            newTest.setString(NAME, result.method.getName());
+            newTest.setString(CLASSNAME, result.getTestClassName());
+            newTest.setString(NAME, result.getTestMethodName());
 
             newTest.setInt(BENCHMARK_ROUNDS, result.benchmarkRounds);
             newTest.setInt(WARMUP_ROUNDS, result.warmupRounds);
@@ -140,8 +140,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             newTest.setInt(GC_INVOCATIONS, (int) result.gcInfo.accumulatedInvocations());
             newTest.setDouble(GC_TIME, result.gcInfo.accumulatedTime() / 1000.0);
 
-            newTest.setDouble(TIME_BENCHMARK, result.warmupTime / 1000);
-            newTest.setDouble(TIME_WARMUP, result.benchmarkTime / 1000);
+            newTest.setDouble(TIME_WARMUP, result.warmupTime / 1000.0);
+            newTest.setDouble(TIME_BENCHMARK, result.benchmarkTime / 1000.0);
 
             newTest.executeUpdate();
             connection.commit();
@@ -168,7 +168,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     private void checkAnnotations(Result result)
     {
-        Class<?> clazz = result.method.getMethod().getDeclaringClass();
+        Class<?> clazz = result.getTestClass();
         if (clazz.isAnnotationPresent(GenerateMethodChart.class))
         {
             String clazzName = clazz.getName();
@@ -176,7 +176,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             {
                 typeCharts.add(clazzName);
                 chartGenerators.add(new MethodChartGenerator(
-                    connection, chartsDir, runId, clazz));
+                    connection, chartsDir, runId, clazzName));
             }
         }
     }

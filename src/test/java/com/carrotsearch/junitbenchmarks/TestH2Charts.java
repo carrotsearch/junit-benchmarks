@@ -47,6 +47,12 @@ public class TestH2Charts
         Thread.sleep(40);
     }
 
+    @Test
+    public void testMethodC() throws Exception
+    {
+        Thread.sleep(60);
+    }
+
     @AfterClass
     public static void verify() throws Exception
     {
@@ -56,6 +62,6 @@ public class TestH2Charts
 
         final File chart = new File(TestH2Charts.class.getName() + ".html");  
         assertTrue(chart.exists());
-        assertTrue(chart.delete());
+        // assertTrue(chart.delete());
     }
 }

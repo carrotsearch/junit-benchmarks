@@ -59,8 +59,8 @@ public final class XMLConsumer extends AutocloseConsumer implements Closeable
             final StringBuilder b = new StringBuilder();
 
             b.append("\t<testname");
-            attribute(b, "classname", result.target.getClass().getSimpleName());
-            attribute(b, "name", result.method.getName());
+            attribute(b, "classname", result.getTestClassName());
+            attribute(b, "name", result.getTestMethodName());
 
             b.append("\n\t\t");
             attribute(b, "benchmark-rounds", Integer.toString(result.benchmarkRounds));
