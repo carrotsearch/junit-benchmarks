@@ -19,6 +19,7 @@ public class TestH2Consumer
 {
     private static final File dbFile = new File("test-benchmarks");
     private static final File dbFileFull = new File(dbFile.getName() + ".h2.db");
+    private static final String CUSTOM_KEY_VALUE = "xyz";
 
     private static H2Consumer h2consumer;
 
@@ -28,7 +29,7 @@ public class TestH2Consumer
         if (dbFileFull.exists())
             assertTrue(dbFileFull.delete());
 
-        h2consumer = new H2Consumer(dbFile);
+        h2consumer = new H2Consumer(dbFile, new File("."), CUSTOM_KEY_VALUE);
     }
 
     @Rule
@@ -73,6 +74,10 @@ public class TestH2Consumer
         rs = connection.createStatement().executeQuery("SELECT COUNT(*) FROM RUNS");
         assertTrue(rs.next());
         assertEquals(1, rs.getInt(1));
+
+        rs = connection.createStatement().executeQuery("SELECT CUSTOM_KEY FROM RUNS");
+        assertTrue(rs.next());
+        assertEquals(CUSTOM_KEY_VALUE, rs.getString(1));
 
         connection.close();
         

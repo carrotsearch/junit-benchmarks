@@ -64,9 +64,13 @@ public final class MethodChartGenerator implements Callable<Void>
         {   
             for (int i = 1; i <= metaData.getColumnCount(); i++)
             {
+                final Object obj = rs.getObject(i);
+                if (obj == null)
+                    continue;
+
                 buf.append(metaData.getColumnLabel(i));
                 buf.append(": ");
-                buf.append(rs.getObject(i));
+                buf.append(obj);
                 buf.append("\n");
             }
         }

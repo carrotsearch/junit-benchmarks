@@ -56,13 +56,13 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     public H2Consumer(File dbFileName)
     {
-        this(dbFileName, new File("."));
+        this(dbFileName, new File("."), null);
     }
 
     /*
      *
      */
-    public H2Consumer(File dbFileName, File chartsDir)
+    public H2Consumer(File dbFileName, File chartsDir, String customKeyValue)
     {
         try
         {
@@ -79,7 +79,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
 
             checkSchema();
     
-            runId = getRunID();
+            runId = getRunID(customKeyValue);
     
             newTest = connection.prepareStatement(getResource("003-new-result.sql"));
             newTest.setInt(RUN_ID, runId);
@@ -93,12 +93,13 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     /**
      * @return Create a row for this consumer's test run.
      */
-    private int getRunID() throws SQLException
+    private int getRunID(String customKeyValue) throws SQLException
     {
         PreparedStatement s = connection.prepareStatement(
             getResource("002-new-run.sql"), Statement.RETURN_GENERATED_KEYS);
         s.setString(1, System.getProperty("os.arch", "?"));
         s.setString(2, System.getProperty("java.runtime.version", "?"));
+        s.setString(3, customKeyValue);
         s.executeUpdate();
 
         ResultSet rs = s.getGeneratedKeys();

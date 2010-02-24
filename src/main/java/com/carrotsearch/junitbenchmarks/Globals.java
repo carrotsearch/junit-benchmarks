@@ -49,6 +49,11 @@ public final class Globals
     public final static String CHARTS_DIR_PROPERTY = "charts.dir";
 
     /**
+     * Custom key to attach to the run.
+     */
+    public final static String CUSTOM_KEY_PROPERTY = "benchmarks.key";
+
+    /**
      * The default consumer of benchmark results.
      */
     private static IResultsConsumer [] consumers;
@@ -77,9 +82,10 @@ public final class Globals
         
         String path = System.getProperty(BENCHMARKS_RESULTS_DB_PROPERTY);
         String chartsDir = System.getProperty(CHARTS_DIR_PROPERTY, ".");
+        String customKey = System.getProperty(CUSTOM_KEY_PROPERTY);
         if (path != null && !path.trim().equals(""))
         {
-            result.add(new H2Consumer(new File(path), new File(chartsDir)));
+            result.add(new H2Consumer(new File(path), new File(chartsDir), customKey));
         }
 
         path = System.getProperty(BENCHMARKS_RESULTS_XML_PROPERTY);

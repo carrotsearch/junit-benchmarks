@@ -1,3 +1,5 @@
 
-INSERT INTO RUNS (JVM, OS) 
-VALUES (?, ?);
+INSERT INTO RUNS 
+  (JVM, OS, CUSTOM_KEY)
+VALUES 
+  (  ?,  ?,          ?);
