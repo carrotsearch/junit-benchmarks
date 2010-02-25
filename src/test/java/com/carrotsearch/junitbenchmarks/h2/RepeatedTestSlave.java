@@ -16,7 +16,7 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 /**
  * Test H2 consumer's chart generation functionality. 
  */
-@GenerateHistoryChart()
+@BenchmarkHistoryChart()
 @BenchmarkOptions(callgc = false)
 public class RepeatedTestSlave
 {
@@ -25,14 +25,14 @@ public class RepeatedTestSlave
 
     private static H2Consumer h2consumer;
 
+    @Rule
+    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+
     @BeforeClass
     public static void checkFile() throws SQLException
     {
         h2consumer = new H2Consumer(dbFile);
     }
-
-    @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
 
     @Test
     public void testMethodA() throws Exception

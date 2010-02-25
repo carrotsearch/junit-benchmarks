@@ -173,7 +173,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     {
         final Class<?> clazz = result.getTestClass();
         final String clazzName = clazz.getName();
-        if (clazz.isAnnotationPresent(GenerateMethodChart.class))
+        if (clazz.isAnnotationPresent(BenchmarkMethodChart.class))
         {
             if (!typeCharts.contains(clazzName))
             {
@@ -183,8 +183,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             }
         }
 
-        boolean onMethod = result.getTestMethod().isAnnotationPresent(GenerateHistoryChart.class);
-        boolean onClass = clazz.isAnnotationPresent(GenerateHistoryChart.class);
+        boolean onMethod = result.getTestMethod().isAnnotationPresent(BenchmarkHistoryChart.class);
+        boolean onClass = clazz.isAnnotationPresent(BenchmarkHistoryChart.class);
 
         if (onMethod || onClass)
         {
@@ -206,13 +206,13 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             if (onClass)
             {
                 generator.updateMax(
-                    clazz.getAnnotation(GenerateHistoryChart.class).maxRuns());
+                    clazz.getAnnotation(BenchmarkHistoryChart.class).maxRuns());
             }
             
             if (onMethod)
             {
                 generator.updateMax(
-                    result.getTestMethod().getAnnotation(GenerateHistoryChart.class).maxRuns());
+                    result.getTestMethod().getAnnotation(BenchmarkHistoryChart.class).maxRuns());
             }
         }
     }

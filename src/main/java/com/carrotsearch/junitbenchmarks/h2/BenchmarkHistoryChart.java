@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface GenerateHistoryChart
+public @interface BenchmarkHistoryChart
 {
     /**
      * Maximum number of historical runs to take into account.
