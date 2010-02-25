@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Benchmark results for methods in class CLASSNAME</title>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("jquery", "1.4.2");
+      google.load('visualization', '1', {packages: ['linechart', 'table']});
+    </script>
+
+    <style type="text/css">
+        #content {
+          width: 800px ;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        #chart {
+          width: 500px;
+          height: 300px;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 10px;
+          display: block;
+        }
+        
+        ul.expander {
+          display: inline;
+          margin-left: 0;
+          padding-left: 0;
+          font-size: .8em;
+        }
+
+        ul.expander li {
+          margin-left: 0;
+          list-style: none;
+          display: inline;
+        }
+
+        ul.expander li:before {
+          content: "\25BA\0020";  // 25B8
+        }
+
+        ul.expander li.expanded:before {
+          content: "\25BC\0020";  // 25BE
+        }
+    </style>
+
+    <script type="text/javascript">
+
+      function visualize(jsonData, className) {
+        var data = new google.visualization.DataTable(jsonData);
+
+        var table = new google.visualization.Table(document.getElementById('raw-data'));
+        table.draw(data);
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+        chart.draw(data, {
+        });
+      }
+
+      google.setOnLoadCallback(function() {
+          $.getJSON('JSONDATA.json', function(data) {
+              visualize(data, "CLASSNAME");
+          });
+
+          $("#properties").click(function () {
+              $(this).toggleClass("expanded"); 
+              $("#proplist").slideToggle();
+          });
+      });
+    </script>
+  </head>
+
+  <body style="font-family: Arial; margin: 30px;">
+    <div id="content">
+        <h1>Benchmark results for methods in class CLASSNAME</h1>
+
+        <div id="chart" ></div>
+        <div id="raw-data"></div>
+
+        <div>
+            <ul class="expander"><li id="properties"><a href="#">Properties</a></li></ul>
+            <pre id="proplist" style="display: none; background-color: #e0e0e0;">PROPERTIES</pre>
+        </div>
+    </div>
+  </body>
+</html>

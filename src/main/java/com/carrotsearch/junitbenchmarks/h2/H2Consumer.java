@@ -51,6 +51,22 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     /** Output directory for charts. */
     private File chartsDir;
 
+    /**
+     * Cache of types for which {@link MethodChartGenerator} should be invoked.
+     */
+    private HashSet<String> typeCharts = new HashSet<String>();
+
+    /**
+     * Cache of types for which {@link HistoryChartGenerator} should be invoked.
+     */
+    private HashMap<String, HistoryChartGenerator> historyCharts 
+        = new HashMap<String, HistoryChartGenerator>();
+    
+    /**
+     * Chart generators to be executed at the end of collecting results. 
+     */
+    private List<Callable<Void>> chartGenerators = new ArrayList<Callable<Void>>();
+
     /*
      * 
      */
@@ -68,9 +84,9 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
         {
             final JdbcDataSource ds = new org.h2.jdbcx.JdbcDataSource();
     
-            ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath());
+            ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE");
             ds.setUser("sa");
-            
+
             this.chartsDir = chartsDir;
     
             this.connection = ds.getConnection();
@@ -151,29 +167,52 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     }
 
     /**
-     * Cache of types for which {@link MethodChartGenerator} should be invoked.
-     */
-    private HashSet<String> typeCharts = new HashSet<String>();
-
-    /**
-     * Chart generators to be executed at the end of collecting results. 
-     */
-    private List<Callable<Void>> chartGenerators = new ArrayList<Callable<Void>>();
-
-    /**
      * Check target object and method's H2-specific annotations.
      */
     private void checkAnnotations(Result result)
     {
-        Class<?> clazz = result.getTestClass();
+        final Class<?> clazz = result.getTestClass();
+        final String clazzName = clazz.getName();
         if (clazz.isAnnotationPresent(GenerateMethodChart.class))
         {
-            String clazzName = clazz.getName();
             if (!typeCharts.contains(clazzName))
             {
                 typeCharts.add(clazzName);
                 chartGenerators.add(new MethodChartGenerator(
                     connection, chartsDir, runId, clazzName));
+            }
+        }
+
+        boolean onMethod = result.getTestMethod().isAnnotationPresent(GenerateHistoryChart.class);
+        boolean onClass = clazz.isAnnotationPresent(GenerateHistoryChart.class);
+
+        if (onMethod || onClass)
+        {
+            HistoryChartGenerator generator;
+            if (!historyCharts.containsKey(clazzName))
+            {
+                generator = new HistoryChartGenerator(connection, chartsDir, clazzName);
+                historyCharts.put(clazzName, generator);
+                chartGenerators.add(generator);
+            }
+            generator = historyCharts.get(clazzName);
+
+            if (!onClass)
+            {
+                historyCharts.get(clazzName)
+                    .includeMethod(result.getTestMethod().getName());
+            }
+            
+            if (onClass)
+            {
+                generator.updateMax(
+                    clazz.getAnnotation(GenerateHistoryChart.class).maxRuns());
+            }
+            
+            if (onMethod)
+            {
+                generator.updateMax(
+                    result.getTestMethod().getAnnotation(GenerateHistoryChart.class).maxRuns());
             }
         }
     }

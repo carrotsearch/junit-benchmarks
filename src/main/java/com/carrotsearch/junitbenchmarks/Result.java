@@ -1,5 +1,7 @@
 package com.carrotsearch.junitbenchmarks;
 
+import java.lang.reflect.Method;
+
 import org.junit.runners.model.FrameworkMethod;
 
 /**
@@ -79,5 +81,13 @@ public final class Result
     public Class<?> getTestClass()
     {
         return method.getMethod().getDeclaringClass();
+    }
+
+    /**
+     * Returns the method under test. 
+     */
+    public Method getTestMethod()
+    {
+        return method.getMethod();
     }
 }

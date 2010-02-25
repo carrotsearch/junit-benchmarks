@@ -10,6 +10,7 @@ import org.junit.rules.MethodRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
+import com.carrotsearch.junitbenchmarks.Common;
 import com.carrotsearch.junitbenchmarks.h2.GenerateMethodChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
@@ -62,14 +63,7 @@ public class TestH2MethodChart
         assertTrue(dbFileFull.exists());
         assertTrue(dbFileFull.delete());
 
-        assertFileExists(TestH2MethodChart.class.getName() + ".html");
-        assertFileExists(TestH2MethodChart.class.getName() + ".json");
-    }
-
-    private static void assertFileExists(String fileName)
-    {
-        final File f = new File(fileName);  
-        assertTrue(f.exists());
-        assertTrue(f.delete());
+        Common.assertFileExists(TestH2MethodChart.class.getName() + ".html");
+        Common.assertFileExists(TestH2MethodChart.class.getName() + ".json");
     }
 }

@@ -40,7 +40,8 @@ public final class MethodChartGenerator implements Callable<Void>
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = replaceToken(template, "CLASSNAME", clazzName);
         template = replaceToken(template, "JSONDATA.json", jsonFileName);
-        template = replaceToken(template, "PROPERTIES", getProperties());
+        template = replaceToken(template, "PROPERTIES", 
+            getProperties(connection, runId));
 
         save(parentDir, htmlFileName, template);
         save(parentDir, jsonFileName, getData());
@@ -50,7 +51,7 @@ public final class MethodChartGenerator implements Callable<Void>
     /**
      * Get extra properties associated with the chart's test class/ run. 
      */
-    private String getProperties() throws SQLException
+    static String getProperties(Connection connection, int runId) throws SQLException
     {
         StringBuilder buf = new StringBuilder();
 
@@ -134,7 +135,7 @@ public final class MethodChartGenerator implements Callable<Void>
         return buf.toString();
     }
 
-    private Object formatValue(int sqlColumnType, Object val)
+    static Object formatValue(int sqlColumnType, Object val)
     {
         switch (sqlColumnType)
         {
@@ -153,7 +154,7 @@ public final class MethodChartGenerator implements Callable<Void>
         throw new RuntimeException("Unsupported column type: " + sqlColumnType);
     }
 
-    private String getMappedType(int sqlColumnType)
+    static String getMappedType(int sqlColumnType)
     {
         switch (sqlColumnType)
         {
@@ -174,7 +175,7 @@ public final class MethodChartGenerator implements Callable<Void>
     /**
      * Process the template and substitute a fixed token.
      */
-    private String replaceToken(String template, String key, String replacement)
+    static String replaceToken(String template, String key, String replacement)
     {
         Pattern p = Pattern.compile(key, Pattern.LITERAL);
         return p.matcher(template).replaceAll(replacement); 
@@ -183,7 +184,7 @@ public final class MethodChartGenerator implements Callable<Void>
     /**
      * Save an output resource. 
      */
-    private void save(File parentDir, String fileName, String content) throws IOException
+    static void save(File parentDir, String fileName, String content) throws IOException
     {
         final FileOutputStream fos = new FileOutputStream(fileName);
         fos.write(content.getBytes("UTF-8"));
