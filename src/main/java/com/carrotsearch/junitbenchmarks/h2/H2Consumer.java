@@ -275,7 +275,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
 
     private static String getDefaultCustomKey()
     {
-        return System.getProperty(Globals.CUSTOMKEY_PROPERTY, ".");
+        return System.getProperty(Globals.CUSTOMKEY_PROPERTY);
     }
 
     private static File getDefaultChartsDir()
@@ -290,8 +290,8 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     {
         PreparedStatement s = connection.prepareStatement(
             getResource("002-new-run.sql"), Statement.RETURN_GENERATED_KEYS);
-        s.setString(1, System.getProperty("os.arch", "?"));
-        s.setString(2, System.getProperty("java.runtime.version", "?"));
+        s.setString(1, System.getProperty("java.runtime.version", "?"));
+        s.setString(2, System.getProperty("os.arch", "?"));
         s.setString(3, customKeyValue);
         s.executeUpdate();
     
