@@ -25,5 +25,7 @@ public class TestH2HistoryChart
         assertEquals(0, result.getFailureCount());
 
         Common.assertFileExists(RepeatedTestSlave.class.getName() + ".html");
+        Common.assertFileExists(RepeatedTestSlave.class.getName() + ".json");
+        RepeatedTestSlave.dbFileFull.delete();
     }
 }
