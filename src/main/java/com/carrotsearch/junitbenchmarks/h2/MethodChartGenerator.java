@@ -1,40 +1,47 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
-import java.io.*;
+import java.io.File;
 import java.sql.*;
-import java.util.concurrent.Callable;
 
 /**
  * Generate a snippet of HTML code for a given class and all of its benchmarked methods. 
  */
-public final class MethodChartGenerator implements Callable<Void>
+public final class MethodChartGenerator
 {
     private Connection connection;
     private int runId;
     private String clazzName;
     private File parentDir;
+    private String filePrefix;
 
     /**
      * @param connection H2 database connection. 
      * @param parentDir Parent directory where charts should be dumped.
+     * @param filePrefix Prefix for generated files.
      * @param runId The run from which to select data.
      * @param clazzName The target test class (fully qualified name).
      */
-    public MethodChartGenerator(Connection connection, File parentDir, int runId, String clazzName)
+    public MethodChartGenerator(
+        Connection connection, 
+        File parentDir,
+        String filePrefix,
+        int runId, 
+        String clazzName)
     {
         this.connection = connection;
         this.runId = runId;
         this.clazzName = clazzName;
         this.parentDir = parentDir;
+        this.filePrefix = filePrefix;
     }
 
     /**
      * Generate the chart's HTML.
      */
-    public Void call() throws Exception
+    public void generate() throws Exception
     {
-        final String jsonFileName = clazzName + ".json";
-        final String htmlFileName = clazzName + ".html";
+        final String jsonFileName = filePrefix + ".json";
+        final String htmlFileName = filePrefix + ".html";
         
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
@@ -44,7 +51,6 @@ public final class MethodChartGenerator implements Callable<Void>
 
         GeneratorUtils.save(parentDir, htmlFileName, template);
         GeneratorUtils.save(parentDir, jsonFileName, getData());
-        return null;
     }
 
     /**

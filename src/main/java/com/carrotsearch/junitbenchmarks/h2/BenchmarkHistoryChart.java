@@ -11,6 +11,11 @@ import java.lang.annotation.*;
 public @interface BenchmarkHistoryChart
 {
     /**
+     * Chart file prefix override. If empty, class name is used. 
+     */
+    String filePrefix() default "";
+
+    /**
      * Maximum number of historical runs to take into account.
      */
     int maxRuns() default Integer.MAX_VALUE;

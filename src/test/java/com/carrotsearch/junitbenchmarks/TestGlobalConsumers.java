@@ -22,6 +22,9 @@ public class TestGlobalConsumers
             + ConsumerName.XML);
         
         System.setProperty(Globals.XML_FILE_PROPERTY, resultsFile.getAbsolutePath());
+
+        // Close any previous globals.
+        closeGlobals();
     }
 
     @Rule
@@ -42,13 +45,22 @@ public class TestGlobalConsumers
     @AfterClass
     public static void verify() throws Exception
     {
+        assertEquals(2, closeGlobals());
+        Common.existsAndDelete(resultsFile.getAbsolutePath());
+    }
+
+    /*
+     * 
+     */
+    private static int closeGlobals() throws IOException
+    {
         for (IResultsConsumer c : Globals.consumers)
         {
             if (c instanceof Closeable)
                 ((Closeable) c).close();
         }
-        assertEquals(2, Globals.consumers.length);
+        final int count = Globals.consumers.length;
         Globals.consumers = null;
-        Common.assertFileExists(resultsFile.getAbsolutePath());
+        return count;
     }
 }

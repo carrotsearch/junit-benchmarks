@@ -1,9 +1,9 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import org.h2.jdbcx.JdbcDataSource;
 
@@ -43,29 +43,18 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     private Connection connection;
 
     /** Unique primary key for this consumer in the RUNS table. */
-    private int runId;
+    int runId;
 
     /** Insert statement to the tests table. */
     private PreparedStatement newTest;
 
     /** Output directory for charts. */
-    private File chartsDir;
+    File chartsDir;
 
     /**
-     * Cache of types for which {@link MethodChartGenerator} should be invoked.
+     * Charting visitors.  
      */
-    private HashSet<String> typeCharts = new HashSet<String>();
-
-    /**
-     * Cache of types for which {@link HistoryChartGenerator} should be invoked.
-     */
-    private HashMap<String, HistoryChartGenerator> historyCharts 
-        = new HashMap<String, HistoryChartGenerator>();
-    
-    /**
-     * Chart generators to be executed at the end of collecting results. 
-     */
-    private List<Callable<Void>> chartGenerators = new ArrayList<Callable<Void>>();
+    private List<? extends IChartAnnotationVisitor> chartVisitors;
 
     /*
      * 
@@ -91,7 +80,6 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
         try
         {
             final JdbcDataSource ds = new org.h2.jdbcx.JdbcDataSource();
-    
             ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE");
             ds.setUser("sa");
 
@@ -102,11 +90,13 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             super.addAutoclose(this);
 
             checkSchema();
-    
+
             runId = getRunID(customKeyValue);
-    
+
             newTest = connection.prepareStatement(getResource("003-new-result.sql"));
             newTest.setInt(RUN_ID, runId);
+
+            this.chartVisitors = newChartVisitors();
         }
         catch (SQLException e)
         {
@@ -114,13 +104,26 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
         }
     }
 
+    /*
+     * 
+     */
+    private List<? extends IChartAnnotationVisitor> newChartVisitors()
+    {
+        return Arrays.asList(
+            new MethodChartVisitor(),
+            new HistoryChartVisitor());
+    }
+
     /**
      * Accept a single benchmark result.
      */
     public void accept(Result result)
     {
-        // Look for annotated types and save them for further analysis.
-        checkAnnotations(result);
+        // Visit chart collectors.
+        final Class<?> clazz = result.getTestClass();
+        final Method method = result.getTestMethod();
+        for (IChartAnnotationVisitor v : chartVisitors)
+            v.visit(clazz, method, result);
 
         try
         {
@@ -181,7 +184,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
         try
         {
             connection.rollback();
-            chartGenerators.clear();
+            this.chartVisitors = newChartVisitors();
         }
         catch (SQLException e)
         {
@@ -256,57 +259,6 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
     }
 
     /**
-     * Check target object and method's H2-specific annotations.
-     */
-    private void checkAnnotations(Result result)
-    {
-        final Class<?> clazz = result.getTestClass();
-        final String clazzName = clazz.getName();
-        if (clazz.isAnnotationPresent(BenchmarkMethodChart.class))
-        {
-            if (!typeCharts.contains(clazzName))
-            {
-                typeCharts.add(clazzName);
-                chartGenerators.add(new MethodChartGenerator(
-                    connection, chartsDir, runId, clazzName));
-            }
-        }
-    
-        boolean onMethod = result.getTestMethod().isAnnotationPresent(BenchmarkHistoryChart.class);
-        boolean onClass = clazz.isAnnotationPresent(BenchmarkHistoryChart.class);
-    
-        if (onMethod || onClass)
-        {
-            HistoryChartGenerator generator;
-            if (!historyCharts.containsKey(clazzName))
-            {
-                generator = new HistoryChartGenerator(connection, chartsDir, clazzName);
-                historyCharts.put(clazzName, generator);
-                chartGenerators.add(generator);
-            }
-            generator = historyCharts.get(clazzName);
-    
-            if (!onClass)
-            {
-                historyCharts.get(clazzName)
-                    .includeMethod(result.getTestMethod().getName());
-            }
-            
-            if (onClass)
-            {
-                generator.updateMax(
-                    clazz.getAnnotation(BenchmarkHistoryChart.class).maxRuns());
-            }
-            
-            if (onMethod)
-            {
-                generator.updateMax(
-                    result.getTestMethod().getAnnotation(BenchmarkHistoryChart.class).maxRuns());
-            }
-        }
-    }
-
-    /**
      * Return the global default DB name.
      */
     private static File getDefaultDbName()
@@ -359,14 +311,21 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     private void doClose() throws Exception
     {
-        connection.commit();
-
-        for (Callable<?> c : chartGenerators)
+        try
         {
-            c.call();
+            for (IChartAnnotationVisitor v : chartVisitors)
+            {
+                v.generate(this);
+            }
         }
-
-        connection.close();
+        finally
+        {
+            if (!connection.isClosed())
+            {
+                connection.commit();
+                connection.close();
+            }
+        }
     }
 
     /**
@@ -405,5 +364,13 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
         Statement s = connection.createStatement();
         s.executeUpdate("DELETE FROM DBVERSION");
         s.executeUpdate("INSERT INTO DBVERSION (VERSION) VALUES (" + newVersion.version + ")");
+    }
+
+    /**
+     * 
+     */
+    Connection getConnection()
+    {
+        return connection;
     }
 }

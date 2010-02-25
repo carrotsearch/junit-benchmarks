@@ -18,14 +18,22 @@ public class TestH2HistoryChart
     {
         RepeatedTestSlave.dbFileFull.delete();
 
-        Result result = JUnitCore.runClasses(
-            RepeatedTestSlave.class,
-            RepeatedTestSlave.class,
-            RepeatedTestSlave.class);
-        assertEquals(0, result.getFailureCount());
+        RepeatedTestSlave.cleanup = false;
+        try
+        {
+            Result result = JUnitCore.runClasses(
+                RepeatedTestSlave.class,
+                RepeatedTestSlave.class,
+                RepeatedTestSlave.class);
+            assertEquals(0, result.getFailureCount());
+        }
+        finally
+        {
+            RepeatedTestSlave.cleanup = true;            
+        }
 
-        Common.assertFileExists(RepeatedTestSlave.class.getName() + ".html");
-        Common.assertFileExists(RepeatedTestSlave.class.getName() + ".json");
+        Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".html");
+        Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".json");
         RepeatedTestSlave.dbFileFull.delete();
     }
 }

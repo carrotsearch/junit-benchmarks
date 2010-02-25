@@ -9,4 +9,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface BenchmarkMethodChart
 {
+    /**
+     * Chart file prefix override. If empty, class name is used. 
+     */
+    String filePrefix() default "";
 }

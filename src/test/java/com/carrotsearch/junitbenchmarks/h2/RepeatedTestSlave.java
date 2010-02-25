@@ -10,8 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
 
-import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
-import com.carrotsearch.junitbenchmarks.BenchmarkRule;
+import com.carrotsearch.junitbenchmarks.*;
 
 /**
  * Test H2 consumer's chart generation functionality. 
@@ -20,6 +19,7 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 @BenchmarkOptions(callgc = false)
 public class RepeatedTestSlave
 {
+    static boolean cleanup = true; 
     static final File dbFile = new File(RepeatedTestSlave.class.getName());
     static final File dbFileFull = new File(dbFile.getName() + ".h2.db");
 
@@ -50,5 +50,12 @@ public class RepeatedTestSlave
     public static void verify() throws Exception
     {
         h2consumer.close();
+
+        if (cleanup)
+        {
+            Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".html");
+            Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".json");
+            dbFileFull.delete();
+        }
     }
 }

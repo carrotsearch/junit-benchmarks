@@ -4,14 +4,13 @@ import java.io.File;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import com.carrotsearch.junitbenchmarks.Escape;
 
 /**
  * Generate historical view of a given test class (one or more methods). 
  */
-public final class HistoryChartGenerator implements Callable<Void>
+public final class HistoryChartGenerator
 {
     private Connection connection;
     private String clazzName;
@@ -28,6 +27,11 @@ public final class HistoryChartGenerator implements Callable<Void>
     private int maxRuns = Integer.MIN_VALUE;
 
     /**
+     * Prefix for output files.
+     */
+    private String filePrefix;
+
+    /**
      * Value holder for row aggregation.
      */
     private static final class StringHolder {
@@ -42,22 +46,26 @@ public final class HistoryChartGenerator implements Callable<Void>
     /**
      * @param connection H2 database connection. 
      * @param parentDir Parent directory where charts should be dumped.
+     * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
      */
-    public HistoryChartGenerator(Connection connection, File parentDir, String clazzName)
+    public HistoryChartGenerator(Connection connection, File parentDir, 
+        String filePrefix, 
+        String clazzName)
     {
         this.connection = connection;
         this.clazzName = clazzName;
         this.parentDir = parentDir;
+        this.filePrefix = filePrefix;
     }
 
     /**
      * Generate the chart's HTML.
      */
-    public Void call() throws Exception
+    public void generate() throws Exception
     {
-        final String jsonFileName = clazzName + ".json";
-        final String htmlFileName = clazzName + ".html";
+        final String jsonFileName = filePrefix + ".json";
+        final String htmlFileName = filePrefix + ".html";
 
         String template = H2Consumer.getResource("HistoryChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
@@ -66,7 +74,6 @@ public final class HistoryChartGenerator implements Callable<Void>
 
         GeneratorUtils.save(parentDir, htmlFileName, template);
         GeneratorUtils.save(parentDir, jsonFileName, getData());
-        return null;
     }
 
     private String getProperties()

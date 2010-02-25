@@ -63,7 +63,7 @@ public class TestH2MethodChart
         assertTrue(dbFileFull.exists());
         assertTrue(dbFileFull.delete());
 
-        Common.assertFileExists(TestH2MethodChart.class.getName() + ".html");
-        Common.assertFileExists(TestH2MethodChart.class.getName() + ".json");
+        Common.existsAndDelete(TestH2MethodChart.class.getName() + ".html");
+        Common.existsAndDelete(TestH2MethodChart.class.getName() + ".json");
     }
 }
