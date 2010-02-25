@@ -84,6 +84,7 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
             ds.setUser("sa");
 
             this.chartsDir = chartsDir;
+            this.chartVisitors = newChartVisitors();
     
             this.connection = ds.getConnection();
             connection.setAutoCommit(false);
@@ -95,8 +96,6 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
 
             newTest = connection.prepareStatement(getResource("003-new-result.sql"));
             newTest.setInt(RUN_ID, runId);
-
-            this.chartVisitors = newChartVisitors();
         }
         catch (SQLException e)
         {

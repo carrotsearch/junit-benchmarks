@@ -22,12 +22,21 @@ class MethodChartVisitor implements IChartAnnotationVisitor
     {
         for (Class<?> clazz : types)
         {
-            new MethodChartGenerator(
+            MethodChartGenerator g = new MethodChartGenerator(
                 c.getConnection(), 
                 c.chartsDir,
                 getFilePrefix(clazz),
                 c.runId, 
-                clazz.getName()).generate();
+                clazz.getName());
+
+            AxisRange ann = clazz.getAnnotation(AxisRange.class);
+            if (ann != null)
+            {
+                g.min = ann.min();
+                g.max = ann.max();
+            }
+
+            g.generate();
         }
     }
 

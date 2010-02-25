@@ -1,6 +1,6 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -15,9 +15,10 @@ import com.carrotsearch.junitbenchmarks.h2.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**
- * Test H2 consumer's chart generation functionality. 
+ * Test method-level chart generation. 
  */
-@BenchmarkMethodChart
+@AxisRange(max = 1)
+@BenchmarkMethodChart()
 @BenchmarkOptions(callgc = false)
 public class TestH2MethodChart
 {
@@ -63,7 +64,10 @@ public class TestH2MethodChart
         assertTrue(dbFileFull.exists());
         assertTrue(dbFileFull.delete());
 
-        Common.existsAndDelete(TestH2MethodChart.class.getName() + ".html");
+        String c1 = Common.getAndDelete(new File(TestH2MethodChart.class.getName() + ".html"));
+        assertTrue(c1.contains("max:"));
+        assertFalse(c1.contains("min:"));
+
         Common.existsAndDelete(TestH2MethodChart.class.getName() + ".json");
     }
 }

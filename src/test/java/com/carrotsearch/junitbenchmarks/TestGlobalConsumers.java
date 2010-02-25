@@ -54,6 +54,9 @@ public class TestGlobalConsumers
      */
     private static int closeGlobals() throws IOException
     {
+        if (Globals.consumers == null)
+            return 0;
+
         for (IResultsConsumer c : Globals.consumers)
         {
             if (c instanceof Closeable)

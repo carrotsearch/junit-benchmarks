@@ -32,6 +32,11 @@ public final class HistoryChartGenerator
     private String filePrefix;
 
     /**
+     * Min/ max.
+     */
+    private double min = Double.NaN, max = Double.NaN;
+
+    /**
      * Value holder for row aggregation.
      */
     private static final class StringHolder {
@@ -70,6 +75,8 @@ public final class HistoryChartGenerator
         String template = H2Consumer.getResource("HistoryChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
         template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
+            GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
 
         GeneratorUtils.save(parentDir, htmlFileName, template);
@@ -205,6 +212,7 @@ public final class HistoryChartGenerator
                 if (rs.isLast())
                 {
                     byColumn.get(name).value = nf.format(avg);
+                    previousRowId = rowId;
                 }
 
                 if (previousRowId >= 0)
@@ -250,8 +258,30 @@ public final class HistoryChartGenerator
     /**
      * Update max history steps.
      */
-    public void updateMax(int newMax)
+    public void updateMaxRuns(int newMax)
     {
         this.maxRuns = Math.max(newMax, maxRuns);
+    }
+
+    /**
+     * Update min/max fields.
+     */
+    public void updateMinMax(AxisRange r)
+    {
+        if (Double.isNaN(this.min))
+            this.min = r.min();
+
+        if (!Double.isNaN(r.min()))
+        {
+            this.min = Math.min(r.min(), this.min);
+        }
+
+        if (Double.isNaN(this.max))
+            this.max = r.max();
+
+        if (!Double.isNaN(r.max()))
+        {
+            this.max = Math.max(r.max(), this.max);
+        }
     }
 }

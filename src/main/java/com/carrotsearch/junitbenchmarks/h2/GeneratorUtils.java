@@ -105,4 +105,20 @@ final class GeneratorUtils
         fos.write(content.getBytes("UTF-8"));
         fos.close();
     }
+
+    static String getMinMax(double min, double max)
+    {
+        StringBuilder b = new StringBuilder();
+        if (!Double.isNaN(min))
+        {
+            b.append("min: " + min + ",");
+        }
+    
+        if (!Double.isNaN(max))
+        {
+            b.append("max: " + max + ",");
+        }
+    
+        return b.toString();
+    }
 }

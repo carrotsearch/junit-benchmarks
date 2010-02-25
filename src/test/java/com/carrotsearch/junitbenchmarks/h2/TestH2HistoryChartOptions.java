@@ -12,6 +12,7 @@ import org.junit.rules.MethodRule;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.Common;
 
+@AxisRange(max = 1)
 @BenchmarkHistoryChart(filePrefix = "class-global")
 public class TestH2HistoryChartOptions
 {
@@ -39,6 +40,7 @@ public class TestH2HistoryChartOptions
         Thread.sleep(new Random().nextInt(20));
     }
 
+    @AxisRange(max = 2)
     @BenchmarkHistoryChart(filePrefix = "method-level")
     @Test
     public void testMethodB() throws Exception
@@ -63,12 +65,17 @@ public class TestH2HistoryChartOptions
         assertTrue(c1.contains("testMethodA"));
         assertTrue(c1.contains("testMethodB"));
         assertTrue(c1.contains("testMethodC"));
+        c1 = Common.getAndDelete(new File(chartsDir, "class-global" + ".html"));
+        assertTrue(c1.contains("max:"));
+        assertFalse(c1.contains("min:"));
 
         String c2 = Common.getAndDelete(new File(chartsDir, "method-level" + ".json"));
         assertFalse(c2.contains("testMethodA"));
         assertTrue(c2.contains("testMethodB"));
         assertTrue(c2.contains("testMethodC"));
-
+        c2 = Common.getAndDelete(new File(chartsDir, "method-level" + ".html"));
+        assertTrue(c2.contains("max: 2"));
+        assertFalse(c2.contains("min:"));
 
         assertTrue(Common.deleteDir(chartsDir));
     }

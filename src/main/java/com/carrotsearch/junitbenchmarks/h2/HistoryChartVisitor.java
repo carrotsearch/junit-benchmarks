@@ -54,10 +54,11 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
             {
                 HistoryChartGenerator gen = new HistoryChartGenerator(
                     c.getConnection(), c.chartsDir, getFilePrefix(ann, clazz), clazz.getName());
-                gen.updateMax(ann.maxRuns());
+                gen.updateMaxRuns(ann.maxRuns());
+                updateMinMax(clazz.getAnnotation(AxisRange.class), gen);
                 gen.generate();
             }
-            
+
             /*
              * Now check per-method annotations. Partition by file prefix first.
              */
@@ -88,11 +89,20 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
                 
                 for (Method m : e2.getValue())
                 {
-                    gen.updateMax(m.getAnnotation(BenchmarkHistoryChart.class).maxRuns());
+                    gen.updateMaxRuns(m.getAnnotation(BenchmarkHistoryChart.class).maxRuns());
+                    updateMinMax(m.getAnnotation(AxisRange.class), gen);
                     gen.includeMethod(m.getName());
                 }
                 gen.generate();
             }
+        }
+    }
+
+    private void updateMinMax(AxisRange ann, HistoryChartGenerator gen)
+    {
+        if (ann != null)
+        {
+            gen.updateMinMax(ann);
         }
     }
 

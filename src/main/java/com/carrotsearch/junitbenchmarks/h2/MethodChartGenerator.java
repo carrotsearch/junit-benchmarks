@@ -14,6 +14,8 @@ public final class MethodChartGenerator
     private File parentDir;
     private String filePrefix;
 
+    double min = Double.NaN, max = Double.NaN;
+
     /**
      * @param connection H2 database connection. 
      * @param parentDir Parent directory where charts should be dumped.
@@ -46,6 +48,8 @@ public final class MethodChartGenerator
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
         template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
+            GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", 
             GeneratorUtils.getProperties(connection, runId));
 
