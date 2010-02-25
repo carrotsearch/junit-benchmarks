@@ -3,7 +3,6 @@ package com.carrotsearch.junitbenchmarks.h2;
 import java.io.*;
 import java.sql.*;
 import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 
 /**
  * Generate a snippet of HTML code for a given class and all of its benchmarked methods. 
@@ -38,46 +37,14 @@ public final class MethodChartGenerator implements Callable<Void>
         final String htmlFileName = clazzName + ".html";
         
         String template = H2Consumer.getResource("MethodChartGenerator.html");
-        template = replaceToken(template, "CLASSNAME", clazzName);
-        template = replaceToken(template, "JSONDATA.json", jsonFileName);
-        template = replaceToken(template, "PROPERTIES", 
-            getProperties(connection, runId));
+        template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
+        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "PROPERTIES", 
+            GeneratorUtils.getProperties(connection, runId));
 
-        save(parentDir, htmlFileName, template);
-        save(parentDir, jsonFileName, getData());
+        GeneratorUtils.save(parentDir, htmlFileName, template);
+        GeneratorUtils.save(parentDir, jsonFileName, getData());
         return null;
-    }
-
-    /**
-     * Get extra properties associated with the chart's test class/ run. 
-     */
-    static String getProperties(Connection connection, int runId) throws SQLException
-    {
-        StringBuilder buf = new StringBuilder();
-
-        final PreparedStatement s = 
-            connection.prepareStatement(H2Consumer.getResource("method-chart-properties.sql"));
-        s.setInt(1, runId);
-
-        ResultSet rs = s.executeQuery();
-        ResultSetMetaData metaData = rs.getMetaData();
-        while (rs.next())
-        {   
-            for (int i = 1; i <= metaData.getColumnCount(); i++)
-            {
-                final Object obj = rs.getObject(i);
-                if (obj == null)
-                    continue;
-
-                buf.append(metaData.getColumnLabel(i));
-                buf.append(": ");
-                buf.append(obj);
-                buf.append("\n");
-            }
-        }
-
-        // TODO: buf HTML-escaping here?
-        return buf.toString();
     }
 
     /**
@@ -101,7 +68,7 @@ public final class MethodChartGenerator implements Callable<Void>
         for (int i = 1; i <= metaData.getColumnCount(); i++)
         {
             final String colLabel = metaData.getColumnLabel(i);
-            final String type = getMappedType(metaData.getColumnType(i));
+            final String type = GeneratorUtils.getMappedType(metaData.getColumnType(i));
 
             buf.append("{\"label\": \"");
             buf.append(colLabel);
@@ -120,7 +87,7 @@ public final class MethodChartGenerator implements Callable<Void>
             for (int i = 1; i <= metaData.getColumnCount(); i++)
             {
                 if (i > 1) buf.append(", ");
-                final Object value = formatValue(metaData.getColumnType(i), rs.getObject(i)); 
+                final Object value = GeneratorUtils.formatValue(metaData.getColumnType(i), rs.getObject(i)); 
                 buf.append("{\"v\": ");
                 buf.append(value.toString());
                 buf.append("}");
@@ -133,61 +100,5 @@ public final class MethodChartGenerator implements Callable<Void>
 
         rs.close();
         return buf.toString();
-    }
-
-    static Object formatValue(int sqlColumnType, Object val)
-    {
-        switch (sqlColumnType)
-        {
-            // TODO: add escaping here? Seems to be of little practical use in this scenario.
-            case java.sql.Types.VARCHAR:
-                return "\"" + val + "\"";
-
-            case java.sql.Types.NUMERIC:
-            case java.sql.Types.DOUBLE:
-            case java.sql.Types.FLOAT:
-            case java.sql.Types.INTEGER:
-            case java.sql.Types.SMALLINT:
-            case java.sql.Types.TINYINT:
-                return val;
-        }
-        throw new RuntimeException("Unsupported column type: " + sqlColumnType);
-    }
-
-    static String getMappedType(int sqlColumnType)
-    {
-        switch (sqlColumnType)
-        {
-            case java.sql.Types.VARCHAR:
-                return "string";
-
-            case java.sql.Types.NUMERIC:
-            case java.sql.Types.DOUBLE:
-            case java.sql.Types.FLOAT:
-            case java.sql.Types.INTEGER:
-            case java.sql.Types.SMALLINT:
-            case java.sql.Types.TINYINT:
-                return "number";
-        }
-        throw new RuntimeException("Unsupported column type: " + sqlColumnType);
-    }
-
-    /**
-     * Process the template and substitute a fixed token.
-     */
-    static String replaceToken(String template, String key, String replacement)
-    {
-        Pattern p = Pattern.compile(key, Pattern.LITERAL);
-        return p.matcher(template).replaceAll(replacement); 
-    }
-
-    /**
-     * Save an output resource. 
-     */
-    static void save(File parentDir, String fileName, String content) throws IOException
-    {
-        final FileOutputStream fos = new FileOutputStream(fileName);
-        fos.write(content.getBytes("UTF-8"));
-        fos.close();
     }
 }

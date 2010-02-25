@@ -1,18 +1,12 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
-import static com.carrotsearch.junitbenchmarks.h2.MethodChartGenerator.replaceToken;
-import static com.carrotsearch.junitbenchmarks.h2.MethodChartGenerator.save;
-
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.Callable;
+
+import com.carrotsearch.junitbenchmarks.Escape;
 
 /**
  * Generate historical view of a given test class (one or more methods). 
@@ -32,6 +26,18 @@ public final class HistoryChartGenerator implements Callable<Void>
      * Maximum number of history steps to fetch.
      */
     private int maxRuns = Integer.MIN_VALUE;
+
+    /**
+     * Value holder for row aggregation.
+     */
+    private static final class StringHolder {
+        public String value;
+        
+        public StringHolder(String value)
+        {
+            this.value = value;
+        }
+    };
 
     /**
      * @param connection H2 database connection. 
@@ -54,12 +60,12 @@ public final class HistoryChartGenerator implements Callable<Void>
         final String htmlFileName = clazzName + ".html";
 
         String template = H2Consumer.getResource("HistoryChartGenerator.html");
-        template = replaceToken(template, "CLASSNAME", clazzName);
-        template = replaceToken(template, "JSONDATA.json", jsonFileName);
-        template = replaceToken(template, "PROPERTIES", getProperties());
+        template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
+        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
 
-        save(parentDir, htmlFileName, template);
-        save(parentDir, jsonFileName, getData());
+        GeneratorUtils.save(parentDir, htmlFileName, template);
+        GeneratorUtils.save(parentDir, jsonFileName, getData());
         return null;
     }
 
@@ -82,8 +88,7 @@ public final class HistoryChartGenerator implements Callable<Void>
             {
                 if (i > 0) b.append(", ");
                 b.append("'");
-                // TODO: sql-escape here?
-                b.append(methods.get(i));
+                b.append(Escape.sqlEscape(methods.get(i)));
                 b.append("'");
             }
             b.append(")");
@@ -144,7 +149,7 @@ public final class HistoryChartGenerator implements Callable<Void>
         {
             buf.append(",\n");
             buf.append("{\"label\": \"");
-            buf.append(columnNames.get(i));
+            buf.append(Escape.jsonEscape(columnNames.get(i)));
             buf.append("\", \"type\": \"string\"} ");
         }
         buf.append("],\n");
@@ -162,15 +167,6 @@ public final class HistoryChartGenerator implements Callable<Void>
         s.setInt(2, minRunId);
         rs = s.executeQuery();
 
-        class NameValue {
-            public String value;
-            
-            public NameValue(String value)
-            {
-                this.value = value;
-            }
-        };
-
         /*
          * We need to emit a value for every column, possibly missing, so prepare a
          * full row.
@@ -179,12 +175,12 @@ public final class HistoryChartGenerator implements Callable<Void>
         nf.setMaximumFractionDigits(3);
         nf.setGroupingUsed(false);
 
-        HashMap<String, NameValue> byColumn = new HashMap<String, NameValue>();
-        ArrayList<NameValue> row = new ArrayList<NameValue>();
-        row.add(new NameValue(null));
+        final HashMap<String, StringHolder> byColumn = new HashMap<String, StringHolder>();
+        final ArrayList<StringHolder> row = new ArrayList<StringHolder>();
+        row.add(new StringHolder(null));
         for (String name : columnNames)
         {
-            NameValue nv = new NameValue(null);
+            StringHolder nv = new StringHolder(null);
             row.add(nv);
             byColumn.put(name, nv);
         }
@@ -210,7 +206,7 @@ public final class HistoryChartGenerator implements Callable<Void>
                     row.get(0).value = '"' + Integer.toString(previousRowId) + '"';
 
                     buf.append("{\"c\": [");
-                    for (NameValue nv : row)
+                    for (StringHolder nv : row)
                     {
                         buf.append("{\"v\": ");
                         buf.append(nv.value);
@@ -219,15 +215,16 @@ public final class HistoryChartGenerator implements Callable<Void>
                     buf.append("]},");
                     buf.append('\n');
 
-                    for (NameValue nv : row)
+                    for (StringHolder nv : row)
                         nv.value = null;
                 }
 
                 previousRowId = rowId;
             }
 
-            NameValue nv = byColumn.get(name);
-            if (nv == null) throw new RuntimeException("Missing column: " + name);
+            final StringHolder nv = byColumn.get(name);
+            if (nv == null) 
+                throw new RuntimeException("Missing column: " + name);
             nv.value = nf.format(avg);
         }
         buf.append("]}\n");

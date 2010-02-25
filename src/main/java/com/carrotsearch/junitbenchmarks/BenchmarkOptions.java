@@ -16,12 +16,14 @@ public @interface BenchmarkOptions
     boolean callgc() default false;
 
     /**
-     * Sets the number of warmup rounds for the test. If negative, the default is taken.
+     * Sets the number of warmup rounds for the test. If negative, the default is taken
+     * from global options.
      */
     int warmupRounds() default -1;
 
     /**
-     * Sets the number of benchmark rounds for the test. If negative, the default is taken.
+     * Sets the number of benchmark rounds for the test. If negative, the default is taken
+     * from global options.
      */
     int benchmarkRounds() default -1;
 }
