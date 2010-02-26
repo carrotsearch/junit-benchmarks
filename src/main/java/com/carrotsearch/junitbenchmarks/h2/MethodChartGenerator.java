@@ -1,6 +1,5 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
-import java.io.File;
 import java.sql.*;
 
 /**
@@ -11,21 +10,18 @@ public final class MethodChartGenerator
     private Connection connection;
     private int runId;
     private String clazzName;
-    private File parentDir;
     private String filePrefix;
 
     double min = Double.NaN, max = Double.NaN;
 
     /**
      * @param connection H2 database connection. 
-     * @param parentDir Parent directory where charts should be dumped.
      * @param filePrefix Prefix for generated files.
      * @param runId The run from which to select data.
      * @param clazzName The target test class (fully qualified name).
      */
     public MethodChartGenerator(
         Connection connection, 
-        File parentDir,
         String filePrefix,
         int runId, 
         String clazzName)
@@ -33,7 +29,6 @@ public final class MethodChartGenerator
         this.connection = connection;
         this.runId = runId;
         this.clazzName = clazzName;
-        this.parentDir = parentDir;
         this.filePrefix = filePrefix;
     }
 
@@ -53,8 +48,8 @@ public final class MethodChartGenerator
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", 
             GeneratorUtils.getProperties(connection, runId));
 
-        GeneratorUtils.save(parentDir, htmlFileName, template);
-        GeneratorUtils.save(parentDir, jsonFileName, getData());
+        GeneratorUtils.save(htmlFileName, template);
+        GeneratorUtils.save(jsonFileName, getData());
     }
 
     /**

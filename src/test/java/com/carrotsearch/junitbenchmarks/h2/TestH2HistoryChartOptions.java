@@ -13,6 +13,7 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.Common;
 
 @AxisRange(max = 1)
+@BenchmarkMethodChart(filePrefix = "methods-CLASSNAME")
 @BenchmarkHistoryChart(filePrefix = "class-global")
 public class TestH2HistoryChartOptions
 {
@@ -55,6 +56,13 @@ public class TestH2HistoryChartOptions
         Thread.sleep(new Random().nextInt(30));
     }
 
+    @BenchmarkHistoryChart(filePrefix = "testMethodD-CLASSNAME")
+    @Test
+    public void testMethodD() throws Exception
+    {
+        Thread.sleep(new Random().nextInt(30));
+    }
+
     @AfterClass
     public static void verify() throws Exception
     {
@@ -76,6 +84,16 @@ public class TestH2HistoryChartOptions
         c2 = Common.getAndDelete(new File(chartsDir, "method-level" + ".html"));
         assertTrue(c2.contains("max: 2"));
         assertFalse(c2.contains("min:"));
+
+        Common.existsAndDelete(
+            new File(chartsDir, "methods-" + TestH2HistoryChartOptions.class.getName() + ".html"));
+        Common.existsAndDelete(
+            new File(chartsDir, "methods-" + TestH2HistoryChartOptions.class.getName() + ".json"));
+
+        Common.existsAndDelete(
+            new File(chartsDir, "testMethodD-" + TestH2HistoryChartOptions.class.getName() + ".html"));
+        Common.existsAndDelete(
+            new File(chartsDir, "testMethodD-" + TestH2HistoryChartOptions.class.getName() + ".json"));
 
         assertTrue(Common.deleteDir(chartsDir));
     }

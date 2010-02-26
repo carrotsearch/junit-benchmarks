@@ -12,6 +12,12 @@ import com.carrotsearch.junitbenchmarks.Escape;
 final class GeneratorUtils
 {
     /**
+     * Literal 'CLASSNAME'.
+     */
+    private final static Pattern CLASSNAME_PATTERN = 
+        Pattern.compile("CLASSNAME", Pattern.LITERAL);
+
+    /**
      * Get extra properties associated with the given run. 
      */
     static String getProperties(Connection connection, int runId) throws SQLException
@@ -99,9 +105,9 @@ final class GeneratorUtils
     /**
      * Save an output resource to a given file. 
      */
-    static void save(File parentDir, String fileName, String content) throws IOException
+    static void save(String fileName, String content) throws IOException
     {
-        final FileOutputStream fos = new FileOutputStream(new File(parentDir, fileName));
+        final FileOutputStream fos = new FileOutputStream(new File(fileName));
         fos.write(content.getBytes("UTF-8"));
         fos.close();
     }
@@ -120,5 +126,31 @@ final class GeneratorUtils
         }
     
         return b.toString();
+    }
+
+    /**
+     * Process file prefix for charts.
+     * 
+     * @param clazz Chart's class.
+     * @param filePrefix File prefix annotation's value (may be empty).
+     * @param chartsDir Parent directory for chart output files.
+     * @return Fully qualified file name prefix (absolute).
+     */
+    public static String getFilePrefix(Class<?> clazz, String filePrefix, File chartsDir)
+    {
+        if (filePrefix == null || filePrefix.trim().equals(""))
+        {
+            filePrefix = clazz.getName();
+        }
+
+        filePrefix = CLASSNAME_PATTERN.matcher(filePrefix).replaceAll(clazz.getName());
+
+        if (!new File(filePrefix).isAbsolute())
+        {
+            // For relative prefixes, attach parent directory.
+            filePrefix = new File(chartsDir, filePrefix).getAbsolutePath();
+        }
+
+        return filePrefix;
     }
 }

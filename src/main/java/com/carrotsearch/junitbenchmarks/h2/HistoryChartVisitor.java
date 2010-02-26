@@ -53,7 +53,9 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
             if (ann != null)
             {
                 HistoryChartGenerator gen = new HistoryChartGenerator(
-                    c.getConnection(), c.chartsDir, getFilePrefix(ann, clazz), clazz.getName());
+                    c.getConnection(), 
+                    GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.chartsDir), 
+                    clazz.getName());
                 gen.updateMaxRuns(ann.maxRuns());
                 updateMinMax(clazz.getAnnotation(AxisRange.class), gen);
                 gen.generate();
@@ -66,7 +68,7 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
             for (Method m : methods)
             {
                 BenchmarkHistoryChart methodAnn = m.getAnnotation(BenchmarkHistoryChart.class);
-                String prefix = getFilePrefix(methodAnn, clazz);
+                String prefix = GeneratorUtils.getFilePrefix(clazz, methodAnn.filePrefix(), c.chartsDir);
                 if (!byPrefix.containsKey(prefix))
                 {
                     byPrefix.put(prefix, new ArrayList<Method>());
@@ -79,14 +81,16 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
              */
             if (ann != null)
             {
-                byPrefix.remove(getFilePrefix(ann, clazz));
+                byPrefix.remove(GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.chartsDir));
             }
-            
+
             for (Map.Entry<String, List<Method>> e2 : byPrefix.entrySet())
             {
                 HistoryChartGenerator gen = new HistoryChartGenerator(
-                    c.getConnection(), c.chartsDir, e2.getKey(), clazz.getName());
-                
+                    c.getConnection(),
+                    e2.getKey(), 
+                    clazz.getName());
+
                 for (Method m : e2.getValue())
                 {
                     gen.updateMaxRuns(m.getAnnotation(BenchmarkHistoryChart.class).maxRuns());
@@ -104,16 +108,5 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
         {
             gen.updateMinMax(ann);
         }
-    }
-
-    /*
-     * 
-     */
-    private String getFilePrefix(BenchmarkHistoryChart ann, Class<?> clazz)
-    {
-        if (ann.filePrefix().length() > 0)
-            return ann.filePrefix();
-
-        return clazz.getName();
     }
 }

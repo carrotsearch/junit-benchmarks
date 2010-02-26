@@ -24,8 +24,10 @@ class MethodChartVisitor implements IChartAnnotationVisitor
         {
             MethodChartGenerator g = new MethodChartGenerator(
                 c.getConnection(), 
-                c.chartsDir,
-                getFilePrefix(clazz),
+                GeneratorUtils.getFilePrefix(
+                    clazz, 
+                    clazz.getAnnotation(BenchmarkMethodChart.class).filePrefix(),
+                    c.chartsDir),
                 c.runId, 
                 clazz.getName());
 
@@ -50,19 +52,5 @@ class MethodChartVisitor implements IChartAnnotationVisitor
         {
             types.add(clazz);
         }
-    }
-    
-    /*
-     * 
-     */
-    private String getFilePrefix(Class<?> clazz)
-    {
-        BenchmarkMethodChart ann = clazz.getAnnotation(BenchmarkMethodChart.class);
-        String filePrefix = ann.filePrefix();
-        if (filePrefix.length() == 0)
-        {
-            filePrefix = clazz.getName();
-        }
-        return filePrefix;
     }
 }

@@ -19,7 +19,14 @@ public final class Common
      */
     public static void existsAndDelete(String fileName)
     {
-        final File f = new File(fileName);
+        existsAndDelete(new File(fileName));
+    }
+
+    /*
+     * 
+     */
+    public static void existsAndDelete(File f)
+    {
         assertTrue(f.exists());
         assertTrue(f.delete());
     }
