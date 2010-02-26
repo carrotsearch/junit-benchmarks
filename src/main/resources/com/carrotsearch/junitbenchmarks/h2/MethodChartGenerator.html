@@ -7,7 +7,7 @@
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load("jquery", "1.4.2");
-      google.load('visualization', '1', {packages: ['columnchart', 'table']});
+      google.load('visualization', '1', {packages: ['barchart', 'columnchart', 'table']});
     </script>
 
     <style type="text/css">
@@ -18,8 +18,8 @@
 		}
 
 		#chart {
-		  width: 500px;
-		  height: 300px;
+		  width: 600px;
+		  height: 400px;
 		  margin-left: auto;
 		  margin-right: auto;
 		  margin-bottom: 10px;
@@ -56,9 +56,16 @@
     </style>
 
     <script type="text/javascript">
-      var chart;
+      var horizontal = false;
+      var view;
+      var data;
+      var table;
 
-      function redrawChart(view) {
+      function redrawChart() {
+          var chart = (horizontal 
+                  ? new google.visualization.BarChart(document.getElementById('chart'))
+                  : new google.visualization.ColumnChart(document.getElementById('chart')));
+
           chart.draw(view, {
               legend: "none",
               titleY: view.getColumnLabel(1),
@@ -70,16 +77,14 @@
       }
 
       function visualize(jsonData, className) {
-        var data = new google.visualization.DataTable(jsonData);
+        data = new google.visualization.DataTable(jsonData);
 
-        var table = new google.visualization.Table(document.getElementById('raw-data'));
+        table = new google.visualization.Table(document.getElementById('raw-data'));
         table.draw(data);
 
-        var view = new google.visualization.DataView(data);
-
-        chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+        view = new google.visualization.DataView(data);
         view.setColumns([0, 1]);
-        redrawChart(view);
+        redrawChart();
 
         google.visualization.events.addListener(table, 'sort',
 			function(event) {
@@ -88,18 +93,24 @@
 			  }
 
               view.setRows(data.getSortedRows([{column: event.column, desc: !event.ascending}]));
-			  redrawChart(view);
+			  redrawChart();
 		});
       }
 
       google.setOnLoadCallback(function() {
-          $.getJSON('JSONDATA.json', function(data) {
+          $.getJSON('MethodChartGenerator.json', function(data) {
               visualize(data, "CLASSNAME");
           });
 
           $("#properties").click(function () {
         	  $(this).toggleClass("expanded"); 
               $("#proplist").slideToggle();
+          });
+
+          $("#orientation").click(function () {
+              $(this).toggleClass("expanded");
+              horizontal = !horizontal; 
+              redrawChart();
           });
       });
     </script>
@@ -109,6 +120,7 @@
     <div id="content">
 	    <h1>Benchmark results for methods in class CLASSNAME</h1>
 
+        <ul class="expander"><li id="orientation" class="expanded"><a href="#">Orientation</a></li></ul>
 	    <div id="chart" ></div>
 	    <div id="raw-data"></div>
 
