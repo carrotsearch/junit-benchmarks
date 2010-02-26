@@ -18,6 +18,23 @@ final class GeneratorUtils
         Pattern.compile("CLASSNAME", Pattern.LITERAL);
 
     /**
+     * Return the index of a column labeled <code>name</code>. If no explicit
+     * label (SQL's <code>AS</code>) is given, the name defaults to the database
+     * column's name.
+     */
+    public static int getColumnIndex(ResultSet rs, String label)
+        throws SQLException
+    {
+        final ResultSetMetaData md = rs.getMetaData();
+        for (int i = 1; i <= md.getColumnCount(); i++)
+        {
+            if (label.equals(md.getColumnLabel(i)))
+                return i;
+        }
+        throw new RuntimeException("No column labeled: " + label);
+    }
+
+    /**
      * Get extra properties associated with the given run. 
      */
     static String getProperties(Connection connection, int runId) throws SQLException

@@ -1,0 +1,17 @@
+<benchmark-results tstamp="2010-02-26T18:22:51.070+0100">
+
+	<testname classname="com.carrotsearch.junitbenchmarks.TestDefaultRuleFired" name="testNormalMethod"
+		 benchmark-rounds="10" warmup-rounds="5"
+		 round-avg="0" round-stddev="0"
+		 gc-avg="0" gc-stddev="0"
+		 gc-invocations="0" gc-time="0"
+		 benchmark-time-total="0" warmup-time-total="0"/>
+
+	<testname classname="com.carrotsearch.junitbenchmarks.TestDefaultRuleFired" name="testCustomAnnotation"
+		 benchmark-rounds="5" warmup-rounds="3"
+		 round-avg="0" round-stddev="0"
+		 gc-avg="0" gc-stddev="0"
+		 gc-invocations="0" gc-time="0"
+		 benchmark-time-total="0" warmup-time-total="0"/>
+
+</benchmark-results>

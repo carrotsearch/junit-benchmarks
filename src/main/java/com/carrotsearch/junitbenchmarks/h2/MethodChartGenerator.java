@@ -43,7 +43,7 @@ public final class MethodChartGenerator
         
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", 
+        template = GeneratorUtils.replaceToken(template, "MethodChartGenerator.json", 
             new File(jsonFileName).getName());
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
             GeneratorUtils.getMinMax(min, max));

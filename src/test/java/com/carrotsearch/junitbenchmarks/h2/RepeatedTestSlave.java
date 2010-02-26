@@ -15,7 +15,7 @@ import com.carrotsearch.junitbenchmarks.*;
 /**
  * Test H2 consumer's chart generation functionality. 
  */
-@BenchmarkHistoryChart()
+@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY)
 @BenchmarkOptions(callgc = false)
 public class RepeatedTestSlave
 {

@@ -1,9 +1,17 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
+import static com.carrotsearch.junitbenchmarks.h2.GeneratorUtils.getColumnIndex;
+
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
 
 import com.carrotsearch.junitbenchmarks.Escape;
 
@@ -12,6 +20,15 @@ import com.carrotsearch.junitbenchmarks.Escape;
  */
 public final class HistoryChartGenerator
 {
+    private static EnumMap<LabelType, Integer> labelColumns;
+    static
+    {
+        labelColumns = new EnumMap<LabelType, Integer>(LabelType.class);
+        labelColumns.put(LabelType.RUN_ID, 0);
+        labelColumns.put(LabelType.CUSTOM_KEY, 1);
+        labelColumns.put(LabelType.TIMESTAMP, 2);
+    }
+
     private Connection connection;
     private String clazzName;
 
@@ -34,6 +51,11 @@ public final class HistoryChartGenerator
      * Min/ max.
      */
     private double min = Double.NaN, max = Double.NaN;
+    
+    /**
+     * Default X-axis label column.
+     */
+    private final LabelType labelType;
 
     /**
      * Value holder for row aggregation.
@@ -52,11 +74,13 @@ public final class HistoryChartGenerator
      * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
      */
-    public HistoryChartGenerator(Connection connection, String filePrefix, String clazzName)
+    public HistoryChartGenerator(Connection connection, 
+        String filePrefix, String clazzName, LabelType labelType)
     {
         this.connection = connection;
         this.clazzName = clazzName;
         this.filePrefix = filePrefix;
+        this.labelType = labelType;
     }
 
     /**
@@ -69,10 +93,12 @@ public final class HistoryChartGenerator
 
         String template = H2Consumer.getResource("HistoryChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", 
+        template = GeneratorUtils.replaceToken(template, "HistoryChartGenerator.json", 
             new File(jsonFileName).getName());
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
             GeneratorUtils.getMinMax(min, max));
+        template = GeneratorUtils.replaceToken(template, "/*LABELCOLUMN*/", 
+            Integer.toString(labelColumns.get(labelType)));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
 
         GeneratorUtils.save(htmlFileName, template);
@@ -151,9 +177,10 @@ public final class HistoryChartGenerator
         buf.append("{\n");
 
         buf.append("\"cols\": [\n");
-        buf.append("{\"label\": \"");
-        buf.append("Run");
-        buf.append("\", \"type\": \"string\"}");
+        
+        buf.append("{\"label\": \"Run\", \"type\": \"string\"},\n");
+        buf.append("{\"label\": \"Custom key\", \"type\": \"string\"},\n");
+        buf.append("{\"label\": \"Timestamp\", \"type\": \"string\"}");
 
         for (int i = 0; i < columnNames.size(); i++)
         {
@@ -166,7 +193,7 @@ public final class HistoryChartGenerator
 
         // Emit data.
         s = connection.prepareStatement(
-            "SELECT RUN_ID, NAME, ROUND_AVG " + 
+            "SELECT RUN_ID, CUSTOM_KEY, TSTAMP, NAME, ROUND_AVG " + 
             "FROM TESTS t, RUNS r " + 
             "WHERE t.classname = ? " +
             " AND t.run_id = r.id " +
@@ -187,7 +214,9 @@ public final class HistoryChartGenerator
 
         final HashMap<String, StringHolder> byColumn = new HashMap<String, StringHolder>();
         final ArrayList<StringHolder> row = new ArrayList<StringHolder>();
-        row.add(new StringHolder(null));
+        row.add(new StringHolder(null)); // run id
+        row.add(new StringHolder(null)); // custom key
+        row.add(new StringHolder(null)); // timestamp
         for (String name : columnNames)
         {
             StringHolder nv = new StringHolder(null);
@@ -195,13 +224,21 @@ public final class HistoryChartGenerator
             byColumn.put(name, nv);
         }
 
+        final int colRunId = getColumnIndex(rs, "RUN_ID");
+        final int colName = getColumnIndex(rs, "NAME");
+        final int colRoundAvg = getColumnIndex(rs, "ROUND_AVG");
+        final int colCustomKey = getColumnIndex(rs, "CUSTOM_KEY");
+        final int colTimestamp = getColumnIndex(rs, "TSTAMP");
+
         int previousRowId = -1;
         buf.append("\"rows\": [\n");
         while (rs.next())
         {
-            int rowId = rs.getInt(1);
-            String name = rs.getString(2);
-            double avg = rs.getDouble(3);
+            int rowId = rs.getInt(colRunId);
+            String name = rs.getString(colName);
+            double avg = rs.getDouble(colRoundAvg);
+            String customKey = rs.getString(colCustomKey);
+            String timestamp = rs.getTimestamp(colTimestamp).toString();
 
             if (rowId != previousRowId || rs.isLast())
             {
@@ -214,7 +251,10 @@ public final class HistoryChartGenerator
                 if (previousRowId >= 0)
                 {
                     // Emit the last row. Clear row data.
-                    row.get(0).value = '"' + Integer.toString(previousRowId) + '"';
+                    final String runName = Integer.toString(previousRowId);
+                    row.get(0).value = '"' + runName + '"';
+                    row.get(1).value = '"' + (customKey == null ? "[" + runName + "]" : customKey) + '"';
+                    row.get(2).value = '"' + (timestamp) + '"';
 
                     buf.append("{\"c\": [");
                     for (StringHolder nv : row)

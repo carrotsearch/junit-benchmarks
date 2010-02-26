@@ -19,4 +19,9 @@ public @interface BenchmarkHistoryChart
      * Maximum number of historical runs to take into account.
      */
     int maxRuns() default Integer.MAX_VALUE;
+
+    /**
+     * Use custom keys for X-axis label. If <code>false</code>, run ID is used.
+     */
+    LabelType labelWith() default LabelType.RUN_ID;
 }

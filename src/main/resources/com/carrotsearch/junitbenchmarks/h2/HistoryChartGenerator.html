@@ -49,23 +49,43 @@
     </style>
 
     <script type="text/javascript">
+      var chart; 
 
-      function visualize(jsonData, className) {
-        var data = new google.visualization.DataTable(jsonData);
+      function drawData(data, labelColumn) {
+        var labelColumns = [0, 1, 2];
+        labelColumns.splice(labelColumn, 1);
 
-        var table = new google.visualization.Table(document.getElementById('raw-data'));
-        table.draw(data);
+        var view = new google.visualization.DataView(data);
+        view.hideColumns(labelColumns);
 
-        var chart = new google.visualization.LineChart(document.getElementById('chart'));
-
-        chart.draw(data, {
-        	titleY: data.getColumnLabel(1),
+        chart.draw(view, {
+            titleY: "Round time [s]",
             /*MINMAX*/
         });
       }
 
+      function visualize(jsonData, className) {
+		var data = new google.visualization.DataTable(jsonData);
+		
+		var table = new google.visualization.Table(document.getElementById('raw-data'));
+		table.draw(data, {
+		    sort: "event",
+		});
+		
+		google.visualization.events.addListener(table, 'sort',
+		 function(event) {
+		   if (event.column >= 0 && event.column <= 2) {
+			   drawData(data, event.column);
+		   }
+		 }
+		);
+		
+		chart = new google.visualization.LineChart(document.getElementById('chart'));
+		drawData(data, 0/*LABELCOLUMN*/);
+      }
+
       google.setOnLoadCallback(function() {
-          $.getJSON('JSONDATA.json', function(data) {
+          $.getJSON('HistoryChartGenerator.json', function(data) {
               visualize(data, "CLASSNAME");
           });
 
