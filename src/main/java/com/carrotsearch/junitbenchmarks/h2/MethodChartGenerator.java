@@ -1,5 +1,6 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
+import java.io.File;
 import java.sql.*;
 
 /**
@@ -42,7 +43,8 @@ public final class MethodChartGenerator
         
         String template = H2Consumer.getResource("MethodChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", 
+            new File(jsonFileName).getName());
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
             GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", 

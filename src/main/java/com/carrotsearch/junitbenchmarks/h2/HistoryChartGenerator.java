@@ -1,5 +1,6 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
+import java.io.File;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.*;
@@ -68,7 +69,8 @@ public final class HistoryChartGenerator
 
         String template = H2Consumer.getResource("HistoryChartGenerator.html");
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", jsonFileName);
+        template = GeneratorUtils.replaceToken(template, "JSONDATA.json", 
+            new File(jsonFileName).getName());
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
             GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
