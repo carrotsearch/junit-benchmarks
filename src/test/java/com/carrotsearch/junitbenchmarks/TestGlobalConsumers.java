@@ -47,6 +47,9 @@ public class TestGlobalConsumers
     {
         assertEquals(2, closeGlobals());
         Common.existsAndDelete(resultsFile.getAbsolutePath());
+
+        System.clearProperty(Globals.CONSUMERS_PROPERTY);
+        System.clearProperty(Globals.XML_FILE_PROPERTY);
     }
 
     /*
