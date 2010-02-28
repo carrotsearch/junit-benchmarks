@@ -9,10 +9,10 @@ import java.util.Vector;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+// [[[start:lists-initial]]] 
 public class Lists1
 {
     private static Object singleton = new Object();
-
     private static int COUNT = 10000;
     private static int [] rnd;
 
@@ -60,3 +60,4 @@ public class Lists1
             list.remove(rnd[i] % list.size());
     }
 }
+// [[[end:lists-initial]]] 
