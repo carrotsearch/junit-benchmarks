@@ -7,14 +7,37 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
-// [[[start:lists-initial]]] 
-public class Lists1
+import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
+import com.carrotsearch.junitbenchmarks.h2.AxisRange;
+import com.carrotsearch.junitbenchmarks.h2.BenchmarkHistoryChart;
+import com.carrotsearch.junitbenchmarks.h2.BenchmarkMethodChart;
+import com.carrotsearch.junitbenchmarks.h2.LabelType;
+
+// [[[start:lists-annot]]]
+@BenchmarkOptions(callgc = false, benchmarkRounds = 20, warmupRounds = 3)
+// [[[end:lists-annot]]]
+
+// [[[start:lists-chart-methods]]]
+@AxisRange(min = 0, max = 1)
+@BenchmarkMethodChart(filePrefix = "benchmark-lists")
+// [[[end:lists-chart-methods]]]
+
+// [[[start:lists-chart-history]]]
+@BenchmarkHistoryChart(labelWith = LabelType.CUSTOM_KEY, maxRuns = 20)
+// [[[end:lists-chart-history]]]
+public class Lists2
 {
     private static Object singleton = new Object();
     private static int COUNT = 50000;
     private static int [] rnd;
+
+    @Rule
+    public MethodRule benchmarkRun = new BenchmarkRule();    
 
     /** Prepare random numbers for tests. */
     @BeforeClass
@@ -60,4 +83,3 @@ public class Lists1
             list.remove(rnd[i] % list.size());
     }
 }
-// [[[end:lists-initial]]] 
