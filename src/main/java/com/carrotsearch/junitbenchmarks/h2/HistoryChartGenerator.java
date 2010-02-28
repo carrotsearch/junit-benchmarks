@@ -239,7 +239,10 @@ public final class HistoryChartGenerator
             if (rs.isFirst()) previousRowId = rowId;
 
             if (rowId != previousRowId)
+            {
                 emitRow(buf, row);
+                previousRowId = rowId;
+            }
 
             String name = rs.getString(colName);
             double avg = rs.getDouble(colRoundAvg);

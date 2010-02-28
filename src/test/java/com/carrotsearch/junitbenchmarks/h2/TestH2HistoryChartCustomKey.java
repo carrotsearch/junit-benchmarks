@@ -1,8 +1,10 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -40,10 +42,21 @@ public class TestH2HistoryChartCustomKey
         String content = Common.getAndDelete(
             new File(RepeatedTestSlave.class.getName() + ".json"));
         RepeatedTestSlave.dbFileFull.delete();
-        
-        assertTrue(content.contains("custom-key1"));
-        assertTrue(content.contains("custom-key2"));
-        assertTrue(content.contains("custom-key3"));
+
+        assertEquals(1, count(content, "custom-key1"));
+        assertEquals(1, count(content, "custom-key2"));
+        assertEquals(1, count(content, "custom-key3"));
+    }
+
+    private int count(String content, String pattern)
+    {
+        Pattern p = Pattern.compile(pattern, Pattern.LITERAL);
+        int cnt = 0;
+        for (Matcher m = p.matcher(content); m.find(); cnt++)
+        {
+            // repeat.
+        }
+        return cnt;
     }
 
     @AfterClass
