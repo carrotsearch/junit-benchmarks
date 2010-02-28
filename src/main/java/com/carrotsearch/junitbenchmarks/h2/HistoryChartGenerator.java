@@ -234,55 +234,52 @@ public final class HistoryChartGenerator
         buf.append("\"rows\": [\n");
         while (rs.next())
         {
-            int rowId = rs.getInt(colRunId);
+            final int rowId = rs.getInt(colRunId);
+
+            if (rs.isFirst()) previousRowId = rowId;
+
+            if (rowId != previousRowId)
+                emitRow(buf, row);
+
             String name = rs.getString(colName);
             double avg = rs.getDouble(colRoundAvg);
             String customKey = rs.getString(colCustomKey);
             String timestamp = rs.getTimestamp(colTimestamp).toString();
-
-            if (rowId != previousRowId || rs.isLast())
-            {
-                if (rs.isLast())
-                {
-                    byColumn.get(name).value = nf.format(avg);
-                    previousRowId = rowId;
-                }
-
-                if (previousRowId >= 0)
-                {
-                    // Emit the last row. Clear row data.
-                    final String runName = Integer.toString(previousRowId);
-                    row.get(0).value = '"' + runName + '"';
-                    row.get(1).value = '"' + (customKey == null ? "[" + runName + "]" : customKey) + '"';
-                    row.get(2).value = '"' + (timestamp) + '"';
-
-                    buf.append("{\"c\": [");
-                    for (StringHolder nv : row)
-                    {
-                        buf.append("{\"v\": ");
-                        buf.append(nv.value);
-                        buf.append("}, ");
-                    }
-                    buf.append("]},");
-                    buf.append('\n');
-
-                    for (StringHolder nv : row)
-                        nv.value = null;
-                }
-
-                previousRowId = rowId;
-            }
+            
+            final String runName = Integer.toString(rowId);
+            row.get(0).value = '"' + runName + '"';
+            row.get(1).value = '"' + (customKey == null ? "[" + runName + "]" : customKey) + '"';
+            row.get(2).value = '"' + (timestamp) + '"';
 
             final StringHolder nv = byColumn.get(name);
             if (nv == null) 
                 throw new RuntimeException("Missing column: " + name);
             nv.value = nf.format(avg);
+            
+            if (rs.isLast())
+                emitRow(buf, row);
         }
         buf.append("]}\n");
 
         return buf.toString();
     }
 
+    private void emitRow(StringBuilder buf, ArrayList<StringHolder> row)
+    {
+        buf.append("{\"c\": [");
+        for (StringHolder nv : row)
+        {
+            buf.append("{\"v\": ");
+            buf.append(nv.value);
+            buf.append("}, ");
+        }
+        buf.append("]},");
+        buf.append('\n');
+
+        for (StringHolder nv : row)
+            nv.value = null;
+    }
+    
     /**
      * Include a given method in the chart. 
      */
