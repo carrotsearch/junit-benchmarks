@@ -13,6 +13,7 @@
       <outputDirectory/>
       <includes>
         <include>*.LICENSE</include>
+        <include>README</include>
       </includes>
     </fileSet>
     <fileSet>
