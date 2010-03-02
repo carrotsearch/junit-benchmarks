@@ -1,5 +1,6 @@
 package com.carrotsearch.junitbenchmarks;
 
+import org.junit.Rule;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -9,7 +10,7 @@ import org.junit.runners.model.Statement;
  * placed in the test class as a field, with annotation. Example:
  * 
  * <pre>
- * @{@link Rule}
+ * {@link Rule}
  * public {@link MethodRule} runBenchmarks = new BenchmarkRule();
  * </pre>
  */

@@ -21,7 +21,11 @@
       <outputDirectory/>
       <includes>
         <include>*.jar</include>
+        <include>apidocs/**</include>
       </includes>
+      <excludes>
+        <exclude>*-javadoc.jar</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
 </assembly>
