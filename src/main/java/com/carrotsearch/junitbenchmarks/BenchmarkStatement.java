@@ -2,7 +2,7 @@ package com.carrotsearch.junitbenchmarks;
 
 import java.util.ArrayList;
 
-import static com.carrotsearch.junitbenchmarks.Globals.*;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.*;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 

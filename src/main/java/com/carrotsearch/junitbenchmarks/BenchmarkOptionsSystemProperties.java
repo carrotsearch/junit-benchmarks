@@ -5,39 +5,41 @@ import java.util.ArrayList;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**
- * Global settings for benchmarks.
+ * Global settings for benchmarks set through system properties. If
+ * {@link #IGNORE_ANNOTATION_OPTIONS_PROPERTY} is specified, the system properties and
+ * defaults will take precedence over the method- and class-level annotations.
  */
-public final class Globals
+public final class BenchmarkOptionsSystemProperties
 {
     /**
-     * Override property setting the default number of warmup rounds.
+     * <code>{@value}</code>: the default number of warmup rounds.
      */
     public final static String WARMUP_ROUNDS_PROPERTY = "jub.rounds.warmup";
 
     /**
-     * Override property setting the default number of benchmark rounds.
+     * <code>{@value}</code>: the default number of benchmark rounds.
      */
     public final static String BENCHMARK_ROUNDS_PROPERTY = "jub.rounds.benchmark";
 
     /**
-     * If set to <code>true</code>, the defaults (or property values) take precedence over
+     * <code>{@value}</code>: if <code>true</code>, the defaults (or property values) take precedence over
      * {@link BenchmarkOptions} annotations.
      */
     public final static String IGNORE_ANNOTATION_OPTIONS_PROPERTY = "jub.ignore.annotations";
 
     /**
-     * Do not call {@link System#gc()} between rounds. Speeds up tests a lot, but renders
-     * GC statistics useless.
+     * <code>{@value}</code>: if <code>true</code>, do not call {@link System#gc()}
+     * between rounds. Speeds up tests a lot, but renders GC statistics useless.
      */
     public final static String IGNORE_CALLGC_PROPERTY = "jub.ignore.callgc";
 
     /**
-     * If set, an {@link XMLConsumer} is added to the consumers list.
+     * <code>{@value}</code>: if set, an {@link XMLConsumer} is added to the consumers list.
      */
     public final static String XML_FILE_PROPERTY = "jub.xml.file";
 
     /**
-     * If set, an {@link H2Consumer} is added to the consumers list
+     * <code>{@value}</code>: if set, an {@link H2Consumer} is added to the consumers list
      * and benchmark results are saved to a database. This property must point to the
      * H2 database file's location (without <code>.h2.db</code> suffix). If the database does
      * not exist, it will be created. 
@@ -45,20 +47,21 @@ public final class Globals
     public final static String DB_FILE_PROPERTY = "jub.db.file";
 
     /**
-     * Output directory for benchmark charts if {@link H2Consumer} is active 
-     * and chart annotations are present. If not present, the current working
+     * <code>{@value}</code>: output directory for benchmark charts if {@link H2Consumer}
+     * is active and chart annotations are present. If not present, the current working
      * directory is used.
      */
     public final static String CHARTS_DIR_PROPERTY = "jub.charts.dir";
 
     /**
-     * Custom key to attach to the run.
+     * <code>{@value}</code>: custom key to attach to the run.
      */
     public final static String CUSTOMKEY_PROPERTY = "jub.customkey";
 
     /**
-     * Which consumers to instantiate and add to the benchmark results feed? This property
-     * takes a comma-separated list of values from {@link ConsumerName}.
+     * <code>{@value}</code>: specifies the consumers to instantiate and add to the 
+     * benchmark results feed. This property takes a comma-separated list of values 
+     * from {@link ConsumerName}.
      */
     public final static String CONSUMERS_PROPERTY = "jub.consumers";
 

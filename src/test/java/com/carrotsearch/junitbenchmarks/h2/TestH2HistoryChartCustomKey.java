@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.JUnitCore;
 
 import com.carrotsearch.junitbenchmarks.Common;
-import com.carrotsearch.junitbenchmarks.Globals;
+import com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties;
 
 /**
  *  
@@ -26,11 +26,11 @@ public class TestH2HistoryChartCustomKey
         RepeatedTestSlave.cleanup = false;
         try
         {
-            System.setProperty(Globals.CUSTOMKEY_PROPERTY, "custom-key1");
+            System.setProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY, "custom-key1");
             assertEquals(0, JUnitCore.runClasses(RepeatedTestSlave.class).getFailureCount());
-            System.setProperty(Globals.CUSTOMKEY_PROPERTY, "custom-key2");
+            System.setProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY, "custom-key2");
             assertEquals(0, JUnitCore.runClasses(RepeatedTestSlave.class).getFailureCount());
-            System.setProperty(Globals.CUSTOMKEY_PROPERTY, "custom-key3");
+            System.setProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY, "custom-key3");
             assertEquals(0, JUnitCore.runClasses(RepeatedTestSlave.class).getFailureCount());
         }
         finally
@@ -62,6 +62,6 @@ public class TestH2HistoryChartCustomKey
     @AfterClass
     public static void cleanup()
     {
-        System.clearProperty(Globals.CUSTOMKEY_PROPERTY);
+        System.clearProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY);
     }
 }

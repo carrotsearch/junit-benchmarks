@@ -262,24 +262,24 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
      */
     private static File getDefaultDbName()
     {
-        final String dbPath = System.getProperty(Globals.DB_FILE_PROPERTY);
+        final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY);
         if (dbPath != null && !dbPath.trim().equals(""))
         {
             return new File(dbPath);
         }
         
         throw new IllegalArgumentException("Missing global property: "
-            + Globals.DB_FILE_PROPERTY); 
+            + BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY); 
     }
 
     private static String getDefaultCustomKey()
     {
-        return System.getProperty(Globals.CUSTOMKEY_PROPERTY);
+        return System.getProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY);
     }
 
     private static File getDefaultChartsDir()
     {
-        return new File(System.getProperty(Globals.CHARTS_DIR_PROPERTY, "."));
+        return new File(System.getProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "."));
     }
 
     /**

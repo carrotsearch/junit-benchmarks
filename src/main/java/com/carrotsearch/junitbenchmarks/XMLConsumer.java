@@ -117,14 +117,14 @@ public final class XMLConsumer extends AutocloseConsumer implements Closeable
      */
     private static File getDefaultOutputFile()
     {
-        final String xmlPath = System.getProperty(Globals.XML_FILE_PROPERTY);
+        final String xmlPath = System.getProperty(BenchmarkOptionsSystemProperties.XML_FILE_PROPERTY);
         if (xmlPath != null && !xmlPath.trim().equals(""))
         {
             return new File(xmlPath);
         }
     
         throw new IllegalArgumentException("Missing global property: "
-            + Globals.XML_FILE_PROPERTY); 
+            + BenchmarkOptionsSystemProperties.XML_FILE_PROPERTY); 
     }
 
     /**

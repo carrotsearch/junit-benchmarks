@@ -24,7 +24,7 @@ public final class BenchmarkRule implements MethodRule
      */
     public BenchmarkRule()
     {
-        this(Globals.getDefaultConsumers());
+        this(BenchmarkOptionsSystemProperties.getDefaultConsumers());
     }
 
     /**

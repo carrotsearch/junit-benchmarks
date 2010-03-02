@@ -17,11 +17,11 @@ public class TestGlobalConsumers
     @BeforeClass
     public static void checkFile() throws IOException
     {
-        System.setProperty(Globals.CONSUMERS_PROPERTY, 
+        System.setProperty(BenchmarkOptionsSystemProperties.CONSUMERS_PROPERTY, 
               ConsumerName.CONSOLE + ", "
             + ConsumerName.XML);
         
-        System.setProperty(Globals.XML_FILE_PROPERTY, resultsFile.getAbsolutePath());
+        System.setProperty(BenchmarkOptionsSystemProperties.XML_FILE_PROPERTY, resultsFile.getAbsolutePath());
 
         // Close any previous globals.
         closeGlobals();
@@ -48,8 +48,8 @@ public class TestGlobalConsumers
         assertEquals(2, closeGlobals());
         Common.existsAndDelete(resultsFile.getAbsolutePath());
 
-        System.clearProperty(Globals.CONSUMERS_PROPERTY);
-        System.clearProperty(Globals.XML_FILE_PROPERTY);
+        System.clearProperty(BenchmarkOptionsSystemProperties.CONSUMERS_PROPERTY);
+        System.clearProperty(BenchmarkOptionsSystemProperties.XML_FILE_PROPERTY);
     }
 
     /*
@@ -57,16 +57,16 @@ public class TestGlobalConsumers
      */
     private static int closeGlobals() throws IOException
     {
-        if (Globals.consumers == null)
+        if (BenchmarkOptionsSystemProperties.consumers == null)
             return 0;
 
-        for (IResultsConsumer c : Globals.consumers)
+        for (IResultsConsumer c : BenchmarkOptionsSystemProperties.consumers)
         {
             if (c instanceof Closeable)
                 ((Closeable) c).close();
         }
-        final int count = Globals.consumers.length;
-        Globals.consumers = null;
+        final int count = BenchmarkOptionsSystemProperties.consumers.length;
+        BenchmarkOptionsSystemProperties.consumers = null;
         return count;
     }
 }
