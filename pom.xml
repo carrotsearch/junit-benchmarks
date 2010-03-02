@@ -41,8 +41,14 @@
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.6.1</version>
               <configuration>
                   <encoding>${project.build.sourceEncoding}</encoding>
+                  <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+                  <docfilessubdirs>true</docfilessubdirs>
+                  <windowtitle>JUnitBenchmarks v${version} API Documentation (JavaDoc)</windowtitle>
+                  <doctitle>JUnitBenchmarks v${version} API Documentation</doctitle>
+                  <header><![CDATA[<div id='header'><a class='logo' target='_top' href='http://labs.carrotsearch.com'><img src='resources/logo.png'></a>JUnitBenchmarks v${version} <br>API Documentation</div>]]></header>
               </configuration>
               <executions>
                   <execution>
