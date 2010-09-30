@@ -1,6 +1,7 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.annotation;
 
 import java.lang.annotation.*;
+
 
 /**
  * Generate a graphical summary of the historical and current run of a given

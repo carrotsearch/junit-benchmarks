@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import com.carrotsearch.junitbenchmarks.Escape;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 
 /**
  * Generate historical view of a given test class (one or more methods). 

@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.annotation;
 
 /**
  * X-axis label type.

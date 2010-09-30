@@ -11,7 +11,8 @@ import org.junit.rules.MethodRule;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.Common;
-import com.carrotsearch.junitbenchmarks.h2.BenchmarkMethodChart;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 
 /**

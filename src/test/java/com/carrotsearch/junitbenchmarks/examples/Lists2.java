@@ -13,10 +13,7 @@ import org.junit.rules.MethodRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-import com.carrotsearch.junitbenchmarks.h2.AxisRange;
-import com.carrotsearch.junitbenchmarks.h2.BenchmarkHistoryChart;
-import com.carrotsearch.junitbenchmarks.h2.BenchmarkMethodChart;
-import com.carrotsearch.junitbenchmarks.h2.LabelType;
+import com.carrotsearch.junitbenchmarks.annotation.*;
 
 // [[[start:lists-annot]]]
 @BenchmarkOptions(callgc = false, benchmarkRounds = 20, warmupRounds = 3)

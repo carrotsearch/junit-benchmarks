@@ -11,6 +11,7 @@ import org.junit.rules.MethodRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.Common;
+import com.carrotsearch.junitbenchmarks.annotation.*;
 
 @AxisRange(max = 1)
 @BenchmarkMethodChart(filePrefix = "methods-CLASSNAME")

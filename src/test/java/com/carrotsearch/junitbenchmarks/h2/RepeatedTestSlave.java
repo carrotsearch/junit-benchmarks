@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.junit.rules.MethodRule;
 
 import com.carrotsearch.junitbenchmarks.*;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
+import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 
 /**
  * Test H2 consumer's chart generation functionality. 

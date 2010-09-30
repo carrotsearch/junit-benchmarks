@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 
 import com.carrotsearch.junitbenchmarks.Result;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
 /**
  * Collector of {@link BenchmarkMethodChart} annotations.

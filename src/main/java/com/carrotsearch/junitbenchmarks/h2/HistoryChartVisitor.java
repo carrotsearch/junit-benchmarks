@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import com.carrotsearch.junitbenchmarks.Result;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 
 class HistoryChartVisitor implements IChartAnnotationVisitor
 {
