@@ -124,7 +124,11 @@ final class GeneratorUtils
      */
     static void save(String fileName, String content) throws IOException
     {
-        final FileOutputStream fos = new FileOutputStream(new File(fileName));
+        final File file = new File(fileName);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        final FileOutputStream fos = new FileOutputStream(file);
         fos.write(content.getBytes("UTF-8"));
         fos.close();
     }

@@ -279,7 +279,11 @@ public final class H2Consumer extends AutocloseConsumer implements Closeable
 
     private static File getDefaultChartsDir()
     {
-        return new File(System.getProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "."));
+        final File file = new File(System.getProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "."));
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        return file;
     }
 
     /**
