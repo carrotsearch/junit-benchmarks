@@ -188,9 +188,35 @@
           <id>fastinstall</id>
           <properties>
             <maven.test.skip>true</maven.test.skip>
-            <pmd.skip>true</pmd.skip>
-            <checkstyle.skip>true</checkstyle.skip>
           </properties>
+        </profile>
+
+        <!-- Sign everything once completed.-->
+        <profile>
+          <id>sign</id>
+          <build>
+            <defaultGoal>verify</defaultGoal>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*.gz</exclude>
+                        <exclude>**/*.zip</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>sign</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
         </profile>
     </profiles>
 </project>
