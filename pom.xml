@@ -1,43 +1,116 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
+    <!-- We use SonaType for publishing artefacts. Parent POM makes things easier here. -->
     <parent>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>labs-parent</artifactId>
-      <version>1</version>
+      <groupId>org.sonatype.oss</groupId>
+      <artifactId>oss-parent</artifactId>
+      <version>5</version>
     </parent>
 
+    <!-- Project info. -->
     <groupId>com.carrotsearch</groupId>
     <artifactId>junit-benchmarks</artifactId>
     <version>0.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>JUnitBenchmarks</name>
+    <description>A framework for writing performance micro-benchmarks using JUnit4 annotations.</description>
+    <url>http://labs.carrotsearch.com/junit-benchmarks.html</url>
+
+
+    <!-- Extended project info. -->
+    <licenses>
+      <license>
+        <name>The Apache Software License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+
+    <organization>
+      <name>Carrot Search s.c.</name>
+      <url>http://www.carrotsearch.com</url>
+    </organization>
+    
+    <issueManagement>
+      <system>Jira</system>
+      <url>http://issues.carrot2.org/browse/JUNITBENCH</url>
+    </issueManagement>
+
+    <scm>
+      <url>https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/</url>
+      <connection>scm:svn:https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/</connection>
+      <developerConnection>scm:svn:https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/</developerConnection>
+    </scm>
+
+    <developers>
+      <developer>
+        <id>dawid.weiss</id>
+        <name>Dawid Weiss</name>
+        <email>dawid.weiss@carrotsearch.com</email>
+      </developer>
+
+      <developer>
+        <id>stanislaw.osinski</id>
+        <name>Stanisław Osiński</name>
+        <email>stanislaw.osinski@carrotsearch.com</email>
+      </developer>
+    </developers>
+
+    <!-- Global properties. -->
     <properties>
-        <junit.version>4.7</junit.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
 
+
+    <!-- Dependencies. -->
+    <dependencies>
+        <!-- Optional at runtime. -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.127</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Required for tests only. -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <!-- Build tuning. -->
     <build>
         <defaultGoal>install</defaultGoal>
 
         <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptor>src/main/assembly/bin.xml</descriptor>
-            </configuration>
-            <executions>
-              <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>assembly</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
+          <!-- Attach and modify JavaDocs. -->
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
@@ -54,13 +127,13 @@
                   <execution>
                       <id>attach-javadocs</id>
                       <goals>
-                          <goal>javadoc</goal>
                           <goal>jar</goal>
                       </goals>
                   </execution>
               </executions>
           </plugin>
-          
+
+          <!-- Attach sources -->
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-source-plugin</artifactId>
@@ -68,15 +141,37 @@
               <executions>
                   <execution>
                       <id>attach-sources</id>
-                      <phase>verify</phase>
                       <goals>
-                          <goal>jar-no-fork</goal>
+                          <goal>jar</goal>
                       </goals>
                   </execution>
               </executions>
           </plugin>
+
+          <!-- Configure assembly of ZIP and TAR.GZ bundles. -->
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2</version>
+            <configuration>
+               <descriptors>
+                 <descriptor>src/main/assembly/bin.xml</descriptor>
+               </descriptors>
+               <attach>false</attach>
+               <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+            <executions>
+              <execution>
+                <id>make-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
 
+        <!-- Exclude these resources when packaging. -->
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
@@ -87,46 +182,15 @@
         </resources>
     </build>
 
-    <repositories>
-        <repository>
-            <id>carrotsearch.labs.releases</id>
-            <name>Carrot Search Labs Releases Repository</name>
-            <url>http://repository.carrotsearch.com/labs/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.2.127</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <profiles>
+        <!-- No tests, no checs. -->
+        <profile>
+          <id>fastinstall</id>
+          <properties>
+            <maven.test.skip>true</maven.test.skip>
+            <pmd.skip>true</pmd.skip>
+            <checkstyle.skip>true</checkstyle.skip>
+          </properties>
+        </profile>
+    </profiles>
 </project>
