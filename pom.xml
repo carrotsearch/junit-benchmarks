@@ -39,6 +39,15 @@
     <system>Jira</system>
     <url>http://issues.carrot2.org/browse/JUNITBENCH</url>
   </issueManagement>
+  
+  <mailingLists>
+    <mailingList>
+        <name>Announcements and bug reports mailing list</name>
+        <subscribe>junit-benchmarks+subscribe@googlegroups.com</subscribe>
+        <unsubscribe>junit-benchmarks+unsubscribe@googlegroups.com</unsubscribe>
+        <post>junit-benchmarks@googlegroups.com</post>
+    </mailingList>
+  </mailingLists>
 
   <scm>
     <url>https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/trunk</url>
