@@ -1,0 +1,43 @@
+
+
+Snapshot releases
+=================
+
+Prereq.: configured GPG, configured SonaType's server and user settings in ~/.m2/settings.xml as
+explained in https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+mvn clean deploy
+
+
+
+
+Full release procedure overview
+===============================
+
+
+Alternative 1: use maven only
+-----------------------------
+
+Prereq.: configured GPG, configured SonaType's server and user settings in ~/.m2/settings.xml as
+explained in https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+Prereq.: You must be working on an SVN checkout.
+
+mvn release:clean
+mvn release:prepare          [AUTOMATICALLY creates an SVN/SCM tag, updates POM versions]
+mvn release:perform          [Stages the release to SonaType.]
+
+=> go to https://oss.sonatype.org/content/repositories/, close the release, check it and release to central
+
+
+
+Alternative 2: semi-manual release
+----------------------------------
+
+=> Modify POM version info (remove -SNAPSHOT).
+=> SCM commit, create a tag, maintenance branch if needed.
+
+mvn -Prelease,maven-release  [creates release bundles and SonaType manual release bundle]
+
+=> go to https://oss.sonatype.org/content/repositories/, upload the release manually, close, check, release.
+
