@@ -6,7 +6,7 @@ Snapshot releases
 Prereq.: configured GPG, configured SonaType's server and user settings in ~/.m2/settings.xml as
 explained in https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 
-mvn clean deploy
+mvn -Prelease clean deploy
 
 
 
