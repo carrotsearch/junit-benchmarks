@@ -225,10 +225,10 @@
       </build>
     </profile>
 
-    <!-- Manual maven release mode. Prepare bundle ZIPs, sign everything once completed 
-      and prepare sonatype's release bundle. -->
+    <!-- Sonatype manual release mode. Prepare bundle ZIPs, sign everything once completed 
+      and prepare the release bundle JAR. -->
     <profile>
-      <id>maven-release</id>
+      <id>sonatype</id>
       <build>
         <defaultGoal>verify</defaultGoal>
 
