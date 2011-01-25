@@ -21,4 +21,4 @@ JUnitBenchmarks
    
    * {{{./surefire-report.html}JUnit Tests}} (<<<junit>>>).
 
-   * {{{./coverage/index.html}Test Code Coverage}} (<<<clover>>>).
+   * {{{./clover/index.html}Test Code Coverage}} (<<<clover>>>).
