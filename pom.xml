@@ -39,13 +39,13 @@
     <system>Jira</system>
     <url>http://issues.carrot2.org/browse/JUNITBENCH</url>
   </issueManagement>
-  
+
   <mailingLists>
     <mailingList>
-        <name>Announcements and bug reports mailing list</name>
-        <subscribe>junit-benchmarks+subscribe@googlegroups.com</subscribe>
-        <unsubscribe>junit-benchmarks+unsubscribe@googlegroups.com</unsubscribe>
-        <post>junit-benchmarks@googlegroups.com</post>
+      <name>Announcements and bug reports mailing list</name>
+      <subscribe>junit-benchmarks+subscribe@googlegroups.com</subscribe>
+      <unsubscribe>junit-benchmarks+unsubscribe@googlegroups.com</unsubscribe>
+      <post>junit-benchmarks@googlegroups.com</post>
     </mailingList>
   </mailingLists>
 
@@ -119,34 +119,34 @@
 
     <pluginManagement>
       <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-release-plugin</artifactId>
-            <version>2.1</version>
-          </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
 
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.6.1</version>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.1.2</version>
-          </plugin>
-          
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2</version>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.1</version>
-          </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.6.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.1</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -224,6 +224,46 @@
       </build>
     </profile>
 
+
+    <!-- Execute clover code coverage reports via ANT. -->
+    <profile>
+      <id>clover</id>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.atlassian.maven.plugins</groupId>
+            <artifactId>maven-clover2-plugin</artifactId>
+            <configuration>
+              <includesTestSourceRoots>false</includesTestSourceRoots>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>instrument</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>com.atlassian.maven.plugins</groupId>
+            <artifactId>maven-clover2-plugin</artifactId>
+            <version>3.0.2</version>
+            <configuration>
+              <generateXml>true</generateXml>
+              <generateHtml>true</generateHtml>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+
+
     <!-- Release mode. -->
     <profile>
       <id>release</id>
@@ -293,8 +333,8 @@
       </build>
     </profile>
 
-    <!-- Sonatype manual release mode. Prepare bundle ZIPs, sign everything once completed 
-      and prepare the release bundle JAR. -->
+    <!-- Sonatype manual release mode. Prepare bundle ZIPs, sign everything once 
+      completed and prepare the release bundle JAR. -->
     <profile>
       <id>sonatype</id>
       <build>
