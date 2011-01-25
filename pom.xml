@@ -239,6 +239,7 @@
             </configuration>
             <executions>
               <execution>
+                <phase>generate-sources</phase>
                 <goals>
                   <goal>instrument</goal>
                 </goals>
