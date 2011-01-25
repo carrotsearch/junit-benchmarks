@@ -1,0 +1,24 @@
+ ------
+ Introduction
+ ------
+ ------
+ 2011-01-24
+ ------
+
+
+JUnitBenchmarks
+
+ Fast and clean, annotation-based micro benchmarks for JUnit.
+ {{{http://labs.carrotsearch.com}Carrot Search Labs}} page for documentation.
+
+* Reports
+
+   * {{{./cpd.html}Code Duplication}} (<<<cpd>>>).
+
+   * {{{./findbugs.html}Static Bug Analysis, FindBugs}} (<<<findbugs>>>).
+   
+   * {{{./pmd.html}Static Bug Analysis, PMD}} (<<<pmd>>>).
+   
+   * {{{./surefire-report.html}JUnit Tests}} (<<<junit>>>).
+
+
