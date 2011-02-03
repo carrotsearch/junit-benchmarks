@@ -161,8 +161,32 @@
           <releaseProfiles>release,maven-release</releaseProfiles>
         </configuration>
       </plugin>
-    </plugins>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>retrotranslator-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>translate-project</goal>
+            </goals>
+            <configuration>
+              <classifier>jdk15</classifier>
+              <attach>true</attach>
+              <target>1.5</target>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.retrotranslator</groupId>
+            <artifactId>retrotranslator-transformer</artifactId>
+            <version>1.2.9</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+    
     <!-- Exclude these resources when packaging. -->
     <resources>
       <resource>
@@ -173,6 +197,7 @@
       </resource>
     </resources>
   </build>
+  
 
 
   <!-- Reports -->
