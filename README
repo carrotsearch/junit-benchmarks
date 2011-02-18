@@ -1,9 +1,10 @@
 
-
 JUnitBenchmarks
 ---------------
 
-See JavaDoc and http://labs.carrotsearch.com/junit-benchmarks.html for more info
+Simple Java microbenchmarks written as JUnit tests.
+
+See JavaDoc and http://labs.carrotsearch.com/junit-benchmarks.html for more info.
 
 
 Contributors and bug reports
@@ -12,7 +13,6 @@ Contributors and bug reports
 Julien Eluard
 Neil Prosser
 Dominik Drzewiecki [github: drzewo]
-
 
 
 Development
@@ -31,4 +31,3 @@ Release
 
 mvn clean deploy         Snapshot deploy to sonatype [requires proper setup in settings.xml]
 mvn -Prelease,sonatype clean verify Prepare release bundle for manual staging.
-
