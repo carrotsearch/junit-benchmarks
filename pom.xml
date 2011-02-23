@@ -3,7 +3,10 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- We use SonaType for publishing artefacts. Parent POM makes things easier here. -->
+  <!--
+    We use SonaType for publishing artefacts. Parent POM makes things
+    easier here.
+  -->
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -156,25 +159,54 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
         <configuration>
           <useReleaseProfile>true</useReleaseProfile>
           <releaseProfiles>release,maven-release</releaseProfiles>
         </configuration>
       </plugin>
 
+
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>retrotranslator-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
         <executions>
           <execution>
-            <goals>
-              <goal>translate-project</goal>
-            </goals>
+            <id>antrun-retrotranslate-jdk15</id>
+            <phase>package</phase>
             <configuration>
-              <classifier>jdk15</classifier>
-              <attach>true</attach>
-              <target>1.5</target>
+              <target>
+                <taskdef name="retrotranslator"
+                  classname="net.sf.retrotranslator.transformer.RetrotranslatorTask"
+                  classpathref="maven.plugin.classpath" />
+
+                <retrotranslator verbose="true" verify="false"
+                  failonwarning="true" target="1.5"
+                  embed="com.carrotsearch.junitbenchmarks.backport"
+                  destjar="${project.build.directory}/${project.build.finalName}-jdk15.jar">
+
+                  <jarfileset dir="${project.build.directory}"
+                    includes="${project.build.finalName}.jar" />
+
+                  <classpath>
+                    <pathelement location="${basedir}/src/main/retrotranslator" />
+                  </classpath>
+                  <classpath refid="maven.plugin.classpath" />
+                  <classpath refid="maven.compile.classpath" />
+                  <classpath>
+                    <fileset dir="${java.home}/lib" includes="rt.jar" />
+                  </classpath>
+                </retrotranslator>
+
+                <attachartifact
+                  file="${project.build.directory}/${project.build.finalName}-jdk15.jar"
+                  classifier="jdk15" type="jar" />
+              </target>
             </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
           </execution>
         </executions>
         <dependencies>
@@ -183,10 +215,20 @@
             <artifactId>retrotranslator-transformer</artifactId>
             <version>1.2.9</version>
           </dependency>
+          <dependency>
+            <groupId>net.sf.retrotranslator</groupId>
+            <artifactId>retrotranslator-runtime</artifactId>
+            <version>1.2.9</version>
+          </dependency>
+          <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.1</version>
+          </dependency>
         </dependencies>
       </plugin>
     </plugins>
-    
+
     <!-- Exclude these resources when packaging. -->
     <resources>
       <resource>
@@ -197,7 +239,6 @@
       </resource>
     </resources>
   </build>
-  
 
 
   <!-- Reports -->
@@ -306,9 +347,11 @@
               <encoding>${project.build.sourceEncoding}</encoding>
               <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
               <docfilessubdirs>true</docfilessubdirs>
-              <windowtitle>JUnitBenchmarks v${version} API Documentation
+              <windowtitle>JUnitBenchmarks v${version} API
+                Documentation
                 (JavaDoc)</windowtitle>
-              <doctitle>JUnitBenchmarks v${version} API Documentation</doctitle>
+              <doctitle>JUnitBenchmarks v${version} API
+                Documentation</doctitle>
               <header><![CDATA[<div id='header'><a class='logo' target='_top' href='http://labs.carrotsearch.com'><img src='resources/logo.png'></a>JUnitBenchmarks v${version} <br>API Documentation</div>]]></header>
             </configuration>
             <executions>
@@ -335,7 +378,10 @@
             </executions>
           </plugin>
 
-          <!-- Configure assembly of ZIP and TAR.GZ bundles (stand-alone distributions). -->
+          <!--
+            Configure assembly of ZIP and TAR.GZ bundles (stand-alone
+            distributions).
+          -->
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <configuration>
@@ -359,8 +405,10 @@
       </build>
     </profile>
 
-    <!-- Sonatype manual release mode. Prepare bundle ZIPs, sign everything once 
-      completed and prepare the release bundle JAR. -->
+    <!--
+      Sonatype manual release mode. Prepare bundle ZIPs, sign everything
+      once completed and prepare the release bundle JAR.
+    -->
     <profile>
       <id>sonatype</id>
       <build>
