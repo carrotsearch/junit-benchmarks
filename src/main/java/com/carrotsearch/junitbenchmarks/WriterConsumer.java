@@ -23,12 +23,13 @@ public final class WriterConsumer implements IResultsConsumer
     public void accept(Result result) throws IOException
     {
         w.write(String.format(Locale.ENGLISH,
-            "%s: [measured %d out of %d rounds]\n" +
+            "%s: [measured %d out of %d rounds, %s]\n" +
             " round: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f," +
             " time.total: %.2f, time.warmup: %.2f, time.bench: %.2f\n",
             result.getShortTestClassName() + "." + result.getTestMethodName(),
             result.benchmarkRounds, 
             result.benchmarkRounds + result.warmupRounds, 
+            concurrencyToText(result.options),
             result.roundAverage.toString(), 
             result.gcAverage.toString(), 
             result.gcInfo.accumulatedInvocations(), 
@@ -38,6 +39,23 @@ public final class WriterConsumer implements IResultsConsumer
             result.benchmarkTime * 0.001
         ));
         w.flush();
+    }
+
+    private String concurrencyToText(BenchmarkOptions options)
+    {
+        switch (options.concurrency())
+        {
+            case BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES:
+                return "threads: " + Runtime.getRuntime().availableProcessors() +
+                    " (all physical processors)";
+
+            case BenchmarkOptions.CONCURRENCY_SEQUENTIAL:
+                return "threads: 1 (sequential)";
+
+            default:
+                return "threads: " + options.concurrency()
+                    + " (physical processors: " + Runtime.getRuntime().availableProcessors() + ")";
+        }
     }
 
     /**

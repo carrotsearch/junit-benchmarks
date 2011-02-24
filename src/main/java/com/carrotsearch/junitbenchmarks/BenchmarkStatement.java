@@ -73,7 +73,7 @@ final class BenchmarkStatement extends Statement
             final Statistics stats = Statistics.from(results.subList(warmupRounds,
                 totalRounds));
 
-            return new Result(target, method, benchmarkRounds, warmupRounds, warmupTime,
+            return new Result(target, method, options, benchmarkRounds, warmupRounds, warmupTime,
                 benchmarkTime, stats.evaluation, stats.gc, gcSnapshot);
         }
     }

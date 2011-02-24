@@ -17,6 +17,7 @@ public final class Result
     public final Average roundAverage;
     public final Average gcAverage;
     public final GCSnapshot gcInfo;
+    public final BenchmarkOptions options;
 
     /**
      * @param target Target object (test).
@@ -31,7 +32,8 @@ public final class Result
      */
     public Result(
         Object target, 
-        FrameworkMethod method, 
+        FrameworkMethod method,
+        BenchmarkOptions options,
         int benchmarkRounds,
         int warmupRounds, 
         long warmupTime, 
@@ -42,6 +44,7 @@ public final class Result
     {
         this.target = target;
         this.method = method;
+        this.options = options;
         this.benchmarkRounds = benchmarkRounds;
         this.warmupRounds = warmupRounds;
         this.warmupTime = warmupTime;
