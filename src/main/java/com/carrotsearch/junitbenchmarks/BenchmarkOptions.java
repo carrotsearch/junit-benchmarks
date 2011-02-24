@@ -6,12 +6,26 @@ import java.lang.annotation.*;
  * Benchmark options applicable to methods annotated as tests.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(
+{
+    ElementType.TYPE, ElementType.METHOD
+})
 public @interface BenchmarkOptions
 {
     /**
-     * @return Call {@link System#gc()} before each test. This may slow down the tests
-     *         in a significant way, so disabling it is sensible in most cases.
+     * Sequential runs (no threads).
+     */
+    public final static int CONCURRENCY_SEQUENTIAL = -1;
+
+    /**
+     * Runs the benchmark with the number of threads reported
+     * by {@link Runtime#availableProcessors()}.
+     */
+    public final static int CONCURRENCY_AVAILABLE_CORES = 0;
+
+    /**
+     * @return Call {@link System#gc()} before each test. This may slow down the tests in
+     *         a significant way, so disabling it is sensible in most cases.
      */
     boolean callgc() default false;
 
@@ -26,15 +40,19 @@ public @interface BenchmarkOptions
      * from global options.
      */
     int benchmarkRounds() default -1;
-    
+
     /**
-     * Specifies concurrent/sequential execution model
+     * Specifies the number of threads that should execute the benchmarked method 
+     * in parallel. This is a tricky thing to do and you should know what you're doing 
+     * (because concurrent execution will affect GC and other measurements).
+     * 
+     * <p>Allowed values:
      * <ul>
-     * <li>-1 - executed sequentially</li>
-     * <li>0 - executed concurrently with as much threads as reported by Runtime.getRuntime().availableProcessors()</li>
-     * <li>1 - executed concurrently by the thread pool scaled down to 1 thread</li>
-     * <li>n - executed concurrently with arbitrarily set number of threads</li>
+     * <li>{@link #CONCURRENCY_SEQUENTIAL} - executed sequentially</li>
+     * <li>{@link #CONCURRENCY_AVAILABLE_CORES} - executed concurrently with as many threads as reported by
+     * {@link Runtime#availableProcessors()}.</li>
+     * <li>any other integer &gt; 0 - executed concurrently with the given number of threads</li>
      * </ul>
      */
-    int concurrency() default -1;    
+    int concurrency() default CONCURRENCY_SEQUENTIAL;
 }
