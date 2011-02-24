@@ -26,4 +26,15 @@ public @interface BenchmarkOptions
      * from global options.
      */
     int benchmarkRounds() default -1;
+    
+    /**
+     * Specifies concurrent/sequential execution model
+     * <ul>
+     * <li>-1 - executed sequentially</li>
+     * <li>0 - executed concurrently with as much threads as reported by Runtime.getRuntime().availableProcessors()</li>
+     * <li>1 - executed concurrently by the thread pool scaled down to 1 thread</li>
+     * <li>n - executed concurrently with arbitrarily set number of threads</li>
+     * </ul>
+     */
+    int concurrency() default -1;    
 }
