@@ -59,6 +59,7 @@ final class BenchmarkStatement extends Statement
 
             try
             {
+                base.evaluate();
                 final long endTime = System.currentTimeMillis();
                 return new SingleResult(startTime, afterGC, endTime);
             }
@@ -237,10 +238,13 @@ final class BenchmarkStatement extends Statement
     private final BenchmarkOptions options;
     private final IResultsConsumer [] consumers;
 
+    private final Statement base;
+
     /* */
     public BenchmarkStatement(Statement base, FrameworkMethod method, Object target,
         IResultsConsumer... consumers)
     {
+        this.base = base;
         this.method = method;
         this.target = target;
         this.consumers = consumers;
