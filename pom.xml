@@ -53,9 +53,9 @@
   </mailingLists>
 
   <scm>
-    <url>https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/trunk</url>
-    <connection>scm:svn:https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/trunk</connection>
-    <developerConnection>scm:svn:https://carrot2.svn.sourceforge.net/svnroot/carrot2/labs/com.carrotsearch.junit-benchmarks/trunk</developerConnection>
+    <url>git@github.com:carrotsearch/junit-benchmarks.git</url>
+    <connection>scm:git:git@github.com:carrotsearch/junit-benchmarks.git</connection>
+    <developerConnection>scm:git:git@github.com:carrotsearch/junit-benchmarks.git</developerConnection>
   </scm>
 
   <developers>
