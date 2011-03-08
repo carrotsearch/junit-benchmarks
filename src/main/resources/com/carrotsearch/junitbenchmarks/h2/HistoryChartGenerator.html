@@ -85,8 +85,12 @@
       }
 
       google.setOnLoadCallback(function() {
-          $.getJSON('HistoryChartGenerator.json', function(data) {
+          $.ajax({
+            url: "HistoryChartGenerator.json",
+            method: "GET",
+            success: function(data) {
               visualize(data, "CLASSNAME");
+            }
           });
 
           $("#properties").click(function () {

@@ -98,9 +98,13 @@
       }
 
       google.setOnLoadCallback(function() {
-          $.getJSON('MethodChartGenerator.json', function(data) {
-              visualize(data, "CLASSNAME");
-          });
+	        $.ajax({
+	          url: "MethodChartGenerator.json",
+	          method: "GET",
+	          success: function(data) {
+	            visualize(data, "CLASSNAME");
+	          }
+	        });
 
           $("#properties").click(function () {
         	  $(this).toggleClass("expanded"); 
