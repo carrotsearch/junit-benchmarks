@@ -1,8 +1,12 @@
 package com.carrotsearch.junitbenchmarks;
 
-import java.util.ArrayList;
-
 import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
@@ -11,6 +15,202 @@ import org.junit.runners.model.Statement;
  */
 final class BenchmarkStatement extends Statement
 {
+    /**
+     * Factored out as a nested class as it needs to keep some data during test
+     * evaluation.
+     */
+    private abstract class BaseEvaluator
+    {
+        final protected ArrayList<SingleResult> results;
+
+        final protected int warmupRounds;
+        final protected int benchmarkRounds;
+        final protected int totalRounds;
+
+        protected long warmupTime;
+        protected long benchmarkTime;
+
+        protected BaseEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds)
+        {
+            super();
+            this.warmupRounds = warmupRounds;
+            this.benchmarkRounds = benchmarkRounds;
+            this.totalRounds = totalRounds;
+            this.results = new ArrayList<SingleResult>(totalRounds);
+        }
+
+        protected GCSnapshot gcSnapshot = null;
+
+        protected abstract Result evaluate() throws Throwable;
+
+        protected final SingleResult evaluateInternally(int round) throws InvocationTargetException
+        {
+            // We assume no reordering will take place here.
+            final long startTime = System.currentTimeMillis();
+            cleanupMemory();
+            final long afterGC = System.currentTimeMillis();
+
+            if (round == warmupRounds)
+            {
+                gcSnapshot = new GCSnapshot();
+                benchmarkTime = System.currentTimeMillis();
+                warmupTime = benchmarkTime - warmupTime;
+            }
+
+            try
+            {
+                base.evaluate();
+                final long endTime = System.currentTimeMillis();
+                return new SingleResult(startTime, afterGC, endTime);
+            }
+            catch (Throwable t)
+            {
+                throw new InvocationTargetException(t);
+            }
+        }
+
+        protected final Result computeResult()
+        {
+            final Statistics stats = Statistics.from(results.subList(warmupRounds,
+                totalRounds));
+
+            return new Result(target, method, options, benchmarkRounds, warmupRounds, warmupTime,
+                benchmarkTime, stats.evaluation, stats.gc, gcSnapshot);
+        }
+    }
+
+    /**
+     * Performs test method evaluation sequentially.
+     */
+    private final class SequentialEvaluator extends BaseEvaluator
+    {
+        SequentialEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds)
+        {
+            super(warmupRounds, benchmarkRounds, totalRounds);
+        }
+
+        @Override
+        public Result evaluate() throws Throwable
+        {
+            warmupTime = System.currentTimeMillis();
+            benchmarkTime = 0;
+            for (int i = 0; i < totalRounds; i++)
+            {
+                results.add(evaluateInternally(i));
+            }
+            benchmarkTime = System.currentTimeMillis() - benchmarkTime;
+
+            return computeResult();
+        }
+    }
+
+    /**
+     * Performs test method evaluation concurrently. The basic idea is to obtain a
+     * {@link ThreadPoolExecutor} instance (either new one on each evaluation as it is
+     * implemented now or a shared one to avoid excessive thread allocation), wrap it into
+     * a <tt>CompletionService&lt;SingleResult&gt;</tt>, pause its execution until the
+     * associated task queue is filled with <tt>totalRounds</tt> number of
+     * <tt>EvaluatorCallable&lt;SingleResult&gt;</tt>.
+     */
+    private final class ConcurrentEvaluator extends BaseEvaluator
+    {
+        private final class EvaluatorCallable implements Callable<SingleResult>
+        {
+            // Sequence number in order to keep track of warmup / benchmark phase
+            private final int i;
+
+            public EvaluatorCallable(int i)
+            {
+                this.i = i;
+            }
+
+            @Override
+            public SingleResult call() throws Exception
+            {
+                latch.await();
+                return evaluateInternally(i);
+            }
+        }
+
+        private final int concurrency;
+        private final CountDownLatch latch;
+
+        ConcurrentEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds,
+            int concurrency)
+        {
+            super(warmupRounds, benchmarkRounds, totalRounds);
+
+            this.concurrency = concurrency;
+            this.latch = new CountDownLatch(1);
+        }
+
+        /**
+         * Perform ThreadPoolExecution initialization. Returns new preconfigured
+         * threadPoolExecutor for particular concurrency level and totalRounds to be
+         * executed Candidate for further development to mitigate the problem of excessive
+         * thread pool creation/destruction.
+         * 
+         * @param concurrency
+         * @param totalRounds
+         */
+        private final ExecutorService getExecutor(int concurrency, int totalRounds)
+        {
+            return new ThreadPoolExecutor(concurrency, concurrency, 10000,
+                TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(totalRounds));
+        }
+
+        /**
+         * Perform proper ThreadPool cleanup. 
+         */
+        private final void cleanupExecutor(ExecutorService executor)
+        {
+            @SuppressWarnings("unused")
+            List<Runnable> pending = executor.shutdownNow();
+            // Can pending.size() be > 0?
+        }
+
+        @Override
+        public Result evaluate() throws Throwable
+        {
+            // Obtain ThreadPoolExecutor (new instance on each test method for now)
+            ExecutorService executor = getExecutor(concurrency, totalRounds);
+            CompletionService<SingleResult> completed = new ExecutorCompletionService<SingleResult>(
+                executor);
+
+            for (int i = 0; i < totalRounds; i++)
+            {
+                completed.submit(new EvaluatorCallable(i));
+            }
+
+            // Allow all the evaluators to proceed to the warmup phase.
+            latch.countDown();
+
+            warmupTime = System.currentTimeMillis();
+            benchmarkTime = 0;
+            try
+            {
+                for (int i = 0; i < totalRounds; i++)
+                {
+                    results.add(completed.take().get());
+                }
+
+                benchmarkTime = System.currentTimeMillis() - benchmarkTime;
+                return computeResult();
+            }
+            catch (ExecutionException e)
+            {
+                // Unwrap the Throwable thrown by the tested method.
+                e.printStackTrace();                
+                throw e.getCause().getCause();
+            }
+            finally
+            {
+                // Assure proper executor cleanup either on test failure or an successful completion
+                cleanupExecutor(executor);
+            }
+        }
+    }
+
     /**
      * How many warmup runs should we execute for each test method?
      */
@@ -35,12 +235,13 @@ final class BenchmarkStatement extends Statement
 
     private final Object target;
     private final FrameworkMethod method;
-    private final Statement base;
     private final BenchmarkOptions options;
     private final IResultsConsumer [] consumers;
 
+    private final Statement base;
+
     /* */
-    public BenchmarkStatement(Statement base, FrameworkMethod method, Object target, 
+    public BenchmarkStatement(Statement base, FrameworkMethod method, Object target,
         IResultsConsumer... consumers)
     {
         this.base = base;
@@ -97,47 +298,34 @@ final class BenchmarkStatement extends Statement
         final int benchmarkRounds = getIntOption(options.benchmarkRounds(),
             BENCHMARK_ROUNDS_PROPERTY, DEFAULT_BENCHMARK_ROUNDS);
 
+        final int concurrency = getIntOption(options.concurrency(), CONCURRENCY_PROPERTY,
+            BenchmarkOptions.CONCURRENCY_SEQUENTIAL);
+
         final int totalRounds = warmupRounds + benchmarkRounds;
 
-        final ArrayList<SingleResult> results = new ArrayList<SingleResult>(totalRounds);
-
-        GCSnapshot gcSnapshot = null;
-        long warmupTime = System.currentTimeMillis();
-        long benchmarkTime = 0;
-        for (int i = 0; i < totalRounds; i++)
+        final BaseEvaluator evaluator; 
+        if (concurrency == BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
         {
-            // We assume no reordering will take place here.
-            final long startTime = System.currentTimeMillis();
-            cleanupMemory();
-            final long afterGC = System.currentTimeMillis();
-
-            if (i == warmupRounds)
-            {
-                gcSnapshot = new GCSnapshot();
-                benchmarkTime = System.currentTimeMillis();
-                warmupTime = benchmarkTime - warmupTime;
-            }
-
-            base.evaluate();
-            final long endTime = System.currentTimeMillis();
-
-            results.add(new SingleResult(startTime, afterGC, endTime));
+            evaluator = new SequentialEvaluator(warmupRounds, benchmarkRounds, totalRounds); 
         }
-        benchmarkTime = System.currentTimeMillis() - benchmarkTime;
+        else
+        {
+            /*
+             * Just don't allow call GC during concurrent execution.
+             */
+            if (options.callgc())
+                throw new IllegalArgumentException("Concurrent benchmark execution must be"
+                    + " combined ignoregc=\"true\".");
 
-        final Statistics stats = Statistics.from(
-            results.subList(warmupRounds, totalRounds));
+            int threads = (concurrency == BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES 
+                    ? Runtime.getRuntime().availableProcessors() 
+                    : concurrency);
+            
+            evaluator = new ConcurrentEvaluator(
+                warmupRounds, benchmarkRounds, totalRounds, threads);
+        }
 
-        final Result result = new Result(
-            target, method,
-            benchmarkRounds,
-            warmupRounds,
-            warmupTime,
-            benchmarkTime,
-            stats.evaluation,
-            stats.gc,
-            gcSnapshot
-        );
+        final Result result = evaluator.evaluate();
 
         for (IResultsConsumer consumer : consumers)
             consumer.accept(result);

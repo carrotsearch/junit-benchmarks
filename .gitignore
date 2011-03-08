@@ -1,4 +1,9 @@
+/*.html
+/*.json
+/*.db
+/report.xml
 target
 .project
 .settings
 .classpath
+*.patch

@@ -30,7 +30,7 @@ import com.carrotsearch.junitbenchmarks.annotation.*;
 public class Lists2
 {
     private static Object singleton = new Object();
-    private static int COUNT = 50000;
+    private static int COUNT = 10000;
     private static int [] rnd;
 
     @Rule

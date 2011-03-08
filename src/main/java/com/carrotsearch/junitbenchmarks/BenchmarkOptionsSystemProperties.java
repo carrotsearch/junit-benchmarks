@@ -22,6 +22,11 @@ public final class BenchmarkOptionsSystemProperties
     public final static String BENCHMARK_ROUNDS_PROPERTY = "jub.rounds.benchmark";
 
     /**
+     * <code>{@value}</code>: the default number of threads.
+     */
+    public final static String CONCURRENCY_PROPERTY = "jub.concurrency";
+    
+    /**
      * <code>{@value}</code>: if <code>true</code>, the defaults (or property values) take precedence over
      * {@link BenchmarkOptions} annotations.
      */
