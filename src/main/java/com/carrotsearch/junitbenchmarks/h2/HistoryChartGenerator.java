@@ -242,7 +242,7 @@ public final class HistoryChartGenerator
 
             if (rowId != previousRowId)
             {
-                emitRow(buf, row);
+                emitRow(buf, row, rs.isLast());
                 previousRowId = rowId;
             }
 
@@ -261,24 +261,39 @@ public final class HistoryChartGenerator
                 throw new RuntimeException("Missing column: " + name);
             nv.value = nf.format(avg);
             
-            if (rs.isLast())
-                emitRow(buf, row);
+            if (rs.isLast()) {
+                emitRow(buf, row, true);
+            }
         }
         buf.append("]}\n");
 
         return buf.toString();
     }
 
-    private void emitRow(StringBuilder buf, ArrayList<StringHolder> row)
+    private void emitRow(StringBuilder buf, ArrayList<StringHolder> row, boolean lastRow)
     {
         buf.append("{\"c\": [");
-        for (StringHolder nv : row)
-        {
+        //rpg
+//        for (StringHolder nv : row)
+//        {
+//            buf.append("{\"v\": ");
+//            buf.append(nv.value);
+//            buf.append("}, ");
+//        }
+        
+        for (int i = 0; i < row.size(); i++) {
+        	StringHolder nv = row.get(i); 
             buf.append("{\"v\": ");
             buf.append(nv.value);
-            buf.append("}, ");
-        }
-        buf.append("]},");
+            buf.append("}");
+            if (i<row.size())
+            	buf.append(", ");
+		}
+        
+        buf.append("]}");
+        //rpg
+        if (!lastRow)
+        	buf.append(",");
         buf.append('\n');
 
         for (StringHolder nv : row)

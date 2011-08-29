@@ -28,7 +28,11 @@ class MethodChartVisitor implements IChartAnnotationVisitor
                 c.getConnection(), 
                 GeneratorUtils.getFilePrefix(
                     clazz, 
-                    clazz.getAnnotation(BenchmarkMethodChart.class).filePrefix(),
+                    clazz.getCanonicalName() + 
+                    //rpg
+                    clazz.getAnnotation(BenchmarkMethodChart.class).filePrefix() 
+                    + "-run" 
+                    + c.runId,
                     c.chartsDir),
                 c.runId, 
                 clazz.getName());
