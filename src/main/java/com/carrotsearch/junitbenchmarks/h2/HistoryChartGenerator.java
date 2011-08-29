@@ -242,7 +242,7 @@ public final class HistoryChartGenerator
 
             if (rowId != previousRowId)
             {
-                emitRow(buf, row);
+                emitRow(buf, row, rs.isLast());
                 previousRowId = rowId;
             }
 
@@ -262,29 +262,33 @@ public final class HistoryChartGenerator
             nv.value = nf.format(avg);
             
             if (rs.isLast())
-                emitRow(buf, row);
+                emitRow(buf, row, rs.isLast());
         }
         buf.append("]}\n");
 
         return buf.toString();
     }
 
-    private void emitRow(StringBuilder buf, ArrayList<StringHolder> row)
+    private void emitRow(StringBuilder buf, ArrayList<StringHolder> row, boolean last)
     {
         buf.append("{\"c\": [");
-        for (StringHolder nv : row)
+        for (int i = 0; i < row.size(); i++)
         {
+            final StringHolder nv = row.get(i);
             buf.append("{\"v\": ");
             buf.append(nv.value);
-            buf.append("}, ");
+            buf.append("}");
+            if (i < row.size())
+                buf.append(", ");
         }
-        buf.append("]},");
+        buf.append("]}");
+        if (!last) buf.append(",");
         buf.append('\n');
 
         for (StringHolder nv : row)
             nv.value = null;
     }
-    
+
     /**
      * Include a given method in the chart. 
      */
