@@ -242,7 +242,7 @@ public final class HistoryChartGenerator
 
             if (rowId != previousRowId)
             {
-                emitRow(buf, row, rs.isLast());
+                emitRow(buf, row, false);
                 previousRowId = rowId;
             }
 
@@ -278,7 +278,7 @@ public final class HistoryChartGenerator
             buf.append("{\"v\": ");
             buf.append(nv.value);
             buf.append("}");
-            if (i < row.size())
+            if (i + 1 < row.size())
                 buf.append(", ");
         }
         buf.append("]}");

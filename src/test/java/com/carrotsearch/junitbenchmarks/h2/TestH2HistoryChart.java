@@ -4,9 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
