@@ -260,7 +260,7 @@ public final class HistoryChartGenerator
             if (nv == null) 
                 throw new RuntimeException("Missing column: " + name);
             nv.value = nf.format(avg);
-            
+
             if (rs.isLast())
                 emitRow(buf, row, rs.isLast());
         }
