@@ -61,7 +61,7 @@ public final class Result
     {
         return target.getClass().getSimpleName();
     }
-    
+
     /**
      * Returns the long version of the test's class.
      */
@@ -83,7 +83,7 @@ public final class Result
      */
     public Class<?> getTestClass()
     {
-        return method.getMethod().getDeclaringClass();
+        return target.getClass();
     }
 
     /**

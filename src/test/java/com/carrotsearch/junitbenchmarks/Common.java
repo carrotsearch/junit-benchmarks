@@ -17,9 +17,12 @@ public final class Common
     /*
      * 
      */
-    public static void existsAndDelete(String fileName)
+    public static void existsAndDelete(String... fileNames)
     {
-        existsAndDelete(new File(fileName));
+        for (String f : fileNames)
+        {
+            existsAndDelete(new File(f));
+        }
     }
 
     /*
