@@ -2,6 +2,7 @@ package com.carrotsearch.junitbenchmarks.h2;
 
 import java.io.*;
 import java.sql.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.carrotsearch.junitbenchmarks.Escape;
@@ -116,7 +117,7 @@ final class GeneratorUtils
     static String replaceToken(String template, String key, String replacement)
     {
         Pattern p = Pattern.compile(key, Pattern.LITERAL);
-        return p.matcher(template).replaceAll(replacement); 
+        return p.matcher(template).replaceAll(Matcher.quoteReplacement(replacement)); 
     }
 
     /**
@@ -164,7 +165,8 @@ final class GeneratorUtils
             filePrefix = clazz.getName();
         }
 
-        filePrefix = CLASSNAME_PATTERN.matcher(filePrefix).replaceAll(clazz.getName());
+        filePrefix = CLASSNAME_PATTERN.matcher(filePrefix).replaceAll(
+            Matcher.quoteReplacement(clazz.getName()));
 
         if (!new File(filePrefix).isAbsolute())
         {
