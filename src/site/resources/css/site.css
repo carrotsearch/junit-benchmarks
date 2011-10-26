@@ -1,0 +1,31 @@
+
+/* Remove the ugly stripes. */
+
+body {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+#banner {
+    background: none;
+    padding: 1em;
+    height: auto;
+}
+
+#bannerLeft {
+}
+
+#breadcrumbs {
+    background: none;
+    height: 1px;
+    background-color: gray;
+    padding: 0px;
+}
+
+#leftColumn {
+    border: none;
+}
+
+a.poweredBy {
+    display: none;
+}
