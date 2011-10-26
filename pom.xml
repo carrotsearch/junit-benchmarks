@@ -204,6 +204,14 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-pmd-plugin</artifactId>
               <version>2.5</version>
+              <reportSets>
+                <reportSet>
+                  <id>cpd</id>
+                  <reports>
+                    <report>cpd</report>
+                  </reports>
+                </reportSet>
+              </reportSets>
               <configuration>
                 <targetJdk>${maven.compiler.target}</targetJdk>
                 <aggregate>true</aggregate>
@@ -233,6 +241,8 @@
               <version>2.3.2</version>
               <configuration>
                 <findbugsXmlOutput>true</findbugsXmlOutput>
+                <excludeFilterFile>${basedir}/src/findbugs/exclude-filters.xml</excludeFilterFile>
+                <includeTests>false</includeTests>
               </configuration>
             </plugin>
 

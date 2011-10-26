@@ -14,8 +14,6 @@ JUnitBenchmarks
 
    * {{{./findbugs.html}Static Bug Analysis, FindBugs}} (<<<findbugs>>>).
    
-   * {{{./pmd.html}Static Bug Analysis, PMD}} (<<<pmd>>>).
-   
    * {{{./surefire-report.html}JUnit Tests}} (<<<junit>>>).
 
    * {{{./clover/index.html}Test Code Coverage}} (<<<clover>>>).
