@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>5</version>
+    <version>7</version>
   </parent>
 
   <!-- Project info. -->
@@ -367,12 +367,12 @@
               <encoding>${project.build.sourceEncoding}</encoding>
               <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
               <docfilessubdirs>true</docfilessubdirs>
-              <windowtitle>JUnitBenchmarks v${version} API
+              <windowtitle>JUnitBenchmarks v${project.version} API
                 Documentation
                 (JavaDoc)</windowtitle>
-              <doctitle>JUnitBenchmarks v${version} API
+              <doctitle>JUnitBenchmarks v${project.version} API
                 Documentation</doctitle>
-              <header><![CDATA[<div id='header'><a class='logo' target='_top' href='http://labs.carrotsearch.com'><img src='resources/logo.png'></a>JUnitBenchmarks v${version} <br>API Documentation</div>]]></header>
+              <header><![CDATA[<div id='header'><a class='logo' target='_top' href='http://labs.carrotsearch.com'><img src='resources/logo.png'></a>JUnitBenchmarks v${project.version} <br>API Documentation</div>]]></header>
             </configuration>
             <executions>
               <execution>
