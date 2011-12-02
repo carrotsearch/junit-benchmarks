@@ -69,13 +69,13 @@ final class BenchmarkStatement extends Statement
             }
         }
 
-        protected final Result computeResult()
+        protected Result computeResult()
         {
-            final Statistics stats = Statistics.from(results.subList(warmupRounds,
-                totalRounds));
+            final Statistics stats = Statistics.from(
+                results.subList(warmupRounds, totalRounds));
 
-            return new Result(target, method, options, benchmarkRounds, warmupRounds, warmupTime,
-                benchmarkTime, stats.evaluation, stats.gc, gcSnapshot);
+            return new Result(target, method, benchmarkRounds, warmupRounds, warmupTime,
+                benchmarkTime, stats.evaluation, stats.gc, gcSnapshot, 1);
         }
     }
 
@@ -208,6 +208,14 @@ final class BenchmarkStatement extends Statement
                 // Assure proper executor cleanup either on test failure or an successful completion
                 cleanupExecutor(executor);
             }
+        }
+        
+        @Override
+        protected Result computeResult()
+        {
+            Result r = super.computeResult();
+            r.concurrency = this.concurrency;
+            return r;
         }
     }
 

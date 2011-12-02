@@ -29,7 +29,7 @@ public final class WriterConsumer implements IResultsConsumer
             result.getShortTestClassName() + "." + result.getTestMethodName(),
             result.benchmarkRounds, 
             result.benchmarkRounds + result.warmupRounds, 
-            concurrencyToText(result.options),
+            concurrencyToText(result),
             result.roundAverage.toString(), 
             result.gcAverage.toString(), 
             result.gcInfo.accumulatedInvocations(), 
@@ -41,21 +41,22 @@ public final class WriterConsumer implements IResultsConsumer
         w.flush();
     }
 
-    private String concurrencyToText(BenchmarkOptions options)
+    private String concurrencyToText(Result result)
     {
-        switch (options.concurrency())
+        int threads = result.getThreadCount();
+        if (threads == Runtime.getRuntime().availableProcessors())
         {
-            case BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES:
-                return "threads: " + Runtime.getRuntime().availableProcessors() +
-                    " (all physical processors)";
-
-            case BenchmarkOptions.CONCURRENCY_SEQUENTIAL:
-                return "threads: 1 (sequential)";
-
-            default:
-                return "threads: " + options.concurrency()
-                    + " (physical processors: " + Runtime.getRuntime().availableProcessors() + ")";
+            return "threads: " + threads +
+                " (all cores)";
         }
+
+        if (threads == 1)
+        {
+            return "threads: 1 (sequential)";
+        }
+
+        return "threads: " + result.concurrency
+            + " (physical processors: " + Runtime.getRuntime().availableProcessors() + ")";
     }
 
     /**

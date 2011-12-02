@@ -9,15 +9,19 @@ import org.junit.runners.model.FrameworkMethod;
  */
 public final class Result
 {
-    private final Object target;
-    private final FrameworkMethod method;
+    final Object target;
+    final FrameworkMethod method;
 
     public final int benchmarkRounds, warmupRounds;
     public final long warmupTime, benchmarkTime;
     public final Average roundAverage;
     public final Average gcAverage;
     public final GCSnapshot gcInfo;
-    public final BenchmarkOptions options;
+
+    /**
+     * Concurrency level (number of used threads).
+     */
+    int concurrency;
 
     /**
      * @param target Target object (test).
@@ -29,22 +33,22 @@ public final class Result
      * @param roundAverage Average and standard deviation from benchmark rounds.
      * @param gcAverage Average and standard deviation from GC cleanups.
      * @param gcInfo Extra information about GC activity.
+     * @param concurrency {@link BenchmarkOptions#concurrency()} setting (or global override).
      */
     public Result(
         Object target, 
         FrameworkMethod method,
-        BenchmarkOptions options,
         int benchmarkRounds,
         int warmupRounds, 
         long warmupTime, 
         long benchmarkTime,
         Average roundAverage, 
         Average gcAverage, 
-        GCSnapshot gcInfo)
+        GCSnapshot gcInfo,
+        int concurrency)
     {
         this.target = target;
         this.method = method;
-        this.options = options;
         this.benchmarkRounds = benchmarkRounds;
         this.warmupRounds = warmupRounds;
         this.warmupTime = warmupTime;
@@ -52,6 +56,7 @@ public final class Result
         this.roundAverage = roundAverage;
         this.gcAverage = gcAverage;
         this.gcInfo = gcInfo;
+        this.concurrency = concurrency;
     }
     
     /**
@@ -92,5 +97,10 @@ public final class Result
     public Method getTestMethod()
     {
         return method.getMethod();
+    }
+
+    public int getThreadCount()
+    {
+        return concurrency;
     }
 }

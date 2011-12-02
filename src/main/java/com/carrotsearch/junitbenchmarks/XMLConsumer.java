@@ -85,6 +85,9 @@ public final class XMLConsumer extends AutocloseConsumer implements Closeable
         attribute(b, "benchmark-time-total", nf.format(result.benchmarkTime * 0.001));
         attribute(b, "warmup-time-total", nf.format(result.warmupTime * 0.001));
 
+        b.append("\n\t\t");
+        attribute(b, "threads", Integer.toString(result.getThreadCount()));
+
         b.append("/>\n\n");
 
         writer.write(b.toString());
