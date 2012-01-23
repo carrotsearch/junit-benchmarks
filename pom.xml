@@ -20,6 +20,9 @@
   <description>A framework for writing performance micro-benchmarks using JUnit4 annotations.</description>
   <url>http://labs.carrotsearch.com/junit-benchmarks.html</url>
 
+  <prerequisites>
+    <maven>3.0.2</maven>
+  </prerequisites>
 
   <!-- Extended project info. -->
   <licenses>
@@ -168,27 +171,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-maven3</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>[3.0.3,)</version>
-                  <message>Maven 3.0.3 or later is required.</message>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.0</version>
         <configuration>
@@ -292,7 +274,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.2.2</version>
         <configuration>
           <useReleaseProfile>true</useReleaseProfile>
           <releaseProfiles>release,maven-release</releaseProfiles>
