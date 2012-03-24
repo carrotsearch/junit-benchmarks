@@ -1,5 +1,7 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
+import com.carrotsearch.junitbenchmarks.db.DbConsumer;
+import com.carrotsearch.junitbenchmarks.db.IChartAnnotationVisitor;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -7,7 +9,7 @@ import com.carrotsearch.junitbenchmarks.Result;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 
-class HistoryChartVisitor implements IChartAnnotationVisitor
+public class HistoryChartVisitor implements IChartAnnotationVisitor<DbConsumer>
 {
     /**
      * Cache of all types and methods for which 
@@ -40,7 +42,7 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
     /*
      * 
      */
-    public void generate(H2Consumer c) throws Exception
+    public void generate(DbConsumer c) throws Exception
     {
         for (Map.Entry<Class<?>, List<Method>> e : types.entrySet())
         {
@@ -55,10 +57,10 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
             if (ann != null)
             {
                 HistoryChartGenerator gen = new HistoryChartGenerator(
-                    c.getConnection(), 
-                    GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.chartsDir), 
+                    GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.getChartsDir()), 
                     clazz.getName(), 
-                    ann.labelWith());
+                    ann.labelWith(),
+                    c);
                 gen.updateMaxRuns(ann.maxRuns());
                 updateMinMax(clazz.getAnnotation(AxisRange.class), gen);
                 gen.generate();
@@ -71,7 +73,7 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
             for (Method m : methods)
             {
                 BenchmarkHistoryChart methodAnn = m.getAnnotation(BenchmarkHistoryChart.class);
-                String prefix = GeneratorUtils.getFilePrefix(clazz, methodAnn.filePrefix(), c.chartsDir);
+                String prefix = GeneratorUtils.getFilePrefix(clazz, methodAnn.filePrefix(), c.getChartsDir());
                 if (!byPrefix.containsKey(prefix))
                 {
                     byPrefix.put(prefix, new ArrayList<Method>());
@@ -84,17 +86,17 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
              */
             if (ann != null)
             {
-                byPrefix.remove(GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.chartsDir));
+                byPrefix.remove(GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.getChartsDir()));
             }
 
             for (Map.Entry<String, List<Method>> e2 : byPrefix.entrySet())
             {
                 
                 HistoryChartGenerator gen = new HistoryChartGenerator(
-                    c.getConnection(),
                     e2.getKey(), 
                     clazz.getName(),
-                    e2.getValue().get(0).getAnnotation(BenchmarkHistoryChart.class).labelWith());
+                    e2.getValue().get(0).getAnnotation(BenchmarkHistoryChart.class).labelWith(),
+                    c);
 
                 for (Method m : e2.getValue())
                 {
