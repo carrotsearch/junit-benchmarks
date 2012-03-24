@@ -1,5 +1,6 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
+import com.carrotsearch.junitbenchmarks.db.DbConsumer;
 import java.io.*;
 import java.sql.*;
 import java.util.regex.Matcher;
@@ -10,7 +11,7 @@ import com.carrotsearch.junitbenchmarks.Escape;
 /**
  * Report generator utilities.
  */
-final class GeneratorUtils
+public final class GeneratorUtils
 {
     /**
      * Literal 'CLASSNAME'.
@@ -38,12 +39,14 @@ final class GeneratorUtils
     /**
      * Get extra properties associated with the given run. 
      */
-    static String getProperties(Connection connection, int runId) throws SQLException
+    public static String getProperties(final DbConsumer consumer) throws SQLException
     {
+        Connection connection = consumer.getConnection();
+        int runId = consumer.getRunId();
         final StringBuilder buf = new StringBuilder();
 
         final PreparedStatement s = 
-            connection.prepareStatement(H2Consumer.getResource("method-chart-properties.sql"));
+            connection.prepareStatement(consumer.getMethodChartPropertiesQuery());
         s.setInt(1, runId);
 
         ResultSet rs = s.executeQuery();
@@ -72,7 +75,7 @@ final class GeneratorUtils
     /**
      * Format a given SQL value to be placed in JSON script (add quotes as needed). 
      */
-    static Object formatValue(int sqlColumnType, Object val)
+    public static Object formatValue(int sqlColumnType, Object val)
     {
         switch (sqlColumnType)
         {
@@ -93,7 +96,7 @@ final class GeneratorUtils
     /**
      * Get Google Chart API type for a given SQL type. 
      */
-    static String getMappedType(int sqlColumnType)
+    public static String getMappedType(int sqlColumnType)
     {
         switch (sqlColumnType)
         {
@@ -114,7 +117,7 @@ final class GeneratorUtils
     /**
      * Preprocess a given template and substitute a fixed token.
      */
-    static String replaceToken(String template, String key, String replacement)
+    public static String replaceToken(String template, String key, String replacement)
     {
         Pattern p = Pattern.compile(key, Pattern.LITERAL);
         return p.matcher(template).replaceAll(Matcher.quoteReplacement(replacement)); 
@@ -123,7 +126,7 @@ final class GeneratorUtils
     /**
      * Save an output resource to a given file. 
      */
-    static void save(String fileName, String content) throws IOException
+    public static void save(String fileName, String content) throws IOException
     {
         final File file = new File(fileName);
         if (file.getParentFile() != null) {
@@ -134,7 +137,7 @@ final class GeneratorUtils
         fos.close();
     }
 
-    static String getMinMax(double min, double max)
+    public static String getMinMax(double min, double max)
     {
         StringBuilder b = new StringBuilder();
         if (!Double.isNaN(min))

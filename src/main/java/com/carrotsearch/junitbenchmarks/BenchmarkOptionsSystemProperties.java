@@ -50,6 +50,14 @@ public final class BenchmarkOptionsSystemProperties
      * not exist, it will be created. 
      */
     public final static String DB_FILE_PROPERTY = "jub.db.file";
+    
+    /**
+     * <code>{@value}</code>: if set, an {@link MySQLConsumer} is added to the
+     * consumers list and benchmarks results are saved to a database.  This
+     * property must point to the mysql server instance and include all the
+     * necessary connection/authentication information.
+     */
+    public final static String MYSQL_URL_PROPERTY = "jub.mysql.url";
 
     /**
      * <code>{@value}</code>: output directory for benchmark charts if {@link H2Consumer}

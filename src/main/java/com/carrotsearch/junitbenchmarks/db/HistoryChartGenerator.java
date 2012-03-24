@@ -1,9 +1,9 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
-import static com.carrotsearch.junitbenchmarks.h2.GeneratorUtils.getColumnIndex;
+import com.carrotsearch.junitbenchmarks.db.DbConsumer;
+import static com.carrotsearch.junitbenchmarks.db.GeneratorUtils.getColumnIndex;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +31,6 @@ public final class HistoryChartGenerator
         labelColumns.put(LabelType.TIMESTAMP, 2);
     }
 
-    private Connection connection;
     private String clazzName;
 
     /**
@@ -58,6 +57,10 @@ public final class HistoryChartGenerator
      * Default X-axis label column.
      */
     private final LabelType labelType;
+    /**
+     * The consumer.
+     */
+    private DbConsumer consumer;
 
     /**
      * Value holder for row aggregation.
@@ -76,13 +79,13 @@ public final class HistoryChartGenerator
      * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
      */
-    public HistoryChartGenerator(Connection connection, 
-        String filePrefix, String clazzName, LabelType labelType)
+    public HistoryChartGenerator( 
+        String filePrefix, String clazzName, LabelType labelType, DbConsumer consumer)
     {
-        this.connection = connection;
         this.clazzName = clazzName;
         this.filePrefix = filePrefix;
         this.labelType = labelType;
+        this.consumer = consumer;
     }
 
     /**
@@ -93,7 +96,7 @@ public final class HistoryChartGenerator
         final String jsonFileName = filePrefix + ".json";
         final String htmlFileName = filePrefix + ".html";
 
-        String template = H2Consumer.getResource("HistoryChartGenerator.html");
+        String template = consumer.getHistoryHtmlTemplate();
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
         template = GeneratorUtils.replaceToken(template, "HistoryChartGenerator.json", 
             new File(jsonFileName).getName());
@@ -139,7 +142,7 @@ public final class HistoryChartGenerator
         if (maxRuns != Integer.MAX_VALUE)
         {
             // Get min. runId to start from.
-            s = connection.prepareStatement(
+            s = consumer.getConnection().prepareStatement(
                 "SELECT DISTINCT RUN_ID FROM TESTS t, RUNS r " + 
                 " WHERE t.classname = ? " +
                 " AND t.run_id = r.id " +
@@ -157,7 +160,7 @@ public final class HistoryChartGenerator
         }
 
         // Get all the method names within the runs range.
-        s = connection.prepareStatement(
+        s = consumer.getConnection().prepareStatement(
             "SELECT DISTINCT NAME FROM TESTS t, RUNS r " +
             " WHERE t.classname = ? " +
             " AND t.run_id = r.id " +
@@ -194,7 +197,7 @@ public final class HistoryChartGenerator
         buf.append("],\n");
 
         // Emit data.
-        s = connection.prepareStatement(
+        s = consumer.getConnection().prepareStatement(
             "SELECT RUN_ID, CUSTOM_KEY, TSTAMP, NAME, ROUND_AVG " + 
             "FROM TESTS t, RUNS r " + 
             "WHERE t.classname = ? " +

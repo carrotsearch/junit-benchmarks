@@ -1,27 +1,27 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.mysql;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties;
 import com.carrotsearch.junitbenchmarks.db.DbConsumer;
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.h2.jdbcx.JdbcDataSource;
 
 /**
- * {@link DbConsumer} implementation for H2.
+ * {@link DbConsumer} implementation for MySQL.
  */
-public final class H2Consumer extends DbConsumer {
+public final class MySQLConsumer extends DbConsumer {
 
     /**
-     * The database file name.
+     * The server location
      */
-    private File dbFileName;
+    private String dbUrl;
 
     /**
      * Creates a consumer with the default file name.
      */
-    public H2Consumer() {
-        this(getDefaultDbName());
+    public MySQLConsumer() {
+        this(getDefaultServerLocation());
     }
 
     /**
@@ -29,45 +29,44 @@ public final class H2Consumer extends DbConsumer {
      *
      * @param dbFileName the database file name
      */
-    public H2Consumer(File dbFileName) {
-        this(dbFileName, getDefaultChartsDir(), getDefaultCustomKey());
+    public MySQLConsumer(String dbUrl) {
+        this(dbUrl, getDefaultChartsDir(), getDefaultCustomKey());
     }
 
     /**
      * Creates a consumer with the specified database file, charts directory,
      * and custom key value.
      *
-     * @param dbFileName the database file
+     * @param dbUrl the database url
      * @param chartsDir the charts directory
      * @param customKeyValue the custom key value
      */
-    public H2Consumer(File dbFileName, File chartsDir, String customKeyValue) {
+    public MySQLConsumer(String dbUrl, File chartsDir, String customKeyValue) {
         super(chartsDir, customKeyValue);
-        this.dbFileName = dbFileName;
+        this.dbUrl = dbUrl;
         try {
             checkSchema();
         } catch (SQLException e) {
-            throw new RuntimeException("Cannot initialize H2 database.", e);
+            throw new RuntimeException("Cannot initialize MySQL database.", e);
         }
     }
 
     /**
      * Return the global default DB name.
      */
-    private static File getDefaultDbName() {
-        final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY);
+    private static String getDefaultServerLocation() {
+        final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.MYSQL_URL_PROPERTY);
         if (dbPath != null && !dbPath.trim().equals("")) {
-            return new File(dbPath);
+            return dbPath;
         }
         throw new IllegalArgumentException("Missing global property: "
-                + BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY);
+                + BenchmarkOptionsSystemProperties.MYSQL_URL_PROPERTY);
     }
 
     @Override
     protected Connection createConnection() throws SQLException {
-        final JdbcDataSource ds = new org.h2.jdbcx.JdbcDataSource();
-        ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE");
-        ds.setUser("sa");
+        final MysqlDataSource ds = new MysqlDataSource();
+        ds.setURL(dbUrl);
         Connection results = ds.getConnection();
         results.setAutoCommit(false);
         return results;
@@ -75,41 +74,41 @@ public final class H2Consumer extends DbConsumer {
 
     @Override
     public String getMethodChartResultsQuery() {
-        return getResource(H2Consumer.class, "method-chart-results.sql");
+        return getResource(MySQLConsumer.class, "method-chart-results.sql");
     }
 
     @Override
     public String getMethodChartPropertiesQuery() {
-        return getResource(H2Consumer.class, "method-chart-properties.sql");
+        return getResource(MySQLConsumer.class, "method-chart-properties.sql");
     }
 
     @Override
     protected String getCreateRunsSql() {
-        return getResource(H2Consumer.class, "000-create-runs.sql");
+        return getResource(MySQLConsumer.class, "000-create-runs.sql");
     }
 
     @Override
     protected String getCreateTestsSql() {
-        return getResource(H2Consumer.class, "001-create-tests.sql");
+        return getResource(MySQLConsumer.class, "001-create-tests.sql");
     }
 
     @Override
     protected String getNewRunSql() {
-        return getResource(H2Consumer.class, "002-new-run.sql");
+        return getResource(MySQLConsumer.class, "002-new-run.sql");
     }
 
     @Override
     protected String getTestInsertSql() {
-        return getResource(H2Consumer.class, "003-new-result.sql");
+        return getResource(MySQLConsumer.class, "003-new-result.sql");
     }
 
     @Override
     protected String getCreateDbVersionSql() {
-        return getResource(H2Consumer.class, "004-create-dbversion.sql");
+        return getResource(MySQLConsumer.class, "004-create-dbversion.sql");
     }
 
     @Override
     protected String getAddCustomKeySql() {
-        return getResource(H2Consumer.class, "005-add-custom-key.sql");
+        return getResource(MySQLConsumer.class, "005-add-custom-key.sql");
     }
 }
