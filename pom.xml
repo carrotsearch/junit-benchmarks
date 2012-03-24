@@ -137,12 +137,21 @@
             <version>1.9.1</version>
             <scope>test</scope>
         </dependency>
-    
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-mxj</artifactId>
             <version>5.0.12</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!--
+                        This is a 133 MB dependency.  We should only require it
+                        when running the test profile for mysql.
+                    -->
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-mxj-db-files</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -308,16 +317,16 @@
                         <configuration>
                             <target>
                                 <taskdef name="retrotranslator"
-                         classname="net.sf.retrotranslator.transformer.RetrotranslatorTask"
-                         classpathref="maven.plugin.classpath" />
+                                         classname="net.sf.retrotranslator.transformer.RetrotranslatorTask"
+                                         classpathref="maven.plugin.classpath" />
 
                                 <retrotranslator verbose="true" verify="false"
-                                 failonwarning="true" target="1.5"
-                                 embed="com.carrotsearch.junitbenchmarks.backport"
-                                 destjar="${project.build.directory}/${project.build.finalName}-jdk15.jar">
+                                                 failonwarning="true" target="1.5"
+                                                 embed="com.carrotsearch.junitbenchmarks.backport"
+                                                 destjar="${project.build.directory}/${project.build.finalName}-jdk15.jar">
 
                                     <jarfileset dir="${project.build.directory}"
-                              includes="${project.build.finalName}.jar" />
+                                                includes="${project.build.finalName}.jar" />
 
                                     <classpath>
                                         <pathelement location="${basedir}/src/main/retrotranslator" />
@@ -356,28 +365,6 @@
                         <version>3.1</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-      
-            <plugin>
-                <!-- Find free ports to run our server -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>reserve-server-port</id>
-                        <goals>
-                            <goal>reserve-network-port</goal>
-                        </goals>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <portNames>
-                                <portName>mysql.port</portName>
-                            </portNames>
-                            <outputFile>target/mysql.properties</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 
@@ -515,6 +502,55 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>tests-include-mysql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-mxj-db-files</artifactId>
+                    <version>5.0.12</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.12</version>
+                        <configuration>
+                            <includes>
+                                <include>**/MySQLConsumerT.java</include>
+                                <include>**/Test*.java</include>
+                                <include>**/*Test.java</include>
+                                <include>**/*TestCase.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <!-- Find free ports to run the mysql instance -->
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>reserve-server-port</id>
+                                <goals>
+                                    <goal>reserve-network-port</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                                <configuration>
+                                    <portNames>
+                                        <portName>mysql.port</portName>
+                                    </portNames>
+                                    <outputFile>target/mysql.properties</outputFile>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

@@ -27,16 +27,14 @@ import java.util.Properties;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertNotNull;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /**
  *
  * @author <a href="mailto:steven.swor@summitsystemsinc.com"
  * title="steven.swor@summitsystemsinc.com">Steven Swor</a>
  */
-public class MySQLConsumerTest {
+public class MySQLConsumerT {
 
     private static final String MYSQL_URL = "jdbc:mysql://localhost:{0}/MySQLConsumerTest?user=test&password=test&createDatabaseIfNotExist=true";
     private static MysqldResource server = null;
@@ -44,7 +42,7 @@ public class MySQLConsumerTest {
     
     private MySQLConsumer testInstance = null;
 
-    public MySQLConsumerTest() {
+    public MySQLConsumerT() {
         testInstance = new MySQLConsumer(MessageFormat.format(MYSQL_URL,getMySQLPort("3306")));
     }
 
