@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
 import java.io.*;
 import java.sql.*;
@@ -38,12 +38,14 @@ final class GeneratorUtils
     /**
      * Get extra properties associated with the given run. 
      */
-    static String getProperties(Connection connection, int runId) throws SQLException
+    static String getProperties(final DbConsumer consumer) throws SQLException
     {
+        Connection connection = consumer.getConnection();
+        int runId = consumer.getRunId();
         final StringBuilder buf = new StringBuilder();
 
         final PreparedStatement s = 
-            connection.prepareStatement(H2Consumer.getResource("method-chart-properties.sql"));
+            connection.prepareStatement(consumer.getMethodChartPropertiesQuery());
         s.setInt(1, runId);
 
         ResultSet rs = s.executeQuery();
@@ -93,7 +95,7 @@ final class GeneratorUtils
     /**
      * Get Google Chart API type for a given SQL type. 
      */
-    static String getMappedType(int sqlColumnType)
+    public static String getMappedType(int sqlColumnType)
     {
         switch (sqlColumnType)
         {

@@ -1,9 +1,9 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
 /**
  * Database versions for upgrades.
  */
-enum DbVersions
+public enum DbVersions
 {
     /**
      * No tables present.

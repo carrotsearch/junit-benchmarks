@@ -1,4 +1,4 @@
-package com.carrotsearch.junitbenchmarks.h2;
+package com.carrotsearch.junitbenchmarks.db;
 
 import java.io.File;
 import java.sql.*;
@@ -8,10 +8,9 @@ import java.sql.*;
  */
 public final class MethodChartGenerator
 {
-    private Connection connection;
-    private int runId;
     private String clazzName;
     private String filePrefix;
+    private DbConsumer consumer;
 
     double min = Double.NaN, max = Double.NaN;
 
@@ -22,15 +21,13 @@ public final class MethodChartGenerator
      * @param clazzName The target test class (fully qualified name).
      */
     public MethodChartGenerator(
-        Connection connection, 
-        String filePrefix,
-        int runId, 
-        String clazzName)
+        String filePrefix, 
+        String clazzName,
+        DbConsumer consumer)
     {
-        this.connection = connection;
-        this.runId = runId;
         this.clazzName = clazzName;
         this.filePrefix = filePrefix;
+        this.consumer = consumer;
     }
 
     /**
@@ -41,14 +38,14 @@ public final class MethodChartGenerator
         final String jsonFileName = filePrefix + ".json";
         final String htmlFileName = filePrefix + ".html";
         
-        String template = H2Consumer.getResource("MethodChartGenerator.html");
+        String template = consumer.getMethodHtmlTemplate();
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
         template = GeneratorUtils.replaceToken(template, "MethodChartGenerator.json", 
             new File(jsonFileName).getName());
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
             GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", 
-            GeneratorUtils.getProperties(connection, runId));
+            GeneratorUtils.getProperties(consumer));
 
         GeneratorUtils.save(htmlFileName, template);
         GeneratorUtils.save(jsonFileName, getData());
@@ -63,8 +60,8 @@ public final class MethodChartGenerator
         buf.append("{\n");
 
         final PreparedStatement s = 
-            connection.prepareStatement(H2Consumer.getResource("method-chart-results.sql"));
-        s.setInt(1, runId);
+            consumer.getConnection().prepareStatement(consumer.getMethodChartResultsQuery());
+        s.setInt(1, consumer.getRunId());
         s.setString(2, clazzName);
 
         ResultSet rs = s.executeQuery();
