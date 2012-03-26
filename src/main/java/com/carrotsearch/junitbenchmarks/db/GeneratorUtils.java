@@ -1,6 +1,5 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.db.DbConsumer;
 import java.io.*;
 import java.sql.*;
 import java.util.regex.Matcher;
@@ -11,7 +10,7 @@ import com.carrotsearch.junitbenchmarks.Escape;
 /**
  * Report generator utilities.
  */
-public final class GeneratorUtils
+final class GeneratorUtils
 {
     /**
      * Literal 'CLASSNAME'.
@@ -39,7 +38,7 @@ public final class GeneratorUtils
     /**
      * Get extra properties associated with the given run. 
      */
-    public static String getProperties(final DbConsumer consumer) throws SQLException
+    static String getProperties(final DbConsumer consumer) throws SQLException
     {
         Connection connection = consumer.getConnection();
         int runId = consumer.getRunId();
@@ -75,7 +74,7 @@ public final class GeneratorUtils
     /**
      * Format a given SQL value to be placed in JSON script (add quotes as needed). 
      */
-    public static Object formatValue(int sqlColumnType, Object val)
+    static Object formatValue(int sqlColumnType, Object val)
     {
         switch (sqlColumnType)
         {
@@ -117,7 +116,7 @@ public final class GeneratorUtils
     /**
      * Preprocess a given template and substitute a fixed token.
      */
-    public static String replaceToken(String template, String key, String replacement)
+    static String replaceToken(String template, String key, String replacement)
     {
         Pattern p = Pattern.compile(key, Pattern.LITERAL);
         return p.matcher(template).replaceAll(Matcher.quoteReplacement(replacement)); 
@@ -126,7 +125,7 @@ public final class GeneratorUtils
     /**
      * Save an output resource to a given file. 
      */
-    public static void save(String fileName, String content) throws IOException
+    static void save(String fileName, String content) throws IOException
     {
         final File file = new File(fileName);
         if (file.getParentFile() != null) {
@@ -137,7 +136,7 @@ public final class GeneratorUtils
         fos.close();
     }
 
-    public static String getMinMax(double min, double max)
+    static String getMinMax(double min, double max)
     {
         StringBuilder b = new StringBuilder();
         if (!Double.isNaN(min))

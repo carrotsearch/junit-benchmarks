@@ -1,6 +1,5 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.db.DbConsumer;
 import java.io.File;
 import java.sql.*;
 

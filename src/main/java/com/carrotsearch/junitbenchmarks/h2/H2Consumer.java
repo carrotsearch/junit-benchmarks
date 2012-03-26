@@ -10,7 +10,8 @@ import org.h2.jdbcx.JdbcDataSource;
 /**
  * {@link DbConsumer} implementation for H2.
  */
-public final class H2Consumer extends DbConsumer {
+public final class H2Consumer extends DbConsumer
+{
 
     /**
      * The database file name.
@@ -20,7 +21,8 @@ public final class H2Consumer extends DbConsumer {
     /**
      * Creates a consumer with the default file name.
      */
-    public H2Consumer() {
+    public H2Consumer()
+    {
         this(getDefaultDbName());
     }
 
@@ -29,7 +31,8 @@ public final class H2Consumer extends DbConsumer {
      *
      * @param dbFileName the database file name
      */
-    public H2Consumer(File dbFileName) {
+    public H2Consumer(File dbFileName)
+    {
         this(dbFileName, getDefaultChartsDir(), getDefaultCustomKey());
     }
 
@@ -41,12 +44,16 @@ public final class H2Consumer extends DbConsumer {
      * @param chartsDir the charts directory
      * @param customKeyValue the custom key value
      */
-    public H2Consumer(File dbFileName, File chartsDir, String customKeyValue) {
+    public H2Consumer(File dbFileName, File chartsDir, String customKeyValue)
+    {
         super(chartsDir, customKeyValue);
         this.dbFileName = dbFileName;
-        try {
+        try
+        {
             checkSchema();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RuntimeException("Cannot initialize H2 database.", e);
         }
     }
@@ -54,9 +61,11 @@ public final class H2Consumer extends DbConsumer {
     /**
      * Return the global default DB name.
      */
-    private static File getDefaultDbName() {
+    private static File getDefaultDbName()
+    {
         final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY);
-        if (dbPath != null && !dbPath.trim().equals("")) {
+        if (dbPath != null && !dbPath.trim().equals(""))
+        {
             return new File(dbPath);
         }
         throw new IllegalArgumentException("Missing global property: "
@@ -64,7 +73,8 @@ public final class H2Consumer extends DbConsumer {
     }
 
     @Override
-    protected Connection createConnection() throws SQLException {
+    protected Connection createConnection() throws SQLException
+    {
         final JdbcDataSource ds = new org.h2.jdbcx.JdbcDataSource();
         ds.setURL("jdbc:h2:" + dbFileName.getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE");
         ds.setUser("sa");
@@ -74,42 +84,50 @@ public final class H2Consumer extends DbConsumer {
     }
 
     @Override
-    public String getMethodChartResultsQuery() {
+    public String getMethodChartResultsQuery()
+    {
         return getResource(H2Consumer.class, "method-chart-results.sql");
     }
 
     @Override
-    public String getMethodChartPropertiesQuery() {
+    public String getMethodChartPropertiesQuery()
+    {
         return getResource(H2Consumer.class, "method-chart-properties.sql");
     }
 
     @Override
-    protected String getCreateRunsSql() {
+    protected String getCreateRunsSql()
+    {
         return getResource(H2Consumer.class, "000-create-runs.sql");
     }
 
     @Override
-    protected String getCreateTestsSql() {
+    protected String getCreateTestsSql()
+    {
         return getResource(H2Consumer.class, "001-create-tests.sql");
     }
 
     @Override
-    protected String getNewRunSql() {
+    protected String getNewRunSql()
+    {
         return getResource(H2Consumer.class, "002-new-run.sql");
     }
 
     @Override
-    protected String getTestInsertSql() {
+    protected String getTestInsertSql()
+    {
         return getResource(H2Consumer.class, "003-new-result.sql");
     }
 
     @Override
-    protected String getCreateDbVersionSql() {
+    protected String getCreateDbVersionSql()
+    {
         return getResource(H2Consumer.class, "004-create-dbversion.sql");
     }
 
     @Override
-    protected String getAddCustomKeySql() {
+    protected String getAddCustomKeySql()
+    {
         return getResource(H2Consumer.class, "005-add-custom-key.sql");
     }
 }

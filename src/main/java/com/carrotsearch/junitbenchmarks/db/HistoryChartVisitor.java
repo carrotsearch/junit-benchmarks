@@ -1,7 +1,5 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.db.DbConsumer;
-import com.carrotsearch.junitbenchmarks.db.IChartAnnotationVisitor;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -9,7 +7,7 @@ import com.carrotsearch.junitbenchmarks.Result;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 
-public class HistoryChartVisitor implements IChartAnnotationVisitor<DbConsumer>
+class HistoryChartVisitor implements IChartAnnotationVisitor<DbConsumer>
 {
     /**
      * Cache of all types and methods for which 

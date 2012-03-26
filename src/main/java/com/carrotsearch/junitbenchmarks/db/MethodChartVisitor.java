@@ -1,7 +1,5 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.db.DbConsumer;
-import com.carrotsearch.junitbenchmarks.db.IChartAnnotationVisitor;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 
@@ -12,7 +10,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 /**
  * Collector of {@link BenchmarkMethodChart} annotations.
  */
-public class MethodChartVisitor implements IChartAnnotationVisitor<DbConsumer>
+class MethodChartVisitor implements IChartAnnotationVisitor<DbConsumer>
 {
     /**
      * Types for which method-level chart should be generated.

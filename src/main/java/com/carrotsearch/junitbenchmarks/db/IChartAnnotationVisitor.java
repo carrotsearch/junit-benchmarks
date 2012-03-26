@@ -1,8 +1,8 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.IResultsConsumer;
 import java.lang.reflect.Method;
 
+import com.carrotsearch.junitbenchmarks.IResultsConsumer;
 import com.carrotsearch.junitbenchmarks.Result;
 
 /**

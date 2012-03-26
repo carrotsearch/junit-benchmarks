@@ -10,7 +10,8 @@ import java.sql.SQLException;
 /**
  * {@link DbConsumer} implementation for MySQL.
  */
-public final class MySQLConsumer extends DbConsumer {
+public final class MySQLConsumer extends DbConsumer
+{
 
     /**
      * The server location
@@ -20,7 +21,8 @@ public final class MySQLConsumer extends DbConsumer {
     /**
      * Creates a consumer with the default file name.
      */
-    public MySQLConsumer() {
+    public MySQLConsumer()
+    {
         this(getDefaultServerLocation());
     }
 
@@ -29,7 +31,8 @@ public final class MySQLConsumer extends DbConsumer {
      *
      * @param dbFileName the database file name
      */
-    public MySQLConsumer(String dbUrl) {
+    public MySQLConsumer(String dbUrl)
+    {
         this(dbUrl, getDefaultChartsDir(), getDefaultCustomKey());
     }
 
@@ -41,12 +44,16 @@ public final class MySQLConsumer extends DbConsumer {
      * @param chartsDir the charts directory
      * @param customKeyValue the custom key value
      */
-    public MySQLConsumer(String dbUrl, File chartsDir, String customKeyValue) {
+    public MySQLConsumer(String dbUrl, File chartsDir, String customKeyValue)
+    {
         super(chartsDir, customKeyValue);
         this.dbUrl = dbUrl;
-        try {
+        try
+        {
             checkSchema();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RuntimeException("Cannot initialize MySQL database.", e);
         }
     }
@@ -54,9 +61,11 @@ public final class MySQLConsumer extends DbConsumer {
     /**
      * Return the global default DB name.
      */
-    private static String getDefaultServerLocation() {
+    private static String getDefaultServerLocation()
+    {
         final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.MYSQL_URL_PROPERTY);
-        if (dbPath != null && !dbPath.trim().equals("")) {
+        if (dbPath != null && !dbPath.trim().equals(""))
+        {
             return dbPath;
         }
         throw new IllegalArgumentException("Missing global property: "
@@ -64,7 +73,8 @@ public final class MySQLConsumer extends DbConsumer {
     }
 
     @Override
-    protected Connection createConnection() throws SQLException {
+    protected Connection createConnection() throws SQLException
+    {
         final MysqlDataSource ds = new MysqlDataSource();
         ds.setURL(dbUrl);
         Connection results = ds.getConnection();
@@ -73,42 +83,50 @@ public final class MySQLConsumer extends DbConsumer {
     }
 
     @Override
-    public String getMethodChartResultsQuery() {
+    public String getMethodChartResultsQuery()
+    {
         return getResource(MySQLConsumer.class, "method-chart-results.sql");
     }
 
     @Override
-    public String getMethodChartPropertiesQuery() {
+    public String getMethodChartPropertiesQuery()
+    {
         return getResource(MySQLConsumer.class, "method-chart-properties.sql");
     }
 
     @Override
-    protected String getCreateRunsSql() {
+    protected String getCreateRunsSql()
+    {
         return getResource(MySQLConsumer.class, "000-create-runs.sql");
     }
 
     @Override
-    protected String getCreateTestsSql() {
+    protected String getCreateTestsSql()
+    {
         return getResource(MySQLConsumer.class, "001-create-tests.sql");
     }
 
     @Override
-    protected String getNewRunSql() {
+    protected String getNewRunSql()
+    {
         return getResource(MySQLConsumer.class, "002-new-run.sql");
     }
 
     @Override
-    protected String getTestInsertSql() {
+    protected String getTestInsertSql()
+    {
         return getResource(MySQLConsumer.class, "003-new-result.sql");
     }
 
     @Override
-    protected String getCreateDbVersionSql() {
+    protected String getCreateDbVersionSql()
+    {
         return getResource(MySQLConsumer.class, "004-create-dbversion.sql");
     }
 
     @Override
-    protected String getAddCustomKeySql() {
+    protected String getAddCustomKeySql()
+    {
         return getResource(MySQLConsumer.class, "005-add-custom-key.sql");
     }
 }

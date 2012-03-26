@@ -18,7 +18,6 @@ package com.carrotsearch.junitbenchmarks.db;
 import com.carrotsearch.junitbenchmarks.AutocloseConsumer;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties;
 import com.carrotsearch.junitbenchmarks.Result;
-import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -30,74 +29,17 @@ import java.util.Set;
 /**
  * Parent class for database consumer implementations.
  */
-public abstract class DbConsumer extends AutocloseConsumer implements Closeable {
-
-    /**
-     * Gets the default custom key.
-     *
-     * @return the default custom key
-     */
-    public static String getDefaultCustomKey() {
-        return System.getProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY);
-    }
-
-    /**
-     * Gets the default charts directory
-     *
-     * @return the default charts directory
-     */
-    public static File getDefaultChartsDir() {
-        final File file = new File(System.getProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "."));
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
-        return file;
-    }
-    
-    /**
-     * Read a given resource from classpath and return UTF-8 decoded string.
-     */
-    protected static String getResource(Class c, String resourceName) {
-        try {
-            InputStream is = c.getResourceAsStream(resourceName);
-            if (is == null) {
-                throw new IOException();
-            }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final byte[] buffer = new byte[1024];
-            int cnt;
-            while ((cnt = is.read(buffer)) > 0) {
-                baos.write(buffer, 0, cnt);
-            }
-            is.close();
-            baos.close();
-
-            return new String(baos.toByteArray(), "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException("Required resource missing: "
-                    + resourceName);
-        }
-    }
-    
+public abstract class DbConsumer extends AutocloseConsumer implements Closeable
+{
     /*
      * Column indexes in the prepared insert statement.
      */
-    public static final int CLASSNAME;
-    public static final int GC_AVG;
-    public static final int GC_INVOCATIONS;
-    public static final int GC_STDDEV;
-    public static final int GC_TIME;
-    public static final int NAME;
-    public static final int ROUND_AVG;
-    public static final int ROUND_STDDEV;
-    public static final int RUN_ID;
-    public static final int TIME_BENCHMARK;
-    public static final int TIME_WARMUP;
-    public static final int WARMUP_ROUNDS;
-    public static final int BENCHMARK_ROUNDS;
+    public final static int RUN_ID, CLASSNAME, NAME, BENCHMARK_ROUNDS, WARMUP_ROUNDS,
+        ROUND_AVG, ROUND_STDDEV, GC_AVG, GC_STDDEV, GC_INVOCATIONS, GC_TIME,
+        TIME_BENCHMARK, TIME_WARMUP;
     
-    static {
+    static
+    {
         int column = 1;
         RUN_ID = column++;
         CLASSNAME = column++;
@@ -115,169 +57,75 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable 
     }
     
     /**
-     * The charts directory.
-     */
-    private File chartsDir;
-    /**
-     * The custom key value.
-     */
-    private String customKeyValue;
-    /**
      * The database connection.
      */
     private Connection connection;
-    /**
-     * Insert statement to the tests table.
-     */
-    private PreparedStatement newTest;
+    
     /**
      * Unique primary key for this consumer in the RUNS table.
      */
     private int runId = -1;
+    
+    /**
+     * Insert statement to the tests table.
+     */
+    private PreparedStatement newTest;
+    
+    /**
+     * The charts directory.
+     */
+    private File chartsDir;
+    
     /**
      * Charting visitors.
      */
     private List<? extends IChartAnnotationVisitor> chartVisitors;
     
     /**
+     * The custom key value.
+     */
+    private String customKeyValue;
+
+    /**
      * Creates a new DbConsumer.
+     *
      * @param chartsDir the charts directory
      * @param customKeyValue the custom key value
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public DbConsumer(File chartsDir, String customKeyValue) {
+    public DbConsumer(File chartsDir, String customKeyValue)
+    {
         this.chartsDir = chartsDir;
         this.customKeyValue = customKeyValue;
         this.chartVisitors = newChartVisitors();
         AutocloseConsumer.addAutoclose(this);
     }
     
-    /**
-     * Gets the custom key value.
-     * @return the custom key value
+    /*
+     *
      */
-    public String getCustomKeyValue() {
-        return customKeyValue;
-    }
-    /**
-     * Gets the charts directory.
-     * @return the charts directory
-     */
-    public File getChartsDir() {
-        return chartsDir;
-    }
-    /**
-     * Gets the history HTML template.
-     * @return the history HTML template
-     */
-    public String getHistoryHtmlTemplate() {
-        return getResource(DbConsumer.class, "HistoryChartGenerator.html");
-    }
-    /**
-     * Gets the method HTML template.
-     * @return the method html template
-     */
-    public String getMethodHtmlTemplate() {
-        return getResource(DbConsumer.class, "MethodChartGenerator.html");
-    }
-    /**
-     * Gets the connection, instantiating it if necessary.
-     */
-    public Connection getConnection() throws SQLException {
-        if (connection == null) {
-            connection = createConnection();
-        }
-        return connection;
-    }
-    /**
-     * Gets the run ID, lazy-loading it if it was not already read.
-     * @return the run Id
-     * @throws SQLException if the run ID cannot be determined 
-     */
-    public int getRunId() throws SQLException {
-        if (runId == -1) {
-            runId = getRunID(customKeyValue);
-        }
-        return runId;
-    }
-    /**
-     * @return Create a row for this consumer's test run.
-     */
-    private int getRunID(String customKeyValue) throws SQLException {
-        PreparedStatement s = getConnection().prepareStatement(
-                getNewRunSql(), Statement.RETURN_GENERATED_KEYS);
-        s.setString(1, System.getProperty("java.runtime.version", "?"));
-        s.setString(2, System.getProperty("os.arch", "?"));
-        s.setString(3, customKeyValue);
-        s.executeUpdate();
-
-        ResultSet rs = s.getGeneratedKeys();
-        if (!rs.next()) {
-            throw new SQLException("No autogenerated keys?");
-        }
-        final int key = rs.getInt(1);
-        if (rs.next()) {
-            throw new SQLException("More than one autogenerated key?");
-        }
-
-        rs.close();
-        s.close();
-
-        return key;
+    private List<? extends IChartAnnotationVisitor> newChartVisitors()
+    {
+        return Arrays.asList(
+                new MethodChartVisitor(),
+                new HistoryChartVisitor());
     }
     
-    /**
-     * Retrieve DB version.
-     */
-    public DbVersions getDbVersion() throws SQLException {
-        Statement s = getConnection().createStatement();
-        ResultSet rs = s.executeQuery("SHOW TABLES");
-        Set<String> tables = new HashSet<String>();
-        while (rs.next()) {
-            tables.add(rs.getString(1));
-        }
-        if (!tables.contains("DBVERSION")) {
-            if (tables.contains("RUNS")) {
-                return DbVersions.VERSION_1;
-            }
-            return DbVersions.UNINITIALIZED;
-        }
-        DbVersions version;
-        rs = s.executeQuery("SELECT VERSION FROM DBVERSION");
-        if (!rs.next()) {
-            throw new RuntimeException("Missing version row in DBVERSION table.");
-        }
-        version = DbVersions.fromInt(rs.getInt(1));
-        if (rs.next()) {
-            throw new RuntimeException("More than one row in DBVERSION table.");
-        }
-        return version;
-    }
-    /**
-     * Lazy-loads the test insert statement.
-     * @return the test insert statement
-     * @throws SQLException if the test insert statement cannot be created
-     */
-    protected PreparedStatement getTestInsertStatement() throws SQLException {
-        if (newTest == null) {
-            newTest = getConnection().prepareStatement(getTestInsertSql());
-            newTest.setInt(RUN_ID, getRunId());
-        }
-        return newTest;
-    }
-
     /**
      * Accept a single benchmark result.
      */
     @Override
-    public void accept(Result result) {
+    public void accept(Result result)
+    {
         // Visit chart collectors.
         final Class<?> clazz = result.getTestClass();
         final Method method = result.getTestMethod();
-        for (IChartAnnotationVisitor v : chartVisitors) {
+        for (IChartAnnotationVisitor v : chartVisitors)
+        {
             v.visit(clazz, method, result);
         }
-        try {
+        try
+        {
             PreparedStatement testInsertStatement = getTestInsertStatement();
             testInsertStatement.setString(CLASSNAME, result.getTestClassName());
             testInsertStatement.setString(NAME, result.getTestMethodName());
@@ -292,70 +140,206 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable 
             testInsertStatement.setDouble(TIME_WARMUP, result.warmupTime / 1000.0);
             testInsertStatement.setDouble(TIME_BENCHMARK, result.benchmarkTime / 1000.0);
             testInsertStatement.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RuntimeException("Error while saving the benchmark result to H2.", e);
         }
     }
-
+    
     /**
      * Close the database connection and finalize transaction.
      */
     @Override
-    public void close() {
-        try {
-            if (connection != null) {
-                if (!connection.isClosed()) {
+    public void close()
+    {
+        try
+        {
+            if (connection != null)
+            {
+                if (!connection.isClosed())
+                {
                     doClose();
                 }
                 connection = null;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException("Failed to close DB consumer.", e);
         }
     }
+    
+    /**
+     * Rollback all performed operations on request.
+     */
+    public void rollback()
+    {
+        try
+        {
+            connection.rollback();
+            this.chartVisitors = newChartVisitors();
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Could not rollback.", e);
+        }
+    }
+    
+    /**
+     * Retrieve DB version.
+     */
+    public DbVersions getDbVersion() throws SQLException
+    {
+        Statement s = getConnection().createStatement();
+        ResultSet rs = s.executeQuery("SHOW TABLES");
+        Set<String> tables = new HashSet<String>();
+        while (rs.next())
+        {
+            tables.add(rs.getString(1));
+        }
+    
+        if (!tables.contains("DBVERSION"))
+        {
+            if (tables.contains("RUNS"))
+            {
+                return DbVersions.VERSION_1;
+            }
+    
+            return DbVersions.UNINITIALIZED;
+        }
+    
+        DbVersions version;
+        rs = s.executeQuery("SELECT VERSION FROM DBVERSION");
+        if (!rs.next())
+        {
+            throw new RuntimeException("Missing version row in DBVERSION table.");
+        }
+    
+        version = DbVersions.fromInt(rs.getInt(1));
+        if (rs.next()) {
+            throw new RuntimeException("More than one row in DBVERSION table.");
+        }
+    
+        return version;
+    }
+    
+    /**
+     * Read a given resource from classpath and return UTF-8 decoded string.
+     */
+    protected static String getResource(Class c, String resourceName)
+    {
+        try
+        {
+            InputStream is = c.getResourceAsStream(resourceName);
+            if (is == null)
+            {
+                throw new IOException();
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final byte[] buffer = new byte[1024];
+            int cnt;
+            while ((cnt = is.read(buffer)) > 0)
+            {
+                baos.write(buffer, 0, cnt);
+            }
+            is.close();
+            baos.close();
+
+            return new String(baos.toByteArray(), "UTF-8");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Required resource missing: "
+                    + resourceName);
+        }
+    }
+    
+    /**
+     * Gets the default custom key.
+     *
+     * @return the default custom key
+     */
+    public static String getDefaultCustomKey()
+    {
+        return System.getProperty(BenchmarkOptionsSystemProperties.CUSTOMKEY_PROPERTY);
+    }
+
+    /**
+     * Gets the default charts directory
+     *
+     * @return the default charts directory
+     */
+    public static File getDefaultChartsDir()
+    {
+        final File file = new File(System.getProperty(BenchmarkOptionsSystemProperties.CHARTS_DIR_PROPERTY, "."));
+        if (file.getParentFile() != null)
+        {
+            file.getParentFile().mkdirs();
+        }
+        return file;
+    }
+    
+    /**
+     * @return Create a row for this consumer's test run.
+     */
+    private int getRunID(String customKeyValue) throws SQLException
+    {
+        PreparedStatement s = getConnection().prepareStatement(
+                getNewRunSql(), Statement.RETURN_GENERATED_KEYS);
+        s.setString(1, System.getProperty("java.runtime.version", "?"));
+        s.setString(2, System.getProperty("os.arch", "?"));
+        s.setString(3, customKeyValue);
+        s.executeUpdate();
+
+        ResultSet rs = s.getGeneratedKeys();
+        if (!rs.next())
+        {
+            throw new SQLException("No autogenerated keys?");
+        }
+        final int key = rs.getInt(1);
+        if (rs.next())
+        {
+            throw new SQLException("More than one autogenerated key?");
+        }
+
+        rs.close();
+        s.close();
+
+        return key;
+    }
+    
     /**
      * Do finalize the consumer; close db connection and emit reports.
      */
-    private void doClose() throws Exception {
-        try {
-            for (IChartAnnotationVisitor v : chartVisitors) {
+    private void doClose() throws Exception
+    {
+        try
+        {
+            for (IChartAnnotationVisitor v : chartVisitors)
+            {
                 v.generate(this);
             }
-        } finally {
-            if (!connection.isClosed()) {
+        } finally
+        {
+            if (!connection.isClosed())
+            {
                 connection.commit();
                 connection.close();
             }
         }
     }
-    /**
-     * Rollback all performed operations on request.
-     */
-    public void rollback() {
-        try {
-            connection.rollback();
-            this.chartVisitors = newChartVisitors();
-        } catch (SQLException e) {
-            throw new RuntimeException("Could not rollback.", e);
-        }
-    }
-
-    /*
-     *
-     */
-    private List<? extends IChartAnnotationVisitor> newChartVisitors() {
-        return Arrays.asList(
-                new MethodChartVisitor(),
-                new HistoryChartVisitor());
-    }
-
+    
     /**
      * Check database schema and create it if needed.
      */
-    protected void checkSchema() throws SQLException {
+    protected void checkSchema() throws SQLException
+    {
         DbVersions dbVersion = getDbVersion();
         Statement s = connection.createStatement();
-        switch (dbVersion) {
+        switch (dbVersion)
+        {
             case UNINITIALIZED:
                 s.execute(getCreateRunsSql());
                 s.execute(getCreateTestsSql());
@@ -374,56 +358,159 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable 
         }
         connection.commit();
     }
+    
     /**
      * Update database version.
      */
-    private void updateDbVersion(DbVersions newVersion) throws SQLException {
+    private void updateDbVersion(DbVersions newVersion) throws SQLException
+    {
         Statement s = getConnection().createStatement();
         s.executeUpdate("DELETE FROM DBVERSION");
         s.executeUpdate("INSERT INTO DBVERSION (VERSION) VALUES (" + newVersion.version + ")");
     }
+    
+    /**
+     * Gets the connection, instantiating it if necessary.
+     */
+    public Connection getConnection() throws SQLException
+    {
+        if (connection == null)
+        {
+            connection = createConnection();
+        }
+        return connection;
+    }
+
+    /**
+     * Gets the custom key value.
+     *
+     * @return the custom key value
+     */
+    public String getCustomKeyValue()
+    {
+        return customKeyValue;
+    }
+
+    /**
+     * Gets the charts directory.
+     *
+     * @return the charts directory
+     */
+    public File getChartsDir()
+    {
+        return chartsDir;
+    }
+
+    /**
+     * Gets the history HTML template.
+     *
+     * @return the history HTML template
+     */
+    public String getHistoryHtmlTemplate()
+    {
+        return getResource(DbConsumer.class, "HistoryChartGenerator.html");
+    }
+
+    /**
+     * Gets the method HTML template.
+     *
+     * @return the method html template
+     */
+    public String getMethodHtmlTemplate()
+    {
+        return getResource(DbConsumer.class, "MethodChartGenerator.html");
+    }
+
+    /**
+     * Gets the run ID, lazy-loading it if it was not already read.
+     *
+     * @return the run Id
+     * @throws SQLException if the run ID cannot be determined
+     */
+    public int getRunId() throws SQLException
+    {
+        if (runId == -1)
+        {
+            runId = getRunID(customKeyValue);
+        }
+        return runId;
+    }
+
+    /**
+     * Lazy-loads the test insert statement.
+     *
+     * @return the test insert statement
+     * @throws SQLException if the test insert statement cannot be created
+     */
+    protected PreparedStatement getTestInsertStatement() throws SQLException
+    {
+        if (newTest == null)
+        {
+            newTest = getConnection().prepareStatement(getTestInsertSql());
+            newTest.setInt(RUN_ID, getRunId());
+        }
+        return newTest;
+    }
+
     /**
      * Gets the SQL for obtaining method chart properties.
+     *
      * @return the SQL for obtaining method chart properties
      */
     public abstract String getMethodChartPropertiesQuery();
+
     /**
      * Gets the SQL for obtaining method chart results.
+     *
      * @return the SQL for obtaining method chart results
      */
     public abstract String getMethodChartResultsQuery();
+
     /**
      * Gets the SQL for creating the tests table.
+     *
      * @return the SQL for creating the tests table
      */
     protected abstract String getCreateTestsSql();
+
     /**
      * Gets the SQL for inserting into the test table.
+     *
      * @return the SQL for inserting into the test table
      */
     protected abstract String getTestInsertSql();
+
     /**
      * Gets the SQL for creating the runs table.
+     *
      * @return the SQL for creating the runs table
      */
     protected abstract String getCreateRunsSql();
+
     /**
      * Gets the SQL for inserting into the runs table.
+     *
      * @return the SQL for inserting into the runs table
      */
     protected abstract String getNewRunSql();
+
     /**
      * Gets the SQL for creating the DB Version table.
+     *
      * @return the SQL for creating the DB version table
      */
     protected abstract String getCreateDbVersionSql();
+
     /**
      * Gets the SQL for adding a custom key.
+     *
      * @return the SQL for adding a custom key
      */
     protected abstract String getAddCustomKeySql();
+
     /**
      * Instantiates the database connection.
+     *
      * @return a new, open database connection
      * @throws SQLException if the database connection cannot be created
      */

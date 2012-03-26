@@ -30,37 +30,69 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
+ * Unit tests for the MySQL Consumer.
+ * 
  * @author <a href="mailto:steven.swor@summitsystemsinc.com"
  * title="steven.swor@summitsystemsinc.com">Steven Swor</a>
  */
-public class MySQLConsumerT {
-
+public class MySQLConsumerT
+{
+    /**
+     * The MySQL connection URL
+     */
     private static final String MYSQL_URL = "jdbc:mysql://localhost:{0}/MySQLConsumerTest?user=test&password=test&createDatabaseIfNotExist=true";
+    
+    /**
+     * The embedded server instance.
+     */
     private static MysqldResource server = null;
+    
+    /**
+     * The server port.
+     */
     private static String mySQLPort = null;
     
+    /**
+     * The test consumer.
+     */
     private MySQLConsumer testInstance = null;
 
-    public MySQLConsumerT() {
-        testInstance = new MySQLConsumer(MessageFormat.format(MYSQL_URL,getMySQLPort("3306")));
+    /**
+     * Creates a new MySQLConsumerT with a new test consumer.
+     */
+    public MySQLConsumerT()
+    {
+        testInstance = new MySQLConsumer(MessageFormat.format(MYSQL_URL, getMySQLPort("3306")));
     }
 
-    private static String getMySQLPort(String defaultResult) {
-        if (mySQLPort == null) {
+    /**
+     * Gets the MySQL port.
+     * @param defaultResult the default port
+     * @return the MySQL port from a mysql.properties file, or the default value
+     */
+    private static String getMySQLPort(String defaultResult)
+    {
+        if (mySQLPort == null)
+        {
             FileInputStream fileStream = null;
-            try {
+            try
+            {
                 Properties props = new Properties();
                 fileStream = new FileInputStream(new File("target/mysql.properties"));
                 props.load(fileStream);
                 mySQLPort = props.getProperty("mysql.port", defaultResult);
-            } catch (IOException ex) {
-                mySQLPort= defaultResult;
-            } finally { 
-                if (fileStream != null) {
-                    try {
+            } catch (IOException ex)
+            {
+                mySQLPort = defaultResult;
+            } finally
+            {
+                if (fileStream != null)
+                {
+                    try
+                    {
                         fileStream.close();
-                    } catch (IOException ex) {
+                    } catch (IOException ex)
+                    {
                         //trap
                     }
                 }
@@ -69,10 +101,14 @@ public class MySQLConsumerT {
         return mySQLPort;
     }
 
+    /**
+     * Launches the server instance.
+     */
     @BeforeClass
-    public static void setUpClass() {
+    public static void setUpClass()
+    {
         File ourAppDir = new File(System.getProperty("java.io.tmpdir"));
-        File databaseDir = new File(ourAppDir, "Test");        
+        File databaseDir = new File(ourAppDir, "Test");
         server = new MysqldResource(ourAppDir, databaseDir);
         Map database_options = new HashMap();
         database_options.put(MysqldResourceI.PORT, getMySQLPort("3306"));
@@ -80,18 +116,27 @@ public class MySQLConsumerT {
         database_options.put(MysqldResourceI.INITIALIZE_USER_NAME, "test");
         database_options.put(MysqldResourceI.INITIALIZE_PASSWORD, "test");
         server.start("mysqld", database_options);
-        if (!server.isRunning()) {
+        if (!server.isRunning())
+        {
             throw new RuntimeException("MySQL did not start.");
         }
     }
 
+    /**
+     * Shuts down the server instance.
+     */
     @AfterClass
-    public static void tearDownClass() {
-        if (server != null) {
-            if (server.isRunning()) {
-                try {
+    public static void tearDownClass()
+    {
+        if (server != null)
+        {
+            if (server.isRunning())
+            {
+                try
+                {
                     server.shutdown();
-                } catch (Throwable ex) {
+                } catch (Throwable ex)
+                {
                     ex.printStackTrace();
                 }
             }
@@ -100,75 +145,83 @@ public class MySQLConsumerT {
     }
 
     /**
-     * Test of createConnection method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#createConnection()}.
      */
     @Test
-    //@Ignore("requires a running mysql server instance")
-    public void testCreateConnection() throws Exception {
+    public void testCreateConnection() throws Exception
+    {
         assertNotNull(testInstance.createConnection());
     }
 
     /**
-     * Test of getMethodChartResultsQuery method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getMethodChartResultsQuery()}.
      */
     @Test
-    public void testGetMethodChartResultsQuery() {
+    public void testGetMethodChartResultsQuery()
+    {
         assertNotNull(testInstance.getMethodChartResultsQuery());
     }
 
     /**
-     * Test of getMethodChartPropertiesQuery method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getMethodChartPropertiesQuery()}.
      */
     @Test
-    public void testGetMethodChartPropertiesQuery() {
+    public void testGetMethodChartPropertiesQuery()
+    {
         assertNotNull(testInstance.getMethodChartPropertiesQuery());
     }
 
     /**
-     * Test of getCreateRunsSql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getCreateRunsSql()}.
      */
     @Test
-    public void testGetCreateRunsSql() {
+    public void testGetCreateRunsSql()
+    {
         assertNotNull(testInstance.getCreateRunsSql());
     }
 
     /**
-     * Test of getCreateTestsSql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getCreateTestsSql()}.
      */
     @Test
-    public void testGetCreateTestsSql() {
+    public void testGetCreateTestsSql()
+    {
         assertNotNull(testInstance.getCreateTestsSql());
     }
 
     /**
-     * Test of getNewRunSql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getNewRunSql()}.
      */
     @Test
-    public void testGetNewRunSql() {
+    public void testGetNewRunSql()
+    {
         assertNotNull(testInstance.getNewRunSql());
     }
 
     /**
-     * Test of getTestInsertSql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getTestInsertSql()}.
      */
     @Test
-    public void testGetTestInsertSql() {
+    public void testGetTestInsertSql()
+    {
         assertNotNull(testInstance.getTestInsertSql());
     }
 
     /**
-     * Test of getCreateDbVersionSql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getCreateDbVersionSql()}.
      */
     @Test
-    public void testGetCreateDbVersionSql() {
+    public void testGetCreateDbVersionSql()
+    {
         assertNotNull(testInstance.getCreateDbVersionSql());
     }
 
     /**
-     * Test of getAddCustomKeySql method, of class MySQLConsumer.
+     * Tests {@link MySQLConsumer#getAddCustomKeySql()}.
      */
     @Test
-    public void testGetAddCustomKeySql() {
+    public void testGetAddCustomKeySql()
+    {
         assertNotNull(testInstance.getAddCustomKeySql());
     }
 }

@@ -1,9 +1,9 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import com.carrotsearch.junitbenchmarks.db.DbConsumer;
 import static com.carrotsearch.junitbenchmarks.db.GeneratorUtils.getColumnIndex;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +30,11 @@ public final class HistoryChartGenerator
         labelColumns.put(LabelType.CUSTOM_KEY, 1);
         labelColumns.put(LabelType.TIMESTAMP, 2);
     }
+    
+    /**
+     * The consumer.
+     */
+    private DbConsumer consumer;
 
     private String clazzName;
 
@@ -57,10 +62,6 @@ public final class HistoryChartGenerator
      * Default X-axis label column.
      */
     private final LabelType labelType;
-    /**
-     * The consumer.
-     */
-    private DbConsumer consumer;
 
     /**
      * Value holder for row aggregation.
@@ -75,7 +76,7 @@ public final class HistoryChartGenerator
     };
 
     /**
-     * @param connection H2 database connection. 
+     * @param consumer the database consumer. 
      * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
      */
