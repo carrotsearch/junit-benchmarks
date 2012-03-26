@@ -1,5 +1,6 @@
 package com.carrotsearch.junitbenchmarks.h2;
 
+import com.carrotsearch.junitbenchmarks.db.DbVersions;
 import static org.junit.Assert.*;
 
 import java.io.File;

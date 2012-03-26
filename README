@@ -13,6 +13,7 @@ Contributors and bug reports
 Julien Eluard
 Neil Prosser
 Dominik Drzewiecki [github: drzewo]
+Steven Swor [github: sworisbreathing]
 
 
 Development
@@ -27,3 +28,21 @@ Release
 -------
 
 mvn -Prelease clean deploy  # Snapshot or release deploy to sonatype [requires proper setup in settings.xml]
+
+
+MySQL Testing
+--------------------------
+The MySQL unit test runs an embedded instance of MySQL, listening on a random
+port.  However, the test is disabled under the default build profile, and is
+only executed when the `tests-include-mysql` profile is active.  This is done
+for two reasons:
+
+ 1. Running an embedded instance of mysql as part of a maven build requires
+    `mysql-connector-mxj-db-files`, which is around 133MB in size.  By moving
+    the test to a different profile, we are able to skip downloading this (very
+    large) dependency, unless the user explicitly specifies that he wants to use
+    it.
+ 2. Running an automated task which opens up a random port can cause problems
+    with firewalls or other applications, and opening up a port introduces
+    potential security problems.  The port is not opened under the default build
+    profile.
