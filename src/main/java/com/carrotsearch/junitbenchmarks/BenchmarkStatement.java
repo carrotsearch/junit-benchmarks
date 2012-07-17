@@ -27,15 +27,18 @@ final class BenchmarkStatement extends Statement
         final protected int benchmarkRounds;
         final protected int totalRounds;
 
+        final protected Clock clock;
+
         protected long warmupTime;
         protected long benchmarkTime;
 
-        protected BaseEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds)
+        protected BaseEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds, Clock clock)
         {
             super();
             this.warmupRounds = warmupRounds;
             this.benchmarkRounds = benchmarkRounds;
             this.totalRounds = totalRounds;
+            this.clock = clock;
             this.results = new ArrayList<SingleResult>(totalRounds);
         }
 
@@ -46,24 +49,23 @@ final class BenchmarkStatement extends Statement
         protected final SingleResult evaluateInternally(int round) throws InvocationTargetException
         {
             // We assume no reordering will take place here.
-            final long startTime = System.currentTimeMillis();
+            final long startTime = clock.time();
             cleanupMemory();
-            final long afterGC = System.currentTimeMillis();
+            final long afterGC = clock.time();
 
             if (round == warmupRounds)
             {
                 gcSnapshot = new GCSnapshot();
-                benchmarkTime = System.currentTimeMillis();
+                benchmarkTime = clock.time();
                 warmupTime = benchmarkTime - warmupTime;
             }
 
             try
             {
                 base.evaluate();
-                final long endTime = System.currentTimeMillis();
+                final long endTime = clock.time();
                 return new SingleResult(startTime, afterGC, endTime);
-            }
-            catch (Throwable t)
+            } catch (Throwable t)
             {
                 throw new InvocationTargetException(t);
             }
@@ -86,19 +88,24 @@ final class BenchmarkStatement extends Statement
     {
         SequentialEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds)
         {
-            super(warmupRounds, benchmarkRounds, totalRounds);
+            this(warmupRounds, benchmarkRounds, totalRounds, Clock.REAL_TIME);
+        }
+
+        SequentialEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds, Clock clock)
+        {
+            super(warmupRounds, benchmarkRounds, totalRounds, clock);
         }
 
         @Override
         public Result evaluate() throws Throwable
         {
-            warmupTime = System.currentTimeMillis();
+            warmupTime = clock.time();
             benchmarkTime = 0;
             for (int i = 0; i < totalRounds; i++)
             {
                 results.add(evaluateInternally(i));
             }
-            benchmarkTime = System.currentTimeMillis() - benchmarkTime;
+            benchmarkTime = clock.time() - benchmarkTime;
 
             return computeResult();
         }
@@ -135,10 +142,17 @@ final class BenchmarkStatement extends Statement
         private final int concurrency;
         private final CountDownLatch latch;
 
+
         ConcurrentEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds,
-            int concurrency)
+                            int concurrency)
         {
-            super(warmupRounds, benchmarkRounds, totalRounds);
+            this(warmupRounds, benchmarkRounds, totalRounds, concurrency, Clock.REAL_TIME);
+        }
+
+        ConcurrentEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds,
+                            int concurrency, Clock clock)
+        {
+            super(warmupRounds, benchmarkRounds, totalRounds, clock);
 
             this.concurrency = concurrency;
             this.latch = new CountDownLatch(1);
@@ -149,18 +163,18 @@ final class BenchmarkStatement extends Statement
          * threadPoolExecutor for particular concurrency level and totalRounds to be
          * executed Candidate for further development to mitigate the problem of excessive
          * thread pool creation/destruction.
-         * 
+         *
          * @param concurrency
          * @param totalRounds
          */
         private final ExecutorService getExecutor(int concurrency, int totalRounds)
         {
             return new ThreadPoolExecutor(concurrency, concurrency, 10000,
-                TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(totalRounds));
+                    TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(totalRounds));
         }
 
         /**
-         * Perform proper ThreadPool cleanup. 
+         * Perform proper ThreadPool cleanup.
          */
         private final void cleanupExecutor(ExecutorService executor)
         {
@@ -185,7 +199,7 @@ final class BenchmarkStatement extends Statement
             // Allow all the evaluators to proceed to the warmup phase.
             latch.countDown();
 
-            warmupTime = System.currentTimeMillis();
+            warmupTime = clock.time();
             benchmarkTime = 0;
             try
             {
@@ -194,13 +208,13 @@ final class BenchmarkStatement extends Statement
                     results.add(completed.take().get());
                 }
 
-                benchmarkTime = System.currentTimeMillis() - benchmarkTime;
+                benchmarkTime = clock.time() - benchmarkTime;
                 return computeResult();
             }
             catch (ExecutionException e)
             {
                 // Unwrap the Throwable thrown by the tested method.
-                e.printStackTrace();                
+                e.printStackTrace();
                 throw e.getCause().getCause();
             }
             finally
@@ -209,7 +223,7 @@ final class BenchmarkStatement extends Statement
                 cleanupExecutor(executor);
             }
         }
-        
+
         @Override
         protected Result computeResult()
         {
@@ -311,10 +325,10 @@ final class BenchmarkStatement extends Statement
 
         final int totalRounds = warmupRounds + benchmarkRounds;
 
-        final BaseEvaluator evaluator; 
+        final BaseEvaluator evaluator;
         if (concurrency == BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
         {
-            evaluator = new SequentialEvaluator(warmupRounds, benchmarkRounds, totalRounds); 
+            evaluator = new SequentialEvaluator(warmupRounds, benchmarkRounds, totalRounds, options.clock());
         }
         else
         {
@@ -325,12 +339,12 @@ final class BenchmarkStatement extends Statement
                 throw new IllegalArgumentException("Concurrent benchmark execution must be"
                     + " combined ignoregc=\"true\".");
 
-            int threads = (concurrency == BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES 
-                    ? Runtime.getRuntime().availableProcessors() 
+            int threads = (concurrency == BenchmarkOptions.CONCURRENCY_AVAILABLE_CORES
+                    ? Runtime.getRuntime().availableProcessors()
                     : concurrency);
-            
+
             evaluator = new ConcurrentEvaluator(
-                warmupRounds, benchmarkRounds, totalRounds, threads);
+                warmupRounds, benchmarkRounds, totalRounds, threads, options.clock());
         }
 
         final Result result = evaluator.evaluate();
