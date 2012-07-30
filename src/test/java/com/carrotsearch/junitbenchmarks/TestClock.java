@@ -10,11 +10,6 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Uladzimir Mihura
- *         Date: 7/17/12
- *         Time: 7:44 PM
- */
 public class TestClock
 {
     private static ArrayList<Result> results = new ArrayList<Result>();

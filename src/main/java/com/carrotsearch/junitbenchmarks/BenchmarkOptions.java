@@ -58,13 +58,7 @@ public @interface BenchmarkOptions
 
     /**
      * Sets the type of clock to be used for time measuring.
-     *
-     * <p>Allowed values:
-     * <ul>
-     * <li>{@link Clock#REAL_TIME} - use {@link System#nanoTime()}</li>
-     * <li>{@link Clock#USER_TIME} - use {@link java.lang.management.ThreadMXBean#getCurrentThreadUserTime() ThreadMXBean.getCurrentThreadUserTime()}</li>
-     * <li>{@link Clock#CPU_TIME} - use {@link java.lang.management.ThreadMXBean#getCurrentThreadCpuTime() ThreadMXBean.getCurrentThreadCpuTime()}</li>
-     * </ul>
+     * See {@see Clock} for available values.
      *
      */
     Clock clock() default Clock.REAL_TIME;
