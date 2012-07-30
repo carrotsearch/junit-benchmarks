@@ -1,6 +1,7 @@
 package com.carrotsearch.junitbenchmarks;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 
 /**
  * Used to specify what time to measure in {@link BenchmarkOptions}.
@@ -9,9 +10,21 @@ public enum Clock
 {
 
     /**
-     * Invokes {@link System#nanoTime()}
+     * Invokes {@link System#currentTimeMillis()}
      */
     REAL_TIME
+            {
+                @Override
+                long time()
+                {
+                    return System.currentTimeMillis();
+                }
+            },
+
+    /**
+     * Invokes {@link System#nanoTime()}
+     */
+    NANO_TIME
             {
                 @Override
                 long time()
@@ -19,6 +32,7 @@ public enum Clock
                     return System.nanoTime() / FACTOR;
                 }
             },
+
     /**
      * Invokes {@link java.lang.management.ThreadMXBean#getCurrentThreadCpuTime()}
      */
@@ -27,7 +41,13 @@ public enum Clock
                 @Override
                 long time()
                 {
-                    return ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime() / FACTOR;
+                    if (mxBean.isThreadCpuTimeSupported())
+                    {
+                        return mxBean.getCurrentThreadCpuTime() / FACTOR;
+                    } else
+                    {
+                        throw new RuntimeException("ThreadCpuTime is not supported. Impossible to use Clock.CPU_TIME");
+                    }
                 }
             },
     /**
@@ -38,11 +58,24 @@ public enum Clock
                 @Override
                 long time()
                 {
-                    return ManagementFactory.getThreadMXBean().getCurrentThreadUserTime() / FACTOR;
+                    if (mxBean.isThreadCpuTimeSupported())
+                    {
+                        return mxBean.getCurrentThreadUserTime() / FACTOR;
+                    } else
+                    {
+                        throw new RuntimeException("ThreadCpuTime is not supported. Impossible to use Clock.USER_TIME");
+                    }
                 }
             };
 
     private static final int FACTOR = 1000000;
+    private static ThreadMXBean mxBean;
+
+    static
+    {
+        mxBean = ManagementFactory.getThreadMXBean();
+        if (mxBean.isThreadCpuTimeSupported()) mxBean.setThreadCpuTimeEnabled(true);
+    }
 
     abstract long time();
 }
