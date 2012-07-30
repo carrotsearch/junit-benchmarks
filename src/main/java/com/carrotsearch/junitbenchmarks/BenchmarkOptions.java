@@ -55,4 +55,11 @@ public @interface BenchmarkOptions
      * </ul>
      */
     int concurrency() default CONCURRENCY_SEQUENTIAL;
+
+    /**
+     * Sets the type of clock to be used for time measuring.
+     * See {@see Clock} for available values.
+     *
+     */
+    Clock clock() default Clock.REAL_TIME;
 }
