@@ -2,9 +2,14 @@ package com.carrotsearch.junitbenchmarks;
 
 import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.*;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 import org.junit.runners.model.FrameworkMethod;
@@ -28,6 +33,8 @@ final class BenchmarkStatement extends Statement
         final protected int totalRounds;
 
         final protected Clock clock;
+        final protected ThreadMXBean threadMXBean;
+        final protected Map<Long,Long> threadBlockedTimes;
 
         protected long warmupTime;
         protected long benchmarkTime;
@@ -40,6 +47,10 @@ final class BenchmarkStatement extends Statement
             this.totalRounds = totalRounds;
             this.clock = clock;
             this.results = new ArrayList<SingleResult>(totalRounds);
+
+            this.threadMXBean = ManagementFactory.getThreadMXBean();
+            this.threadMXBean.setThreadContentionMonitoringEnabled(true);
+            this.threadBlockedTimes = new HashMap<Long, Long>();
         }
 
         protected GCSnapshot gcSnapshot = null;
@@ -64,7 +75,16 @@ final class BenchmarkStatement extends Statement
             {
                 base.evaluate();
                 final long endTime = clock.time();
-                return new SingleResult(startTime, afterGC, endTime);
+
+                final long threadId = Thread.currentThread().getId();
+                final ThreadInfo threadInfo = threadMXBean.getThreadInfo(threadId);
+                final long threadBlockedTime = threadInfo.getBlockedTime();
+                final long roundBlockedTime = threadBlockedTimes.containsKey(threadId)
+                        ? threadBlockedTime - threadBlockedTimes.get(threadId)
+                        : threadBlockedTime;
+                threadBlockedTimes.put(threadId,threadBlockedTime);
+
+                return new SingleResult(startTime, afterGC, endTime, roundBlockedTime);
             } catch (Throwable t)
             {
                 throw new InvocationTargetException(t);
@@ -77,7 +97,7 @@ final class BenchmarkStatement extends Statement
                 results.subList(warmupRounds, totalRounds));
 
             return new Result(target, method, benchmarkRounds, warmupRounds, warmupTime,
-                benchmarkTime, stats.evaluation, stats.gc, gcSnapshot, 1);
+                benchmarkTime, stats.evaluation, stats.blocked, stats.gc, gcSnapshot, 1);
         }
     }
 
