@@ -24,13 +24,14 @@ public final class WriterConsumer implements IResultsConsumer
     {
         w.write(String.format(Locale.ENGLISH,
             "%s: [measured %d out of %d rounds, %s]\n" +
-            " round: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f," +
+            " round: %s, round.block: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f," +
             " time.total: %.2f, time.warmup: %.2f, time.bench: %.2f\n",
             result.getShortTestClassName() + "." + result.getTestMethodName(),
             result.benchmarkRounds, 
             result.benchmarkRounds + result.warmupRounds, 
             concurrencyToText(result),
-            result.roundAverage.toString(), 
+            result.roundAverage.toString(),
+            result.blockedAverage.toString(),
             result.gcAverage.toString(), 
             result.gcInfo.accumulatedInvocations(), 
             result.gcInfo.accumulatedTime() / 1000.0,
