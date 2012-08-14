@@ -15,6 +15,7 @@ public final class Result
     public final int benchmarkRounds, warmupRounds;
     public final long warmupTime, benchmarkTime;
     public final Average roundAverage;
+    public final Average blockedAverage;
     public final Average gcAverage;
     public final GCSnapshot gcInfo;
 
@@ -32,6 +33,7 @@ public final class Result
      * @param benchmarkTime Total benchmark time, includes benchmarking and GC overhead.
      * @param roundAverage Average and standard deviation from benchmark rounds.
      * @param gcAverage Average and standard deviation from GC cleanups.
+     * @param blockedAverage Average and standard deviation from thread blocks.
      * @param gcInfo Extra information about GC activity.
      * @param concurrency {@link BenchmarkOptions#concurrency()} setting (or global override).
      */
@@ -42,8 +44,9 @@ public final class Result
         int warmupRounds, 
         long warmupTime, 
         long benchmarkTime,
-        Average roundAverage, 
-        Average gcAverage, 
+        Average roundAverage,
+        Average blockedAverage,
+        Average gcAverage,
         GCSnapshot gcInfo,
         int concurrency)
     {
@@ -54,6 +57,7 @@ public final class Result
         this.warmupTime = warmupTime;
         this.benchmarkTime = benchmarkTime;
         this.roundAverage = roundAverage;
+        this.blockedAverage = blockedAverage;
         this.gcAverage = gcAverage;
         this.gcInfo = gcInfo;
         this.concurrency = concurrency;
