@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.*;
@@ -22,7 +22,7 @@ public class ArrayListIterationBenchmark
         TestH2MethodChart.class.getName()));
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(consumer);
+    public TestRule benchmarkRun = new BenchmarkRule(consumer);
 
     private static ArrayList<Integer> arrayList = new ArrayList<Integer>();
     private static LinkedList<Integer> linkedList = new LinkedList<Integer>();

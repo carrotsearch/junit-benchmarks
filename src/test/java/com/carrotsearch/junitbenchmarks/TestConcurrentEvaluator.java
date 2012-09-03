@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -20,7 +20,7 @@ public class TestConcurrentEvaluator
     }
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule();
+    public TestRule benchmarkRun = new BenchmarkRule();
 
     private AtomicInteger roundNo = new AtomicInteger();
 

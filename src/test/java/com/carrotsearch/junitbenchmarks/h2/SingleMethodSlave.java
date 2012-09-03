@@ -8,7 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.*;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
@@ -28,7 +28,7 @@ public class SingleMethodSlave
     private static H2Consumer h2consumer;
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+    public TestRule benchmarkRun = new BenchmarkRule(h2consumer);
 
     @BeforeClass
     public static void checkFile() throws SQLException

@@ -1,7 +1,7 @@
 package com.carrotsearch.junitbenchmarks;
 
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 /**
  * A superclass for tests that should be executed as benchmarks (several rounds, GC and
@@ -18,5 +18,5 @@ public abstract class AbstractBenchmark
      * Enables the benchmark rule.
      */
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule();
+    public TestRule benchmarkRun = new BenchmarkRule();
 }

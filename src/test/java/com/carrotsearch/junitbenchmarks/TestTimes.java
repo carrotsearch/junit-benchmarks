@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 /**
  * Test the average times.
@@ -24,7 +24,7 @@ public class TestTimes
     };
     
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(resultsConsumer);
+    public TestRule benchmarkRun = new BenchmarkRule(resultsConsumer);
 
     @Test
     public void test100msDelay() throws Exception

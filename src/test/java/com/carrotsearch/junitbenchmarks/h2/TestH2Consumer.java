@@ -8,7 +8,7 @@ import java.sql.*;
 
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
@@ -34,7 +34,7 @@ public class TestH2Consumer
     }
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+    public TestRule benchmarkRun = new BenchmarkRule(h2consumer);
 
     @Test
     public void testMethodA()
