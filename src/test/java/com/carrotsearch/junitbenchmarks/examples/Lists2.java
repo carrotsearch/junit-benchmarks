@@ -9,7 +9,7 @@ import java.util.Vector;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -34,7 +34,7 @@ public class Lists2
     private static int [] rnd;
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule();    
+    public TestRule benchmarkRun = new BenchmarkRule();
 
     /** Prepare random numbers for tests. */
     @BeforeClass
