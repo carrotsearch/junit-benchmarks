@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.*;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 /**
  * Test global consumers and properties.
@@ -28,7 +28,7 @@ public class TestGlobalConsumers
     }
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule();
+    public TestRule benchmarkRun = new BenchmarkRule();
 
     @Test
     public void testMethodA()

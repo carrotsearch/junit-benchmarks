@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Random;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.Common;
@@ -25,7 +25,7 @@ public class TestH2HistoryChartOptions
     private static H2Consumer h2consumer;
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+    public TestRule benchmarkRun = new BenchmarkRule(h2consumer);
 
     @BeforeClass
     public static void checkFile() throws SQLException

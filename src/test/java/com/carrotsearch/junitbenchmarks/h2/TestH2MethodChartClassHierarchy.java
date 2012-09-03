@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
@@ -43,7 +43,7 @@ public class TestH2MethodChartClassHierarchy
         }
 
         @Rule
-        public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+        public TestRule benchmarkRun = new BenchmarkRule(h2consumer);
 
         @Test
         public void onlyInSuper() throws Exception

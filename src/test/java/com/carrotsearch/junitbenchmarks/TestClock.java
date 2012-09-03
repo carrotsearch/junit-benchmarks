@@ -3,7 +3,7 @@ package com.carrotsearch.junitbenchmarks;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,7 @@ public class TestClock
     };
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(resultsConsumer);
+    public TestRule benchmarkRun = new BenchmarkRule(resultsConsumer);
 
 
     @Test

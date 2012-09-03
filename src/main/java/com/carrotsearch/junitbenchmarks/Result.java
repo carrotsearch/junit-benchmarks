@@ -2,15 +2,14 @@ package com.carrotsearch.junitbenchmarks;
 
 import java.lang.reflect.Method;
 
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.runner.Description;
 
 /**
  * A result of a single benchmark test.
  */
 public final class Result
 {
-    final Object target;
-    final FrameworkMethod method;
+    final Description description;
 
     public final int benchmarkRounds, warmupRounds;
     public final long warmupTime, benchmarkTime;
@@ -25,8 +24,7 @@ public final class Result
     int concurrency;
 
     /**
-     * @param target Target object (test).
-     * @param method Target tested method.
+     * @param description Target object and method of the test.
      * @param benchmarkRounds Number of executed benchmark rounds.
      * @param warmupRounds Number of warmup rounds.
      * @param warmupTime Total warmup time, includes benchmarking and GC overhead.
@@ -38,8 +36,7 @@ public final class Result
      * @param concurrency {@link BenchmarkOptions#concurrency()} setting (or global override).
      */
     public Result(
-        Object target, 
-        FrameworkMethod method,
+        Description description,
         int benchmarkRounds,
         int warmupRounds, 
         long warmupTime, 
@@ -50,8 +47,7 @@ public final class Result
         GCSnapshot gcInfo,
         int concurrency)
     {
-        this.target = target;
-        this.method = method;
+        this.description = description;
         this.benchmarkRounds = benchmarkRounds;
         this.warmupRounds = warmupRounds;
         this.warmupTime = warmupTime;
@@ -62,13 +58,13 @@ public final class Result
         this.gcInfo = gcInfo;
         this.concurrency = concurrency;
     }
-    
+
     /**
      * Returns the short version of the test's class.
      */
     public String getShortTestClassName()
     {
-        return target.getClass().getSimpleName();
+        return getTestClass().getSimpleName();
     }
 
     /**
@@ -76,7 +72,7 @@ public final class Result
      */
     public String getTestClassName()
     {
-        return target.getClass().getName();
+        return this.description.getClassName();
     }
 
     /**
@@ -84,7 +80,7 @@ public final class Result
      */
     public String getTestMethodName()
     {
-        return method.getName();
+        return this.description.getMethodName();
     }
 
     /**
@@ -92,15 +88,21 @@ public final class Result
      */
     public Class<?> getTestClass()
     {
-        return target.getClass();
+        return this.description.getTestClass();
     }
 
     /**
      * Returns the method under test. 
      */
-    public Method getTestMethod()
-    {
-        return method.getMethod();
+    public Method getTestMethod() {
+        try {
+            return getTestClass().getMethod(getTestMethodName());
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    getTestMethodName()
+                            + " is declared with required signature[public void no-arguments]",
+                    e);
+        }
     }
 
     public int getThreadCount()

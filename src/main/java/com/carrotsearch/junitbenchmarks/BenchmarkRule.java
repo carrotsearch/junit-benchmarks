@@ -1,8 +1,8 @@
 package com.carrotsearch.junitbenchmarks;
 
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
@@ -14,7 +14,7 @@ import org.junit.runners.model.Statement;
  * public {@link MethodRule} runBenchmarks = new BenchmarkRule();
  * </pre>
  */
-public final class BenchmarkRule implements MethodRule
+public final class BenchmarkRule implements TestRule
 {
     private final IResultsConsumer [] consumers;
 
@@ -39,10 +39,10 @@ public final class BenchmarkRule implements MethodRule
     }
 
     /**
-     * Apply benchmarking to the given method and target.
+     * Apply benchmarking to the given test description.
      */
-    public Statement apply(Statement base, FrameworkMethod method, Object target)
-    {
-        return new BenchmarkStatement(base, method, target, consumers);
+    @Override
+    public Statement apply(Statement base, Description description) {
+        return new BenchmarkStatement(base, description, consumers);
     }
 }

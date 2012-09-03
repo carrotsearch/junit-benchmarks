@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import org.dom4j.Document;
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 /**
  * Creates a benchmark with two measured methods. One of the test methods has an
@@ -29,7 +29,7 @@ public class TestXmlConsumer
     }
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(xmlConsumer);
+    public TestRule benchmarkRun = new BenchmarkRule(xmlConsumer);
 
     @Test
     public void testMethodA()

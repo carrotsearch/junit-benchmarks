@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
@@ -96,7 +96,7 @@ final class BenchmarkStatement extends Statement
             final Statistics stats = Statistics.from(
                 results.subList(warmupRounds, totalRounds));
 
-            return new Result(target, method, benchmarkRounds, warmupRounds, warmupTime,
+            return new Result(description, benchmarkRounds, warmupRounds, warmupTime,
                 benchmarkTime, stats.evaluation, stats.blocked, stats.gc, gcSnapshot, 1);
         }
     }
@@ -275,23 +275,21 @@ final class BenchmarkStatement extends Statement
      */
     private boolean ignoreCallGC = Boolean.getBoolean(IGNORE_CALLGC_PROPERTY);
 
-    private final Object target;
-    private final FrameworkMethod method;
+    private final Description description;
     private final BenchmarkOptions options;
     private final IResultsConsumer [] consumers;
 
     private final Statement base;
 
+
     /* */
-    public BenchmarkStatement(Statement base, FrameworkMethod method, Object target,
-        IResultsConsumer... consumers)
-    {
+    public BenchmarkStatement(Statement base, Description description,
+            IResultsConsumer[] consumers) {
         this.base = base;
-        this.method = method;
-        this.target = target;
+        this.description = description;
         this.consumers = consumers;
 
-        this.options = resolveOptions(method);
+        this.options = resolveOptions(description);
     }
 
     /* Provide the default options from the annotation. */
@@ -302,21 +300,10 @@ final class BenchmarkStatement extends Statement
     }
 
     /* */
-    private BenchmarkOptions resolveOptions(FrameworkMethod method)
-    {
-        // Method-level override.
-        BenchmarkOptions options = method.getAnnotation(BenchmarkOptions.class);
+    private BenchmarkOptions resolveOptions(Description description) {
+        // Method-level or Class-level
+        BenchmarkOptions options = description.getAnnotation(BenchmarkOptions.class);
         if (options != null) return options;
-
-        // Class-level override. Look for annotations in this and superclasses.
-        Class<?> clz = target.getClass();
-        while (clz != null)
-        {
-            options = clz.getAnnotation(BenchmarkOptions.class);
-            if (options != null) return options;
-
-            clz = clz.getSuperclass();
-        }
 
         // Defaults.
         try

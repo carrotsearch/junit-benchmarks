@@ -3,7 +3,7 @@ package com.carrotsearch.junitbenchmarks;
 import java.io.*;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
@@ -18,7 +18,7 @@ public class TestConcurrencyOverride
     public static class Nested
     {
         @Rule
-        public MethodRule benchmarkRun = new BenchmarkRule(stringConsumer);
+        public TestRule benchmarkRun = new BenchmarkRule(stringConsumer);
 
         @Test
         @BenchmarkOptions(benchmarkRounds = 20, warmupRounds = 10)

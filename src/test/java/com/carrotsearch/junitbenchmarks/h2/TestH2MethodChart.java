@@ -6,7 +6,7 @@ import java.io.File;
 import java.sql.SQLException;
 
 import org.junit.*;
-import org.junit.rules.MethodRule;
+import org.junit.rules.TestRule;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -38,7 +38,7 @@ public class TestH2MethodChart
     }
 
     @Rule
-    public MethodRule benchmarkRun = new BenchmarkRule(h2consumer);
+    public TestRule benchmarkRun = new BenchmarkRule(h2consumer);
 
     @Test
     public void testMethodA() throws Exception
