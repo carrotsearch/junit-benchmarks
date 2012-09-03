@@ -29,7 +29,7 @@ public final class MySQLConsumer extends DbConsumer
     /**
      * Creates a consumer with the default charts and custom key dirs.
      *
-     * @param dbFileName the database file name
+     * @param dbUrl the database file name
      */
     public MySQLConsumer(String dbUrl)
     {

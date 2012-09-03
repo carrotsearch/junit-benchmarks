@@ -10,7 +10,7 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 /**
  * Collector of {@link BenchmarkMethodChart} annotations.
  */
-class MethodChartVisitor implements IChartAnnotationVisitor<DbConsumer>
+class MethodChartVisitor implements IChartAnnotationVisitor
 {
     /**
      * Types for which method-level chart should be generated.
@@ -26,11 +26,9 @@ class MethodChartVisitor implements IChartAnnotationVisitor<DbConsumer>
         {
             MethodChartGenerator g = new MethodChartGenerator( 
                 GeneratorUtils.getFilePrefix(
-                    clazz, 
-                    clazz.getAnnotation(BenchmarkMethodChart.class).filePrefix(),
-                    c.getChartsDir()), 
+                    clazz, clazz.getAnnotation(BenchmarkMethodChart.class).filePrefix(), c.getChartsDir()),
                 clazz.getName(),
-                    c);
+                c);
 
             AxisRange ann = clazz.getAnnotation(AxisRange.class);
             if (ann != null)

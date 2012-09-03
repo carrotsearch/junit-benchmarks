@@ -58,7 +58,7 @@ public @interface BenchmarkOptions
 
     /**
      * Sets the type of clock to be used for time measuring.
-     * See {@see Clock} for available values.
+     * See {@link Clock} for available values.
      *
      */
     Clock clock() default Clock.REAL_TIME;

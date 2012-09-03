@@ -11,7 +11,7 @@ import org.junit.runners.model.Statement;
  * 
  * <pre>
  * {@link Rule}
- * public {@link MethodRule} runBenchmarks = new BenchmarkRule();
+ * public {@link TestRule} runBenchmarks = new BenchmarkRule();
  * </pre>
  */
 public final class BenchmarkRule implements TestRule

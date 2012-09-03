@@ -15,10 +15,9 @@ public final class MethodChartGenerator
     double min = Double.NaN, max = Double.NaN;
 
     /**
-     * @param connection H2 database connection. 
      * @param filePrefix Prefix for generated files.
-     * @param runId The run from which to select data.
      * @param clazzName The target test class (fully qualified name).
+     * @param consumer Database consumer for results.
      */
     public MethodChartGenerator(
         String filePrefix, 

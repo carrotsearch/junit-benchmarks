@@ -3,6 +3,7 @@ package com.carrotsearch.junitbenchmarks;
 import java.util.ArrayList;
 
 import com.carrotsearch.junitbenchmarks.h2.H2Consumer;
+import com.carrotsearch.junitbenchmarks.mysql.MySQLConsumer;
 
 /**
  * Global settings for benchmarks set through system properties. If

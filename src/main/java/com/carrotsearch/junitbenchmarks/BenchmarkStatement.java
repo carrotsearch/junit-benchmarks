@@ -106,11 +106,6 @@ final class BenchmarkStatement extends Statement
      */
     private final class SequentialEvaluator extends BaseEvaluator
     {
-        SequentialEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds)
-        {
-            this(warmupRounds, benchmarkRounds, totalRounds, Clock.REAL_TIME);
-        }
-
         SequentialEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds, Clock clock)
         {
             super(warmupRounds, benchmarkRounds, totalRounds, clock);
@@ -162,12 +157,6 @@ final class BenchmarkStatement extends Statement
         private final int concurrency;
         private final CountDownLatch latch;
 
-
-        ConcurrentEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds,
-                            int concurrency)
-        {
-            this(warmupRounds, benchmarkRounds, totalRounds, concurrency, Clock.REAL_TIME);
-        }
 
         ConcurrentEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds,
                             int concurrency, Clock clock)

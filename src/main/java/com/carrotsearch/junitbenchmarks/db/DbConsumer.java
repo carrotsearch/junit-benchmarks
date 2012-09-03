@@ -21,7 +21,7 @@ import com.carrotsearch.junitbenchmarks.Result;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +79,7 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable
     /**
      * Charting visitors.
      */
-    private List<? extends IChartAnnotationVisitor> chartVisitors;
+    private List<IChartAnnotationVisitor> chartVisitors;
     
     /**
      * The custom key value.
@@ -92,7 +92,6 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable
      * @param chartsDir the charts directory
      * @param customKeyValue the custom key value
      */
-    @SuppressWarnings("LeakingThisInConstructor")
     public DbConsumer(File chartsDir, String customKeyValue)
     {
         this.chartsDir = chartsDir;
@@ -104,11 +103,12 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable
     /*
      *
      */
-    private List<? extends IChartAnnotationVisitor> newChartVisitors()
+    private List<IChartAnnotationVisitor> newChartVisitors()
     {
-        return Arrays.asList(
-                new MethodChartVisitor(),
-                new HistoryChartVisitor());
+        List<IChartAnnotationVisitor> visitors = new ArrayList<IChartAnnotationVisitor>();
+        visitors.add(new MethodChartVisitor());
+        visitors.add(new HistoryChartVisitor());
+        return visitors;
     }
     
     /**
@@ -227,7 +227,7 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable
     /**
      * Read a given resource from classpath and return UTF-8 decoded string.
      */
-    protected static String getResource(Class c, String resourceName)
+    protected static String getResource(Class<?> c, String resourceName)
     {
         try
         {

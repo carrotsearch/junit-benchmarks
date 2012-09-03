@@ -110,7 +110,7 @@ public class MySQLConsumerT
         File ourAppDir = new File(System.getProperty("java.io.tmpdir"));
         File databaseDir = new File(ourAppDir, "Test");
         server = new MysqldResource(ourAppDir, databaseDir);
-        Map database_options = new HashMap();
+        Map<String,Object> database_options = new HashMap<String,Object>();
         database_options.put(MysqldResourceI.PORT, getMySQLPort("3306"));
         database_options.put(MysqldResourceI.INITIALIZE_USER, "true");
         database_options.put(MysqldResourceI.INITIALIZE_USER_NAME, "test");

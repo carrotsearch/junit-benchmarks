@@ -3,7 +3,6 @@ package com.carrotsearch.junitbenchmarks.db;
 import static com.carrotsearch.junitbenchmarks.db.GeneratorUtils.getColumnIndex;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

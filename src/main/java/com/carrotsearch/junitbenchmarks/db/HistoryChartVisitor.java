@@ -7,7 +7,7 @@ import com.carrotsearch.junitbenchmarks.Result;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 
-class HistoryChartVisitor implements IChartAnnotationVisitor<DbConsumer>
+class HistoryChartVisitor implements IChartAnnotationVisitor
 {
     /**
      * Cache of all types and methods for which 
