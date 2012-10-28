@@ -79,6 +79,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>
 
     <clover.version>3.1.0</clover.version>
+    <gpg.passphrase></gpg.passphrase>
   </properties>
 
   <!-- Dependencies. -->
