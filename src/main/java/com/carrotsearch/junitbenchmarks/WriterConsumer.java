@@ -24,8 +24,8 @@ public final class WriterConsumer implements IResultsConsumer
     {
         w.write(String.format(Locale.ENGLISH,
             "%s: [measured %d out of %d rounds, %s]\n" +
-            " round: %s s, round.block: %s, round.gc: %s, GC.calls: %d, GC.time: %.2f s," +
-            " time.total: %.2f s, time.warmup: %.2f s, time.bench: %.2f s\n",
+            " round: %ss, round.block: %s, round.gc: %s, GC.calls: %d, GC.time: %.2fs," +
+            " time.total: %.2fs, time.warmup: %.2fs, time.bench: %.2fs\n",
             result.getShortTestClassName() + "." + result.getTestMethodName(),
             result.benchmarkRounds, 
             result.benchmarkRounds + result.warmupRounds, 
