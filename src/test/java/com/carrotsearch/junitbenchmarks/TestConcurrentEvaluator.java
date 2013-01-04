@@ -2,8 +2,6 @@ package com.carrotsearch.junitbenchmarks;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 
 import org.junit.*;
