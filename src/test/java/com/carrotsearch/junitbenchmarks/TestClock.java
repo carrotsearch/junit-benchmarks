@@ -1,24 +1,25 @@
 package com.carrotsearch.junitbenchmarks;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import java.util.ArrayList;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class TestClock
 {
-    private static ArrayList<Result> results = new ArrayList<Result>();
+    private static Map<String, Result> results = new HashMap<String,Result>();
 
     private static IResultsConsumer resultsConsumer = new IResultsConsumer()
     {
         public void accept(Result result)
         {
-            results.add(result);
+            results.put(result.description.getMethodName(), result);
         }
     };
 
@@ -55,9 +56,9 @@ public class TestClock
         final double delta = 0.02;
         assertEquals(3, results.size());
 
-        final double avg1 = results.get(0).roundAverage.avg;
-        final double avg2 = results.get(1).roundAverage.avg;
-        final double avg3 = results.get(2).roundAverage.avg;
+        final double avg1 = results.get("testUserTime").roundAverage.avg;
+        final double avg2 = results.get("testCpuTime").roundAverage.avg;
+        final double avg3 = results.get("testRealTime").roundAverage.avg;
 
         assertTrue(avg1 > -delta && avg1 < delta);
         assertTrue(avg2 > -delta && avg2 < delta);
