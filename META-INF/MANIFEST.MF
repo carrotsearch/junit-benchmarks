@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JUnitBenchmarks
+Bundle-SymbolicName: com.carrotsearch.junitbenchmarks
+Bundle-Version: 0.5.0.qualifier
+Export-Package: com.carrotsearch.junitbenchmarks,
+ com.carrotsearch.junitbenchmarks.annotation,
+ com.carrotsearch.junitbenchmarks.db,
+ com.carrotsearch.junitbenchmarks.h2,
+ com.carrotsearch.junitbenchmarks.mysql
+Bundle-Vendor: Carrot Search Labs
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.h2;bundle-version="1.1.0",
+ com.mysql.jdbc;bundle-version="5.1.0",
+ org.junit;bundle-version="4.10.0"
