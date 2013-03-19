@@ -70,7 +70,7 @@ public class TestH2HistoryChartOptions
         h2consumer.close();
         assertTrue(dbFileFull.delete());
 
-        String c1 = Common.getAndDelete(new File(chartsDir, "class-global" + ".json"));
+        String c1 = Common.getAndDelete(new File(chartsDir, "class-global" + ".jsonp"));
         assertTrue(c1.contains("testMethodA"));
         assertTrue(c1.contains("testMethodB"));
         assertTrue(c1.contains("testMethodC"));
@@ -78,7 +78,7 @@ public class TestH2HistoryChartOptions
         assertTrue(c1.contains("max:"));
         assertFalse(c1.contains("min:"));
 
-        String c2 = Common.getAndDelete(new File(chartsDir, "method-level" + ".json"));
+        String c2 = Common.getAndDelete(new File(chartsDir, "method-level" + ".jsonp"));
         assertFalse(c2.contains("testMethodA"));
         assertTrue(c2.contains("testMethodB"));
         assertTrue(c2.contains("testMethodC"));
@@ -89,12 +89,12 @@ public class TestH2HistoryChartOptions
         Common.existsAndDelete(
             new File(chartsDir, "methods-" + TestH2HistoryChartOptions.class.getName() + ".html"));
         Common.existsAndDelete(
-            new File(chartsDir, "methods-" + TestH2HistoryChartOptions.class.getName() + ".json"));
+            new File(chartsDir, "methods-" + TestH2HistoryChartOptions.class.getName() + ".jsonp"));
 
         Common.existsAndDelete(
             new File(chartsDir, "testMethodD-" + TestH2HistoryChartOptions.class.getName() + ".html"));
         Common.existsAndDelete(
-            new File(chartsDir, "testMethodD-" + TestH2HistoryChartOptions.class.getName() + ".json"));
+            new File(chartsDir, "testMethodD-" + TestH2HistoryChartOptions.class.getName() + ".jsonp"));
 
         assertTrue(Common.deleteDir(chartsDir));
     }

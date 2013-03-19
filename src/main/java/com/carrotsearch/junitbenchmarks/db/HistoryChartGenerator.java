@@ -93,17 +93,14 @@ public final class HistoryChartGenerator
      */
     public void generate() throws Exception
     {
-        final String jsonFileName = filePrefix + ".json";
+        final String jsonFileName = filePrefix + ".jsonp";
         final String htmlFileName = filePrefix + ".html";
 
         String template = consumer.getHistoryHtmlTemplate();
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "HistoryChartGenerator.json", 
-            new File(jsonFileName).getName());
-        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
-            GeneratorUtils.getMinMax(min, max));
-        template = GeneratorUtils.replaceToken(template, "/*LABELCOLUMN*/", 
-            Integer.toString(labelColumns.get(labelType)));
+        template = GeneratorUtils.replaceToken(template, "HistoryChartGenerator.jsonp", new File(jsonFileName).getName());
+        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/",  GeneratorUtils.getMinMax(min, max));
+        template = GeneratorUtils.replaceToken(template, "/*LABELCOLUMN*/", Integer.toString(labelColumns.get(labelType)));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
 
         GeneratorUtils.save(htmlFileName, template);
@@ -179,7 +176,7 @@ public final class HistoryChartGenerator
 
         // Emit columns.
         StringBuilder buf = new StringBuilder();
-        buf.append("{\n");
+        buf.append("receiveJsonpData({\n");
 
         buf.append("\"cols\": [\n");
         
@@ -267,8 +264,8 @@ public final class HistoryChartGenerator
             if (rs.isLast())
                 emitRow(buf, row, rs.isLast());
         }
-        buf.append("]}\n");
-
+        buf.append("]});\n");
+        
         return buf.toString();
     }
 

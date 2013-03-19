@@ -13,7 +13,9 @@ import java.lang.annotation.*;
 public @interface BenchmarkHistoryChart
 {
     /**
-     * Chart file prefix override. If empty, class name is used. 
+     * Chart file prefix override. If empty, class name is used.
+     * Any substring <code>CLASSNAME</code> is replaced with a fully qualified 
+     * class name of the annotated test's class.
      */
     String filePrefix() default "";
 

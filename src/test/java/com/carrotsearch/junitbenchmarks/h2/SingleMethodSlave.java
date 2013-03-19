@@ -50,7 +50,7 @@ public class SingleMethodSlave
         if (cleanup)
         {
             Common.existsAndDelete(SingleMethodSlave.class.getName() + ".html");
-            Common.existsAndDelete(SingleMethodSlave.class.getName() + ".json");
+            Common.existsAndDelete(SingleMethodSlave.class.getName() + ".jsonp");
             dbFileFull.delete();
         }
     }

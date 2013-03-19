@@ -65,33 +65,32 @@
       }
 
       function visualize(jsonData, className) {
-		var data = new google.visualization.DataTable(jsonData);
-		
-		var table = new google.visualization.Table(document.getElementById('raw-data'));
-		table.draw(data, {
-		    sort: "event",
-		});
-		
-		google.visualization.events.addListener(table, 'sort',
-		 function(event) {
-		   if (event.column >= 0 && event.column <= 2) {
-			   drawData(data, event.column);
-		   }
-		 }
-		);
-		
-		chart = new google.visualization.LineChart(document.getElementById('chart'));
-		drawData(data, 0/*LABELCOLUMN*/);
+        var data = new google.visualization.DataTable(jsonData);
+        
+        var table = new google.visualization.Table(document.getElementById('raw-data'));
+        table.draw(data, {
+            sort: "event",
+        });
+        
+        google.visualization.events.addListener(table, 'sort',
+         function(event) {
+           if (event.column >= 0 && event.column <= 2) {
+              drawData(data, event.column);
+           }
+         }
+        );
+        
+        chart = new google.visualization.LineChart(document.getElementById('chart'));
+        drawData(data, 0/*LABELCOLUMN*/);
+      }
+
+      var data;
+      function receiveJsonpData(jsonpData) {
+        data = jsonpData;
       }
 
       google.setOnLoadCallback(function() {
-          $.ajax({
-            url: "HistoryChartGenerator.json",
-            method: "GET",
-            success: function(data) {
-              visualize(data, "CLASSNAME");
-            }
-          });
+          visualize(data, "CLASSNAME");
 
           $("#properties").click(function () {
               $(this).toggleClass("expanded"); 
@@ -113,5 +112,7 @@
             <pre id="proplist" style="display: none; background-color: #e0e0e0;">PROPERTIES</pre>
         </div>
     </div>
+    
+    <script src="HistoryChartGenerator.jsonp"></script>
   </body>
 </html>

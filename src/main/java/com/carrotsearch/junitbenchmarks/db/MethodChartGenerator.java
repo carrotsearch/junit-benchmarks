@@ -34,17 +34,14 @@ public final class MethodChartGenerator
      */
     public void generate() throws Exception
     {
-        final String jsonFileName = filePrefix + ".json";
+        final String jsonFileName = filePrefix + ".jsonp";
         final String htmlFileName = filePrefix + ".html";
         
         String template = consumer.getMethodHtmlTemplate();
         template = GeneratorUtils.replaceToken(template, "CLASSNAME", clazzName);
-        template = GeneratorUtils.replaceToken(template, "MethodChartGenerator.json", 
-            new File(jsonFileName).getName());
-        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", 
-            GeneratorUtils.getMinMax(min, max));
-        template = GeneratorUtils.replaceToken(template, "PROPERTIES", 
-            GeneratorUtils.getProperties(consumer));
+        template = GeneratorUtils.replaceToken(template, "MethodChartGenerator.jsonp", new File(jsonFileName).getName());
+        template = GeneratorUtils.replaceToken(template, "/*MINMAX*/", GeneratorUtils.getMinMax(min, max));
+        template = GeneratorUtils.replaceToken(template, "PROPERTIES", GeneratorUtils.getProperties(consumer));
 
         GeneratorUtils.save(htmlFileName, template);
         GeneratorUtils.save(jsonFileName, getData());
@@ -56,7 +53,7 @@ public final class MethodChartGenerator
     private String getData() throws SQLException
     {
         StringBuilder buf = new StringBuilder();
-        buf.append("{\n");
+        buf.append("receiveJsonpData({\n");
 
         final PreparedStatement s = 
             consumer.getConnection().prepareStatement(consumer.getMethodChartResultsQuery());
@@ -99,7 +96,7 @@ public final class MethodChartGenerator
             if (!rs.isLast()) buf.append(",");
             buf.append('\n');
         }
-        buf.append("]}\n");
+        buf.append("]});\n");
 
         rs.close();
         return buf.toString();

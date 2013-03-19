@@ -69,6 +69,6 @@ public class TestH2MethodChart
         assertTrue(c1.contains("max:"));
         assertFalse(c1.contains("min:"));
 
-        Common.existsAndDelete(TestH2MethodChart.class.getName() + ".json");
+        Common.existsAndDelete(TestH2MethodChart.class.getName() + ".jsonp");
     }
 }

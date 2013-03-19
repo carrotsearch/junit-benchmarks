@@ -11,48 +11,48 @@
     </script>
 
     <style type="text/css">
-		#content {
-		  width: 800px ;
-		  margin-left: auto;
-		  margin-right: auto;
-		}
-
-		#chart {
-		  width: 600px;
-		  height: 400px;
-		  margin-left: auto;
-		  margin-right: auto;
-		  margin-bottom: 10px;
-		  display: block;
-		}
-
-		#help {
-		  text-align: center;
-		  margin-top: 10px;
-		  font-size: .8em;
-		  color: gray;
-		}
-		
-		ul.expander {
-	      display: inline;
-          margin-left: 0;
-          padding-left: 0;
-          font-size: .8em;
-		}
-
-		ul.expander li {
-		  margin-left: 0;
-          list-style: none;
+      #content {
+        width: 800px ;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      #chart {
+        width: 600px;
+        height: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+        display: block;
+      }
+      
+      #help {
+        text-align: center;
+        margin-top: 10px;
+        font-size: .8em;
+        color: gray;
+      }
+      
+      ul.expander {
           display: inline;
-		}
-
-		ul.expander li:before {
-          content: "\25BA\0020";  // 25B8
-        }
-
-        ul.expander li.expanded:before {
-          content: "\25BC\0020";  // 25BE
-        }
+            margin-left: 0;
+            padding-left: 0;
+            font-size: .8em;
+      }
+      
+      ul.expander li {
+        margin-left: 0;
+            list-style: none;
+            display: inline;
+      }
+      
+      ul.expander li:before {
+            content: "\25BA\0020";  // 25B8
+          }
+      
+          ul.expander li.expanded:before {
+            content: "\25BC\0020";  // 25BE
+          }
     </style>
 
     <script type="text/javascript">
@@ -87,27 +87,26 @@
         redrawChart();
 
         google.visualization.events.addListener(table, 'sort',
-			function(event) {
-			  if (event.column > 0) {
-				  view.setColumns([0, event.column]);
-			  }
+          function(event) {
+            if (event.column > 0) {
+              view.setColumns([0, event.column]);
+            }
+          
+            view.setRows(data.getSortedRows([{column: event.column, desc: !event.ascending}]));
+            redrawChart();
+          });
+      }
 
-              view.setRows(data.getSortedRows([{column: event.column, desc: !event.ascending}]));
-			  redrawChart();
-		});
+      var data;
+      function receiveJsonpData(jsonpData) {
+        data = jsonpData;
       }
 
       google.setOnLoadCallback(function() {
-	        $.ajax({
-	          url: "MethodChartGenerator.json",
-	          method: "GET",
-	          success: function(data) {
-	            visualize(data, "CLASSNAME");
-	          }
-	        });
+          visualize(data, "CLASSNAME");
 
           $("#properties").click(function () {
-        	  $(this).toggleClass("expanded"); 
+              $(this).toggleClass("expanded"); 
               $("#proplist").slideToggle();
           });
 
@@ -122,20 +121,22 @@
 
   <body style="font-family: Arial; margin: 30px;">
     <div id="content">
-	    <h1>Benchmark results for methods in class CLASSNAME</h1>
-
-        <ul class="expander"><li id="orientation" class="expanded"><a href="#">Orientation</a></li></ul>
-	    <div id="chart" ></div>
-	    <div id="raw-data"></div>
-
-	    <div id="help">
-	    Click on table headers to change the sorting order and redraw the chart.
-	    </div>
-
-	    <div>
-	        <ul class="expander"><li id="properties"><a href="#">Properties</a></li></ul>
-	        <pre id="proplist" style="display: none; background-color: #e0e0e0;">PROPERTIES</pre>
-	    </div>
+      <h1>Benchmark results for methods in class CLASSNAME</h1>
+  
+      <ul class="expander"><li id="orientation" class="expanded"><a href="#">Orientation</a></li></ul>
+      <div id="chart" ></div>
+      <div id="raw-data"></div>
+  
+      <div id="help">
+      Click on table headers to change the sorting order and redraw the chart.
+      </div>
+  
+      <div>
+        <ul class="expander"><li id="properties"><a href="#">Properties</a></li></ul>
+        <pre id="proplist" style="display: none; background-color: #e0e0e0;">PROPERTIES</pre>
+      </div>
     </div>
+    
+    <script src="MethodChartGenerator.jsonp"></script>
   </body>
 </html>

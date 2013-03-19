@@ -56,7 +56,7 @@ public class RepeatedTestSlave
         if (cleanup)
         {
             Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".html");
-            Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".json");
+            Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".jsonp");
             dbFileFull.delete();
         }
     }

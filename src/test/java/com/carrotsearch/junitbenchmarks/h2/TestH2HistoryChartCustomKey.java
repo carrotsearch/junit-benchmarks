@@ -40,7 +40,7 @@ public class TestH2HistoryChartCustomKey
 
         Common.existsAndDelete(RepeatedTestSlave.class.getName() + ".html");
         String content = Common.getAndDelete(
-            new File(RepeatedTestSlave.class.getName() + ".json"));
+            new File(RepeatedTestSlave.class.getName() + ".jsonp"));
         RepeatedTestSlave.dbFileFull.delete();
 
         assertEquals(1, count(content, "custom-key1"));

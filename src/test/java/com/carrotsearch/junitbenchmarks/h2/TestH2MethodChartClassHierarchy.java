@@ -91,11 +91,11 @@ public class TestH2MethodChartClassHierarchy
     {
         Result result = JUnitCore.runClasses(B.class, C.class, D.class);
         Assert.assertEquals(0, result.getFailureCount());
-        Common.existsAndDelete("a.html", "a.json");
-        Common.existsAndDelete("b.html", "b.json");
-        Common.existsAndDelete("c.html", "c.json");
-        Common.existsAndDelete("ha.html", "ha.json");
-        Common.existsAndDelete("hb.html", "hb.json");
-        Common.existsAndDelete("hc.html", "hc.json");
+        Common.existsAndDelete("a.html", "a.jsonp");
+        Common.existsAndDelete("b.html", "b.jsonp");
+        Common.existsAndDelete("c.html", "c.jsonp");
+        Common.existsAndDelete("ha.html", "ha.jsonp");
+        Common.existsAndDelete("hb.html", "hb.jsonp");
+        Common.existsAndDelete("hc.html", "hc.jsonp");
     }
 }
