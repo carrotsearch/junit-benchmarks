@@ -20,7 +20,7 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
      */
     public void visit(Class<?> clazz, Method method, Result result)
     {
-        boolean onMethod = method.isAnnotationPresent(BenchmarkHistoryChart.class);
+        boolean onMethod = method != null && method.isAnnotationPresent(BenchmarkHistoryChart.class);
         boolean onClass = clazz.isAnnotationPresent(BenchmarkHistoryChart.class);
 
         if (onMethod || onClass)

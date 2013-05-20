@@ -1,6 +1,7 @@
 package com.carrotsearch.junitbenchmarks;
 
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import org.junit.runner.Description;
 
@@ -92,16 +93,16 @@ public final class Result
     }
 
     /**
-     * Returns the method under test. 
+     * Returns the method under test (or null if not available and couldn't be located).
      */
     public Method getTestMethod() {
         try {
             return getTestClass().getMethod(getTestMethodName());
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    getTestMethodName()
-                            + " is declared with required signature[public void no-arguments]",
-                    e);
+            Logger.getAnonymousLogger().warning(
+                "Could not locate the test method responsible for test: "
+                + getTestMethodName());
+            return null;
         }
     }
 

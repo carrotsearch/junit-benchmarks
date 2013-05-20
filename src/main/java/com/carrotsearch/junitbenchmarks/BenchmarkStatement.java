@@ -283,22 +283,32 @@ final class BenchmarkStatement extends Statement
 
     /* Provide the default options from the annotation. */
     @BenchmarkOptions
-    @SuppressWarnings("unused")
     private void defaultOptions()
     {
     }
 
     /* */
     private BenchmarkOptions resolveOptions(Description description) {
-        // Method-level or Class-level
+        // Method-level
         BenchmarkOptions options = description.getAnnotation(BenchmarkOptions.class);
         if (options != null) return options;
+        
+        // Class-level
+        Class<?> clz = description.getTestClass();
+        while (clz != null)
+        {
+            options = clz.getAnnotation(BenchmarkOptions.class);
+            if (options != null) return options;
+
+            clz = clz.getSuperclass();
+        }
 
         // Defaults.
         try
         {
-            return getClass().getDeclaredMethod("defaultOptions").getAnnotation(
-                BenchmarkOptions.class);
+            return getClass()
+                .getDeclaredMethod("defaultOptions")
+                .getAnnotation(BenchmarkOptions.class);
         }
         catch (Exception e)
         {
