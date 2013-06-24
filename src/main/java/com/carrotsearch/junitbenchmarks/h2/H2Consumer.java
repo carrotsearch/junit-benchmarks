@@ -10,13 +10,13 @@ import org.h2.jdbcx.JdbcDataSource;
 /**
  * {@link DbConsumer} implementation for H2.
  */
-public final class H2Consumer extends DbConsumer
+public class H2Consumer extends DbConsumer
 {
 
     /**
      * The database file name.
      */
-    private File dbFileName;
+    protected File dbFileName;
 
     /**
      * Creates a consumer with the default file name.
@@ -61,7 +61,7 @@ public final class H2Consumer extends DbConsumer
     /**
      * Return the global default DB name.
      */
-    private static File getDefaultDbName()
+    protected static File getDefaultDbName()
     {
         final String dbPath = System.getProperty(BenchmarkOptionsSystemProperties.DB_FILE_PROPERTY);
         if (dbPath != null && !dbPath.trim().equals(""))
