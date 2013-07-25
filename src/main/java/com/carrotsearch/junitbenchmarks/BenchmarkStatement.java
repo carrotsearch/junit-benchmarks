@@ -1,16 +1,26 @@
 package com.carrotsearch.junitbenchmarks;
 
-import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.*;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.BENCHMARK_ROUNDS_PROPERTY;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.CONCURRENCY_PROPERTY;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.IGNORE_ANNOTATION_OPTIONS_PROPERTY;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.IGNORE_CALLGC_PROPERTY;
+import static com.carrotsearch.junitbenchmarks.BenchmarkOptionsSystemProperties.WARMUP_ROUNDS_PROPERTY;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -20,6 +30,26 @@ import org.junit.runners.model.Statement;
  */
 final class BenchmarkStatement extends Statement
 {
+    private static class LongHolder {
+        public long value;
+        
+        public long getAndSet(long newValue) {
+            long tmp = value;
+            value = newValue;
+            return tmp;
+        }
+    }
+
+    final static ThreadMXBean threadMXBean;
+    final static boolean supportsThreadContention;
+    static {
+        threadMXBean = ManagementFactory.getThreadMXBean();
+        supportsThreadContention = threadMXBean.isThreadContentionMonitoringSupported();
+        if (supportsThreadContention) {
+            threadMXBean.setThreadContentionMonitoringEnabled(true);
+        }
+    }
+
     /**
      * Factored out as a nested class as it needs to keep some data during test
      * evaluation.
@@ -33,11 +63,15 @@ final class BenchmarkStatement extends Statement
         final protected int totalRounds;
 
         final protected Clock clock;
-        final protected ThreadMXBean threadMXBean;
-        final protected Map<Long,Long> threadBlockedTimes;
 
         protected long warmupTime;
         protected long benchmarkTime;
+        
+        private final ThreadLocal<LongHolder> previousThreadBlockedTime = new ThreadLocal<LongHolder>() {
+            protected LongHolder initialValue() {
+                return new LongHolder();
+            }
+        };
 
         protected BaseEvaluator(int warmupRounds, int benchmarkRounds, int totalRounds, Clock clock)
         {
@@ -47,10 +81,6 @@ final class BenchmarkStatement extends Statement
             this.totalRounds = totalRounds;
             this.clock = clock;
             this.results = new ArrayList<SingleResult>(totalRounds);
-
-            this.threadMXBean = ManagementFactory.getThreadMXBean();
-            this.threadMXBean.setThreadContentionMonitoringEnabled(true);
-            this.threadBlockedTimes = new HashMap<Long, Long>();
         }
 
         protected GCSnapshot gcSnapshot = null;
@@ -76,13 +106,16 @@ final class BenchmarkStatement extends Statement
                 base.evaluate();
                 final long endTime = clock.time();
 
-                final long threadId = Thread.currentThread().getId();
-                final ThreadInfo threadInfo = threadMXBean.getThreadInfo(threadId);
-                final long threadBlockedTime = threadInfo.getBlockedTime();
-                final long roundBlockedTime = threadBlockedTimes.containsKey(threadId)
-                        ? threadBlockedTime - threadBlockedTimes.get(threadId)
-                        : threadBlockedTime;
-                threadBlockedTimes.put(threadId,threadBlockedTime);
+                final long roundBlockedTime;
+                if (supportsThreadContention) {
+                    final long threadId = Thread.currentThread().getId();
+                    final ThreadInfo threadInfo = threadMXBean.getThreadInfo(threadId);
+                    final long threadBlockedTime = threadInfo.getBlockedTime();
+                    final long previousValue = previousThreadBlockedTime.get().getAndSet(threadBlockedTime);
+                    roundBlockedTime = threadBlockedTime - previousValue;
+                } else {
+                    roundBlockedTime = 0;
+                }
 
                 return new SingleResult(startTime, afterGC, endTime, roundBlockedTime);
             } catch (Throwable t)
