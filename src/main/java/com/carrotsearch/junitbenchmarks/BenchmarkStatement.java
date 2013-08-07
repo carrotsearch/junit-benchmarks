@@ -87,7 +87,7 @@ final class BenchmarkStatement extends Statement
 
         protected abstract Result evaluate() throws Throwable;
 
-        protected final SingleResult evaluateInternally(int round) throws InvocationTargetException
+        protected final SingleResult evaluateInternally(int round) throws Throwable
         {
             // We assume no reordering will take place here.
             final long startTime = clock.time();
@@ -101,27 +101,21 @@ final class BenchmarkStatement extends Statement
                 warmupTime = benchmarkTime - warmupTime;
             }
 
-            try
-            {
-                base.evaluate();
-                final long endTime = clock.time();
+            base.evaluate();
+            final long endTime = clock.time();
 
-                final long roundBlockedTime;
-                if (supportsThreadContention) {
-                    final long threadId = Thread.currentThread().getId();
-                    final ThreadInfo threadInfo = threadMXBean.getThreadInfo(threadId);
-                    final long threadBlockedTime = threadInfo.getBlockedTime();
-                    final long previousValue = previousThreadBlockedTime.get().getAndSet(threadBlockedTime);
-                    roundBlockedTime = threadBlockedTime - previousValue;
-                } else {
-                    roundBlockedTime = 0;
-                }
-
-                return new SingleResult(startTime, afterGC, endTime, roundBlockedTime);
-            } catch (Throwable t)
-            {
-                throw new InvocationTargetException(t);
+            final long roundBlockedTime;
+            if (supportsThreadContention) {
+                final long threadId = Thread.currentThread().getId();
+                final ThreadInfo threadInfo = threadMXBean.getThreadInfo(threadId);
+                final long threadBlockedTime = threadInfo.getBlockedTime();
+                final long previousValue = previousThreadBlockedTime.get().getAndSet(threadBlockedTime);
+                roundBlockedTime = threadBlockedTime - previousValue;
+            } else {
+                roundBlockedTime = 0;
             }
+
+            return new SingleResult(startTime, afterGC, endTime, roundBlockedTime);
         }
 
         protected Result computeResult()
@@ -183,7 +177,13 @@ final class BenchmarkStatement extends Statement
             public SingleResult call() throws Exception
             {
                 latch.await();
-                return evaluateInternally(i);
+                try {
+                    return evaluateInternally(i);
+                } catch (Exception e) {
+                    throw e;
+                } catch (Throwable t) {
+                    throw new InvocationTargetException(t);
+                }
             }
         }
 

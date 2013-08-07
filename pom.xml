@@ -154,6 +154,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
+      <version>2.0M10</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
