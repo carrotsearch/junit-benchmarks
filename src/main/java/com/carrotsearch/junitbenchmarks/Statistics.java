@@ -3,7 +3,7 @@ package com.carrotsearch.junitbenchmarks;
 import java.util.List;
 
 /**
- * Calculate simple statistics from multiple {@link SingleResult}s.
+ * Calculate simple statistics from multiple {@link DefaultSingleResult}s.
  */
 final class Statistics
 {
@@ -28,7 +28,7 @@ final class Statistics
 
         // Thread blocked times.
         for (int i = 0; i < times.length; i++)
-            times[i] = results.get(i).blockTime;
+            times[i] = results.get(i).blockTime();
         stats.blocked = Average.from(times);
 
 
