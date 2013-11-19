@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 
 import org.junit.runner.Description;
 
+import com.mysql.management.util.Threads;
+
 /**
  * A result of a single benchmark test.
  */
@@ -89,7 +91,14 @@ public final class Result
      */
     public Class<?> getTestClass()
     {
-        return this.description.getTestClass();
+       try {
+         return Thread.currentThread().getContextClassLoader().loadClass(getTestClassName());
+      } catch (ClassNotFoundException e) {
+         Logger.getAnonymousLogger().warning(
+               "Could not load the test class responsible for test: "
+               + getTestClassName());
+         return null;
+      }
     }
 
     /**

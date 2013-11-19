@@ -13,7 +13,7 @@ public class BenchmarkRunner extends BlockJUnit4ClassRunner {
    
    protected Statement methodInvoker(FrameworkMethod method, Object test) {
       final BenchmarkInvokeMethod benchmarkInvokeMethod = new BenchmarkInvokeMethod(method, test);
-      TestRepository.addTest(new TestId(test.getClass(), method.getName()), benchmarkInvokeMethod);
+      TestRepository.addTest(new TestId(test.getClass().getName(), method.getName()), benchmarkInvokeMethod);
       return benchmarkInvokeMethod;
   }
 

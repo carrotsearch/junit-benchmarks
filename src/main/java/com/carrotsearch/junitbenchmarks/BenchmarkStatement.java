@@ -126,7 +126,7 @@ final class BenchmarkStatement extends Statement
         final int totalRounds = warmupRounds + benchmarkRounds;
 
         final BenchmarkEvaluator evaluator;
-        final BenchmarkInvokeMethod test = TestRepository.getTest(new TestId(description.getTestClass(), description.getMethodName()));
+        final BenchmarkInvokeMethod test = TestRepository.getTest(new TestId(description.getClassName(), description.getMethodName()));
         if (concurrency == BenchmarkOptions.CONCURRENCY_SEQUENTIAL)
         {
            if(test == null){

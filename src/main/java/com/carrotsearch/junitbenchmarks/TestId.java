@@ -2,12 +2,12 @@ package com.carrotsearch.junitbenchmarks;
 
 public class TestId {
    
-   private final Class<?> testClass;
+   private final String testClassName;
    
    private final String testMethodName;
 
-   public TestId(Class<?> testClass, String testMethodName) {
-      this.testClass = testClass;
+   public TestId(String testClass, String testMethodName) {
+      this.testClassName = testClass;
       this.testMethodName = testMethodName;
    }
 
@@ -15,7 +15,7 @@ public class TestId {
    public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((testClass == null) ? 0 : testClass.hashCode());
+      result = prime * result + ((testClassName == null) ? 0 : testClassName.hashCode());
       result = prime * result + ((testMethodName == null) ? 0 : testMethodName.hashCode());
       return result;
    }
@@ -32,11 +32,11 @@ public class TestId {
          return false;
       }
       TestId other = (TestId) obj;
-      if (testClass == null) {
-         if (other.testClass != null) {
+      if (testClassName == null) {
+         if (other.testClassName != null) {
             return false;
          }
-      } else if (!testClass.equals(other.testClass)) {
+      } else if (!testClassName.equals(other.testClassName)) {
          return false;
       }
       if (testMethodName == null) {
