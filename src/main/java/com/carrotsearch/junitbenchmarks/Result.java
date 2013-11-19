@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 
 import org.junit.runner.Description;
 
-import com.mysql.management.util.Threads;
-
 /**
  * A result of a single benchmark test.
  */
