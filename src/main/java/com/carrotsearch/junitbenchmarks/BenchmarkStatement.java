@@ -256,8 +256,7 @@ final class BenchmarkStatement extends Statement
             catch (ExecutionException e)
             {
                 // Unwrap the Throwable thrown by the tested method.
-                e.printStackTrace();
-                throw e.getCause().getCause();
+                throw e.getCause();
             }
             finally
             {
