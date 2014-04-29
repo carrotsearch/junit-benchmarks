@@ -65,10 +65,15 @@ public final class Result
      */
     public String getShortTestClassName()
     {
-        return getTestClass().getSimpleName();
+        Class<?> testClass = getTestClass();
+        return testClass == null ? simpleClassName() : testClass.getSimpleName(); 
     }
 
-    /**
+    private String simpleClassName() {
+		return getTestClassName().substring(getTestClassName().lastIndexOf('.') + 1);
+	}
+
+	/**
      * Returns the long version of the test's class.
      */
     public String getTestClassName()
