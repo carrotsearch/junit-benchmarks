@@ -1,5 +1,6 @@
 package com.carrotsearch.junitbenchmarks;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -47,5 +48,30 @@ public final class Average
         return new Average(
             (sum / (double) values.length) / 1000.0, 
             Math.sqrt(sumSquares / (double) values.length - avg * avg) / 1000.0);
+    }
+
+    static Average median(long [] values)
+    {
+        Arrays.sort(values);
+        long median = middle(values);
+        
+        for (int i = 0; i < values.length; i++) {
+            values[i] = Math.abs(values[i] - median);
+        }
+        
+        Arrays.sort(values);
+        long mad = middle(values);
+        
+        return new Average(median / 1000.0, mad / 1000.0);
+    }
+    
+    private static long middle(long [] values)
+    {
+        if (values.length % 2 == 1) {
+            return values[values.length / 2];
+        }
+        
+        return ( values[values.length / 2]
+               + values[values.length / 2 - 1] ) / 2;
     }
 }
