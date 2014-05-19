@@ -50,7 +50,7 @@ public class TestConcurrentEvaluator2
     @AfterClass
     public static void afterClass() {
         Assert.assertEquals(1, results.size());
-        Assert.assertTrue("Blocked time should be > 0: " + results.get(0).blockedAverage.avg,
-            results.get(0).blockedAverage.avg > 0);
+        Assert.assertTrue("Blocked time should be > 0: " + results.get(0).blockedAverage.location,
+            results.get(0).blockedAverage.location > 0);
     }
 }

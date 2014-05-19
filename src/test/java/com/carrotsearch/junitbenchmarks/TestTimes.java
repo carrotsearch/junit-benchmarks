@@ -37,7 +37,7 @@ public class TestTimes
     {
         assertEquals(1, results.size());
 
-        final double avg = results.get(0).roundAverage.avg;
+        final double avg = results.get(0).roundAverage.location;
         final double delta = 0.02;
         assertTrue(avg > 0.1 - delta && avg < 0.1 + delta);
     }

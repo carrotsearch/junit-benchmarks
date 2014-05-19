@@ -56,9 +56,9 @@ public class TestClock
         final double delta = 0.02;
         assertEquals(3, results.size());
 
-        final double avg1 = results.get("testUserTime").roundAverage.avg;
-        final double avg2 = results.get("testCpuTime").roundAverage.avg;
-        final double avg3 = results.get("testRealTime").roundAverage.avg;
+        final double avg1 = results.get("testUserTime").roundAverage.location;
+        final double avg2 = results.get("testCpuTime").roundAverage.location;
+        final double avg3 = results.get("testRealTime").roundAverage.location;
 
         assertTrue(avg1 > -delta && avg1 < delta);
         assertTrue(avg2 > -delta && avg2 < delta);
