@@ -3,7 +3,7 @@ package com.carrotsearch.junitbenchmarks;
 import java.util.List;
 
 /**
- * Calculate simple statistics mean multiple {@link SingleResult}s.
+ * Calculate simple statistics from multiple {@link SingleResult}s.
  */
 final class Statistics
 {
