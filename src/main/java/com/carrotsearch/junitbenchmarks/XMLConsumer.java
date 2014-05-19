@@ -70,12 +70,12 @@ public final class XMLConsumer extends AutocloseConsumer implements Closeable
         attribute(b, "warmup-rounds", Integer.toString(result.warmupRounds));
 
         b.append("\n\t\t");
-        attribute(b, "round-avg", nf.format(result.roundAverage.avg));
-        attribute(b, "round-stddev", nf.format(result.roundAverage.stddev));
+        attribute(b, "round-avg", nf.format(result.roundAverage.location));
+        attribute(b, "round-stddev", nf.format(result.roundAverage.dispersion));
 
         b.append("\n\t\t");
-        attribute(b, "gc-avg", nf.format(result.gcAverage.avg));
-        attribute(b, "gc-stddev", nf.format(result.gcAverage.stddev));
+        attribute(b, "gc-avg", nf.format(result.gcAverage.location));
+        attribute(b, "gc-stddev", nf.format(result.gcAverage.dispersion));
 
         b.append("\n\t\t");
         attribute(b, "gc-invocations", Long.toString(result.gcInfo.accumulatedInvocations()));

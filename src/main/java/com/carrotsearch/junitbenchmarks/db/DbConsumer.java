@@ -131,10 +131,10 @@ public abstract class DbConsumer extends AutocloseConsumer implements Closeable
             testInsertStatement.setString(NAME, result.getTestMethodName());
             testInsertStatement.setInt(BENCHMARK_ROUNDS, result.benchmarkRounds);
             testInsertStatement.setInt(WARMUP_ROUNDS, result.warmupRounds);
-            testInsertStatement.setDouble(ROUND_AVG, result.roundAverage.avg);
-            testInsertStatement.setDouble(ROUND_STDDEV, result.roundAverage.stddev);
-            testInsertStatement.setDouble(GC_AVG, result.gcAverage.avg);
-            testInsertStatement.setDouble(GC_STDDEV, result.gcAverage.stddev);
+            testInsertStatement.setDouble(ROUND_AVG, result.roundAverage.location);
+            testInsertStatement.setDouble(ROUND_STDDEV, result.roundAverage.dispersion);
+            testInsertStatement.setDouble(GC_AVG, result.gcAverage.location);
+            testInsertStatement.setDouble(GC_STDDEV, result.gcAverage.dispersion);
             testInsertStatement.setInt(GC_INVOCATIONS, (int) result.gcInfo.accumulatedInvocations());
             testInsertStatement.setDouble(GC_TIME, result.gcInfo.accumulatedTime() / 1000.0);
             testInsertStatement.setDouble(TIME_WARMUP, result.warmupTime / 1000.0);

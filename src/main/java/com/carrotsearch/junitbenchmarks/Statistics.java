@@ -7,11 +7,11 @@ import java.util.List;
  */
 final class Statistics
 {
-    public Average gc;
-    public Average evaluation;
-    public Average blocked;
+    public Measures gc;
+    public Measures evaluation;
+    public Measures blocked;
 
-    public static Statistics from(List<SingleResult> results)
+    public static Statistics from(List<SingleResult> results, boolean median)
     {
         final Statistics stats = new Statistics();
         long [] times = new long [results.size()];
@@ -19,17 +19,17 @@ final class Statistics
         // GC-times.
         for (int i = 0; i < times.length; i++)
             times[i] = results.get(i).gcTime();
-        stats.gc = Average.from(times);
+        stats.gc = median ? Measures.median(times) : Measures.mean(times);
 
         // Evaluation-only times.
         for (int i = 0; i < times.length; i++)
             times[i] = results.get(i).evaluationTime();
-        stats.evaluation = Average.from(times);
+        stats.evaluation = median ? Measures.median(times) : Measures.mean(times);
 
         // Thread blocked times.
         for (int i = 0; i < times.length; i++)
             times[i] = results.get(i).blockTime;
-        stats.blocked = Average.from(times);
+        stats.blocked = median ? Measures.median(times) : Measures.mean(times);
 
 
         return stats;

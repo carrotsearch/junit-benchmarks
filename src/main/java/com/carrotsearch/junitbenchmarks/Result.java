@@ -14,9 +14,9 @@ public final class Result
 
     public final int benchmarkRounds, warmupRounds;
     public final long warmupTime, benchmarkTime;
-    public final Average roundAverage;
-    public final Average blockedAverage;
-    public final Average gcAverage;
+    public final Measures roundAverage;
+    public final Measures blockedAverage;
+    public final Measures gcAverage;
     public final GCSnapshot gcInfo;
 
     /**
@@ -30,9 +30,9 @@ public final class Result
      * @param warmupRounds Number of warmup rounds.
      * @param warmupTime Total warmup time, includes benchmarking and GC overhead.
      * @param benchmarkTime Total benchmark time, includes benchmarking and GC overhead.
-     * @param roundAverage Average and standard deviation from benchmark rounds.
-     * @param gcAverage Average and standard deviation from GC cleanups.
-     * @param blockedAverage Average and standard deviation from thread blocks.
+     * @param roundAverage Measures and standard deviation from benchmark rounds.
+     * @param gcAverage Measures and standard deviation from GC cleanups.
+     * @param blockedAverage Measures and standard deviation from thread blocks.
      * @param gcInfo Extra information about GC activity.
      * @param concurrency {@link BenchmarkOptions#concurrency()} setting (or global override).
      */
@@ -42,9 +42,9 @@ public final class Result
         int warmupRounds, 
         long warmupTime, 
         long benchmarkTime,
-        Average roundAverage,
-        Average blockedAverage,
-        Average gcAverage,
+        Measures roundAverage,
+        Measures blockedAverage,
+        Measures gcAverage,
         GCSnapshot gcInfo,
         int concurrency)
     {
