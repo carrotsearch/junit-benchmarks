@@ -1,0 +1,20 @@
+
+WARNINGS
+--------
+
+* Benchmarking is *very* tricky in Java. JIT compilation type, dead code elimination 
+  and other factors may affect your results (and seriously distort conclusions if you
+  don't understand what they are).
+
+* This project is implemented for tracking execution speed of JUnit test methods, so
+  any overhead is included (JUnit runners, test rules, before-after hooks, etc.). If
+  you need to measure nano-time scale, use JMH or Caliper:
+
+  http://openjdk.java.net/projects/code-tools/jmh/
+  https://code.google.com/p/caliper/
+
+* Any @Before or @After hooks WILL BE EXECUTED AS PART OF THE BENCHMARK RUN. More
+  information about why this is the case is provided here:
+
+  https://groups.google.com/forum/#!searchin/junit-benchmarks/before$20after
+
