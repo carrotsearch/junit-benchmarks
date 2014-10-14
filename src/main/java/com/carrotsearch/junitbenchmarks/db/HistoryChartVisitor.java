@@ -1,11 +1,14 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import java.lang.reflect.Method;
-import java.util.*;
-
 import com.carrotsearch.junitbenchmarks.Result;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class HistoryChartVisitor implements IChartAnnotationVisitor
 {
@@ -58,6 +61,7 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
                     GeneratorUtils.getFilePrefix(clazz, ann.filePrefix(), c.getChartsDir()), 
                     clazz.getName(), 
                     ann.labelWith(),
+                    ann.includeCssFile(),
                     c);
                 gen.updateMaxRuns(ann.maxRuns());
                 updateMinMax(clazz.getAnnotation(AxisRange.class), gen);
@@ -89,11 +93,13 @@ class HistoryChartVisitor implements IChartAnnotationVisitor
 
             for (Map.Entry<String, List<Method>> e2 : byPrefix.entrySet())
             {
-                
+
+                BenchmarkHistoryChart annotation = e2.getValue().get(0).getAnnotation(BenchmarkHistoryChart.class);
                 HistoryChartGenerator gen = new HistoryChartGenerator(
                     e2.getKey(), 
                     clazz.getName(),
-                    e2.getValue().get(0).getAnnotation(BenchmarkHistoryChart.class).labelWith(),
+                    annotation.labelWith(),
+                    annotation.includeCssFile(),
                     c);
 
                 for (Method m : e2.getValue())
