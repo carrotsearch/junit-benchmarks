@@ -5,6 +5,7 @@ import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -79,9 +80,21 @@ public final class HistoryChartGenerator
     };
 
     /**
+     * @param consumer the database consumer.
+     * @param filePrefix Prefix for output files.
+     * @param clazzName The target test class (fully qualified name).
+     */
+    public HistoryChartGenerator(
+        String filePrefix, String clazzName, LabelType labelType, DbConsumer consumer)
+    {
+        this(filePrefix, clazzName, labelType, null, consumer);
+    }
+
+    /**
      * @param consumer the database consumer. 
      * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
+     * @param cssFile Stylesheet uri to add to the html file, so one can include its own style.
      */
     public HistoryChartGenerator( 
         String filePrefix, String clazzName, LabelType labelType, String cssFile, DbConsumer consumer)
@@ -108,8 +121,8 @@ public final class HistoryChartGenerator
         template = GeneratorUtils.replaceToken(template, "/*LABELCOLUMN*/", Integer.toString(labelColumns.get(labelType)));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
         String cssFileElement = "";
-        if (cssFile != null){
-            cssFileElement = "<link href=\"" + this.cssFile + "\" media=\"all\" rel=\"stylesheet\" type=\"text/css\"/>";
+        if (cssFile != null && cssFile.length() > 0){
+            cssFileElement = "<link href=\"" + URLEncoder.encode(this.cssFile, "UTF-8") + "\" media=\"all\" rel=\"stylesheet\" type=\"text/css\"/>";
         }
         template = GeneratorUtils.replaceToken(template, "INCLUDECSSFILE", cssFileElement);
 
