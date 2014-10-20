@@ -28,4 +28,11 @@ public @interface BenchmarkHistoryChart
      * Use custom keys for X-axis label. If <code>false</code>, run ID is used.
      */
     LabelType labelWith() default LabelType.RUN_ID;
+
+
+    /**
+     * When filled, adds a stylesheet include with the filename to the generated report.
+     */
+    String includeCssFile() default "";
+
 }

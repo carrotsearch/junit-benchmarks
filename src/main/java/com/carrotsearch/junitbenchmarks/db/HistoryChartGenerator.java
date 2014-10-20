@@ -1,8 +1,11 @@
 package com.carrotsearch.junitbenchmarks.db;
 
-import static com.carrotsearch.junitbenchmarks.db.GeneratorUtils.getColumnIndex;
+import com.carrotsearch.junitbenchmarks.Escape;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,9 +15,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.carrotsearch.junitbenchmarks.Escape;
-import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
-import com.carrotsearch.junitbenchmarks.annotation.LabelType;
+import static com.carrotsearch.junitbenchmarks.db.GeneratorUtils.getColumnIndex;
 
 /**
  * Generate historical view of a given test class (one or more methods). 
@@ -29,7 +30,6 @@ public final class HistoryChartGenerator
         labelColumns.put(LabelType.CUSTOM_KEY, 1);
         labelColumns.put(LabelType.TIMESTAMP, 2);
     }
-    
     /**
      * The consumer.
      */
@@ -63,6 +63,11 @@ public final class HistoryChartGenerator
     private final LabelType labelType;
 
     /**
+     * When not empty a stylesheet element will be filled with this filename for custom styling.
+     */
+    private final String cssFile;
+
+    /**
      * Value holder for row aggregation.
      */
     private static final class StringHolder {
@@ -75,16 +80,29 @@ public final class HistoryChartGenerator
     };
 
     /**
-     * @param consumer the database consumer. 
+     * @param consumer the database consumer.
      * @param filePrefix Prefix for output files.
      * @param clazzName The target test class (fully qualified name).
      */
-    public HistoryChartGenerator( 
+    public HistoryChartGenerator(
         String filePrefix, String clazzName, LabelType labelType, DbConsumer consumer)
+    {
+        this(filePrefix, clazzName, labelType, null, consumer);
+    }
+
+    /**
+     * @param consumer the database consumer. 
+     * @param filePrefix Prefix for output files.
+     * @param clazzName The target test class (fully qualified name).
+     * @param cssFile Stylesheet uri to add to the html file, so one can include its own style.
+     */
+    public HistoryChartGenerator( 
+        String filePrefix, String clazzName, LabelType labelType, String cssFile, DbConsumer consumer)
     {
         this.clazzName = clazzName;
         this.filePrefix = filePrefix;
         this.labelType = labelType;
+        this.cssFile = cssFile;
         this.consumer = consumer;
     }
 
@@ -102,6 +120,11 @@ public final class HistoryChartGenerator
         template = GeneratorUtils.replaceToken(template, "/*MINMAX*/",  GeneratorUtils.getMinMax(min, max));
         template = GeneratorUtils.replaceToken(template, "/*LABELCOLUMN*/", Integer.toString(labelColumns.get(labelType)));
         template = GeneratorUtils.replaceToken(template, "PROPERTIES", getProperties());
+        String cssFileElement = "";
+        if (cssFile != null && cssFile.length() > 0){
+            cssFileElement = "<link href=\"" + URLEncoder.encode(this.cssFile, "UTF-8") + "\" media=\"all\" rel=\"stylesheet\" type=\"text/css\"/>";
+        }
+        template = GeneratorUtils.replaceToken(template, "INCLUDECSSFILE", cssFileElement);
 
         GeneratorUtils.save(htmlFileName, template);
         GeneratorUtils.save(jsonFileName, getData());
