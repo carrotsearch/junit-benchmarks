@@ -2,48 +2,13 @@
 JUnitBenchmarks
 ---------------
 
-Simple Java microbenchmarks written as JUnit tests.
+THE PROJECT HAS BEEN OFFICIALLY DEPRECATED. 
 
-See JavaDoc and http://labs.carrotsearch.com/junit-benchmarks.html for more info.
+There are now other, much better and consistently maintained, alternatives to
+play with microbenchmarks (and macrobenchmarks).
 
+Check out JMH [1].
+And of course [2].
 
-Contributors and bug reports
-----------------------------
-
-Julien Eluard
-Neil Prosser
-Dominik Drzewiecki [github: drzewo]
-Steven Swor [github: sworisbreathing]
-Vladimir Miguro [github: trnl]
-
-
-Development
------------
-
-mvn clean                # Clean the working copy.
-mvn install -DskipTests  # Quick compile, no tests.
-mvn -Prelease            # Release mode (javadocs, sources, zip/tgz bundles, gpg signing).
-                         # Results in: target/*.tgz
-
-Release
--------
-
-mvn -Prelease clean deploy  # Snapshot or release deploy to sonatype [requires proper setup in settings.xml]
-
-
-MySQL Testing
---------------------------
-The MySQL unit test runs an embedded instance of MySQL, listening on a random
-port.  However, the test is disabled under the default build profile, and is
-only executed when the `tests-include-mysql` profile is active.  This is done
-for two reasons:
-
- 1. Running an embedded instance of mysql as part of a maven build requires
-    `mysql-connector-mxj-db-files`, which is around 133MB in size.  By moving
-    the test to a different profile, we are able to skip downloading this (very
-    large) dependency, unless the user explicitly specifies that he wants to use
-    it.
- 2. Running an automated task which opens up a random port can cause problems
-    with firewalls or other applications, and opening up a port introduces
-    potential security problems.  The port is not opened under the default build
-    profile.
+[1] http://openjdk.java.net/projects/code-tools/jmh/
+[2] http://en.wikipedia.org/wiki/So_Long,_and_Thanks_for_All_the_Fish
